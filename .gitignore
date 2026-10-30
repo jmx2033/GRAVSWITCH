@@ -1,0 +1,58 @@
+# ===== Unity 生成物（绝不提交）=====
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+
+# Visual Studio / Rider / VS Code 缓存
+.vs/
+.idea/
+.vscode/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Unity 生成
+sysinfo.txt
+*.apk
+*.aab
+*.unitypackage
+*.app
+
+# 崩溃与日志
+crashlytics-build.properties
+*.log
+
+# ===== 本项目自定义 =====
+
+# 临时试验区：随便试，不进仓库（保留说明文件本身）
+Assets/_Scratch/*
+!Assets/_Scratch/README.md
+
+# 出包产物：走 Release 附件，不进 Git
+Build/
+Builds/
+*.exe
+
+# 大型原始素材：放网盘或 Release，仓库只放导出后的 png/wav
+*.psd
+*.ai
+*.blend
+
+# 本地工具与记忆，不属于交付物
+.workbuddy/
