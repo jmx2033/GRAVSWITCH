@@ -1,12 +1,15 @@
 # ===== Unity 生成物（绝不提交）=====
-[Ll]ibrary/
-[Tt]emp/
-[Oo]bj/
-[Bb]uild/
-[Bb]uilds/
-[Ll]ogs/
-[Uu]ser[Ss]ettings/
-[Mm]emoryCaptures/
+# 重要：下面这些目录规则一律加前导 / ，锚定到仓库根。
+# 裸写 Build/ 会连同 Assets/_Project/Scripts/Build/（卡池模块）一起被忽略，
+# 表现为"文件写了但 git status 里看不到"，极难排查。
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
 
 # Visual Studio / Rider / VS Code 缓存
 .vs/
@@ -44,9 +47,7 @@ crashlytics-build.properties
 Assets/_Scratch/*
 !Assets/_Scratch/README.md
 
-# 出包产物：走 Release 附件，不进 Git
-Build/
-Builds/
+# 出包产物：走 Release 附件，不进 Git（根目录的 Build/ 已在上面忽略）
 *.exe
 
 # 大型原始素材：放网盘或 Release，仓库只放导出后的 png/wav
