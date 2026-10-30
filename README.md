@@ -17,10 +17,25 @@
 
 ---
 
+## 装什么（六个人一模一样）
+
+| 必装 | 验收 |
+|---|---|
+| **Unity `6000.3.7f1`** —— 只装编辑器本体，**不装任何模块**（不装 IL2CPP、不装 Build Support、不装 VS Build Tools） | `Help > About Unity` 版本号六人一字不差 |
+| **Git for Windows** | `git --version` 有输出 |
+| **GitHub 账号**（一人一个）+ 被加成 collaborator 并点过邀请邮件 | 能 `git push` |
+| **Unity ID**（Personal 免费版已激活） | 完成一次 Build 不被 license 拦 |
+
+**只影响顺手，不影响能不能干活**：`7-Zip`（解美术的压缩包）、`VS Code`（策划/美术/程序 3）、`Visual Studio Community`（程序 1、2，只为打断点）。
+
+**明确不装**：第二个 Unity 版本、IL2CPP、VS Build Tools、Git LFS、Rider、任何 Asset Store 插件、新版 Input System、URP、汉化补丁。理由见 `docs/9天实训启动方案.md` §2⑧。
+
+> 首次使用先配 Git（三行，只做一次）：`docs/工程规范.md` §5.0。
+
 ## 怎么跑起来
 
-1. 装 Unity `6000.3.7f1`（只装编辑器即可，Mono 构建支持 Windows 自带）
-2. `git clone` 本仓库，**路径用纯英文、不要中文和空格**
+1. 按上一节装好 Unity 与 Git，并配完 `git config`（`docs/工程规范.md` §5.0）
+2. `git clone https://github.com/jmx2033/FLICKCUT-PROTOCOL.git`，**路径用纯英文、不要中文和空格**（推荐 `D:\git\FLICKCUT-PROTOCOL`）
 3. **不要把项目放在 OneDrive / 坚果云 / 百度网盘同步目录里**——云同步会和 `Library/`、`.meta` 打架
 4. 用 Unity 打开本目录（`Assets/` 所在这一层）
 5. 打开 `Assets/_Project/Scenes/Arena.unity`，按 Play
@@ -55,7 +70,7 @@
 
 ## 冻结时间
 
-- **功能冻结：11/5 22:00**（之后只许 `fix:` / `polish:`）
+- **功能冻结：11/7 23:00**（之后只许 `fix:` / `polish:`）
 - **代码冻结：11/8 23:00**（之后只许打包与素材整理）
 
 ## 文档导航
