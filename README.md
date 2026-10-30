@@ -5,7 +5,7 @@
 
 | 项 | 值 |
 |---|---|
-| 仓库 | https://github.com/jmx2033/FLICKCUT-PROTOCOL |
+| 仓库 | 浏览 <https://github.com/jmx2033/FLICKCUT-PROTOCOL> ／ **克隆与推送一律用 SSH：`git@github.com:jmx2033/FLICKCUT-PROTOCOL.git`** |
 | 引擎 | **Unity `6000.3.7f1`**（六人必须完全一致，含小版本号） |
 | 渲染 | 2D **Built-In**（不用 URP） |
 | 输入 | **Input Manager (Old)**（不是新 Input System） |
@@ -22,9 +22,10 @@
 | 必装 | 验收 |
 |---|---|
 | **Unity `6000.3.7f1`** —— 只装编辑器本体，**不装任何模块**（不装 IL2CPP、不装 Build Support、不装 VS Build Tools） | `Help > About Unity` 版本号六人一字不差 |
-| **Git for Windows** | `git --version` 有输出 |
+| **Git for Windows ≥ 2.40**（版本不必六人一致，`2.55.0.windows.N` 之间的差别只是构建批次） | `git --version` ≥ 2.40，`ssh -V` 有输出 |
 | **GitHub 账号**（一人一个）+ 被加成 collaborator 并点过邀请邮件 | 能 `git push` |
 | **Unity ID**（Personal 免费版已激活） | 完成一次 Build 不被 license 拦 |
+| **SSH 密钥**（贴到自己的 GitHub）——**不是装软件，但六个人一个都不能少** | `ssh -T git@github.com` 返回 `Hi <你自己的账号名>!` |
 
 **只影响顺手，不影响能不能干活**：`7-Zip`（解美术的压缩包）、`VS Code`（策划/美术/程序 3）、`Visual Studio Community`（程序 1、2，只为打断点）。
 
@@ -35,7 +36,9 @@
 ## 怎么跑起来
 
 1. 按上一节装好 Unity 与 Git，并配完 `git config`（`docs/工程规范.md` §5.0）
-2. `git clone https://github.com/jmx2033/FLICKCUT-PROTOCOL.git`，**路径用纯英文、不要中文和空格**（推荐 `D:\git\FLICKCUT-PROTOCOL`）
+2. **配 SSH 并以 SSH 地址克隆**：`git clone git@github.com:jmx2033/FLICKCUT-PROTOCOL.git`
+   先做 `工程规范.md` §5.0 的第 1–4 步（生成密钥 → 贴到 GitHub → `ssh -T` 验证 → 22 端口不通改走 443）。**地址必须是 `git@github.com:` 开头，带 `https://` 的不合规。**
+   路径用纯英文、不要中文和空格（推荐 `D:\git\FLICKCUT-PROTOCOL`）
 3. **不要把项目放在 OneDrive / 坚果云 / 百度网盘同步目录里**——云同步会和 `Library/`、`.meta` 打架
 4. 用 Unity 打开本目录（`Assets/` 所在这一层）
 5. 打开 `Assets/_Project/Scenes/Arena.unity`，按 Play
