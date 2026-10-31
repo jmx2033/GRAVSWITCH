@@ -1,19 +1,18 @@
-# FLICKCUT PROTOCOL（闪切协议）
+# GRAVITY PROTOCOL（重力主题 · 暂名）
 
-> 2D 俯视角动作生存 + 三选一构筑。**别人自动攻击，我们手动蓄力、自己决定切哪一条线。**
-> 按住左键，世界慢下来；松手，沿鼠标方向切出一道刀光，穿过敌群。
+> 2D 俯视角生存。你是场中央的一颗星球，小行星会直线飞进来。
+> **按住 = 开引力。圈越大，吸得越多，也越容易被拽进来的东西撞死。**
+> 你的引力是唯一的武器，也是唯一的危险。
+
+> ⚠️ 本仓库原名 `FLICKCUT-PROTOCOL`（闪切协议），是旧概念的遗留。10/31 启动会公布主题为**重力**，概念已更换，仓库名待改。
 
 | 项 | 值 |
 |---|---|
-| 仓库 | 浏览 <https://github.com/jmx2033/FLICKCUT-PROTOCOL> ／ **克隆与推送一律用 SSH：`git@github.com:jmx2033/FLICKCUT-PROTOCOL.git`** |
-| 引擎 | **Unity `6000.3.7f1`**（六人必须完全一致，含小版本号） |
-| 渲染 | 2D **Built-In**（不用 URP） |
-| 输入 | **Input Manager (Old)**（不是新 Input System） |
-| 构建后端 | **Mono2x**（不装 IL2CPP，不需要 VS Build Tools） |
-| 命名空间 | **`FlickCut`**（所有脚本都加） |
-| Product Name | `FLICKCUT PROTOCOL` |
-| Company Name | `FlickCut` |
-| 交付 | 11/9 现场跑 Windows exe |
+| 仓库 | <https://github.com/jmx2033/FLICKCUT-PROTOCOL> ／ **克隆与推送一律用 SSH：`git@github.com:jmx2033/FLICKCUT-PROTOCOL.git`** |
+| 引擎 | **Godot `4.7.2-stable`**（六人共用同一个 exe，不许各自升级） |
+| 语言 | **只用 GDScript** |
+| 交付 | **11/8 15:00 前把游戏链接发到社团官网** |
+| 开发期 | **10/31 12:00 – 11/8 15:00** |
 
 ---
 
@@ -21,79 +20,67 @@
 
 | 必装 | 验收 |
 |---|---|
-| **Unity `6000.3.7f1`** —— 只装编辑器本体，**不装任何模块**（不装 IL2CPP、不装 Build Support、不装 VS Build Tools） | `Help > About Unity` 版本号六人一字不差 |
-| **Git for Windows ≥ 2.40**（版本不必六人一致，`2.55.0.windows.N` 之间的差别只是构建批次） | `git --version` ≥ 2.40，`ssh -V` 有输出 |
-| **GitHub 账号**（一人一个）+ 被加成 collaborator 并点过邀请邮件 | 能 `git push` |
-| **Unity ID**（Personal 免费版已激活） | 完成一次 Build 不被 license 拦 |
-| **SSH 密钥**（贴到自己的 GitHub）——**不是装软件，但六个人一个都不能少** | `ssh -T git@github.com` 返回 `Hi <你自己的账号名>!` |
+| **Godot `4.7.2-stable`** —— 用群里发的那一个 exe，**不要自己去官网下**（官网可能已经是 4.8，`.tscn` 有版本标记，4.8 存过的 4.7 打不开） | 打开后 `帮助 > 关于` 版本号六人一字不差 |
+| **导出模板** —— 编辑器 → 管理导出模板 → 下载 4.7.2，**Windows 与 Web 各一份** | 能成功导出一次空包 |
+| **Git for Windows ≥ 2.40** | `git --version` ≥ 2.40 |
+| **GitHub 账号**（一人一个）+ 已被加成 collaborator | 能 `git push` |
+| **SSH 密钥**（贴到自己的 GitHub） | `ssh -T git@github.com` 返回 `Hi <你自己的账号名>!` |
 
-**只影响顺手，不影响能不能干活**：`7-Zip`（解美术的压缩包）、`VS Code`（策划/美术/程序 3）、`Visual Studio Community`（程序 1、2，只为打断点）。
+**不需要装**：Unity、Unity Hub、Unity ID、Visual Studio、VS Build Tools、任何插件。这一栏比必装栏更省时间。
 
-**明确不装**：第二个 Unity 版本、IL2CPP、VS Build Tools、Git LFS、Rider、任何 Asset Store 插件、新版 Input System、URP、汉化补丁。理由见 `docs/9天实训启动方案.md` §2⑧。
-
-> 首次使用先配 Git（三行，只做一次）：`docs/工程规范.md` §5.0。
+> 首次使用先配 Git：`docs/工程规范.md` §5.0。
 
 ## 怎么跑起来
 
-1. 按上一节装好 Unity 与 Git，并配完 `git config`（`docs/工程规范.md` §5.0）
+1. 装好 Godot 与 Git，配完 `git config`（`docs/工程规范.md` §5.0）
 2. **配 SSH 并以 SSH 地址克隆**：`git clone git@github.com:jmx2033/FLICKCUT-PROTOCOL.git`
-   先做 `工程规范.md` §5.0 的第 1–4 步（生成密钥 → 贴到 GitHub → `ssh -T` 验证 → 22 端口不通改走 443）。**地址必须是 `git@github.com:` 开头，带 `https://` 的不合规。**
-   路径用纯英文、不要中文和空格（推荐 `D:\git\FLICKCUT-PROTOCOL`）
-3. **装提交信息钩子**：`bash Tools/ci/install-hooks.sh`（一次即可，只用 Git Bash，**不需要装 Python**）
-4. **不要把项目放在 OneDrive / 坚果云 / 百度网盘同步目录里**——云同步会和 `Library/`、`.meta` 打架
-5. 用 Unity 打开本目录（`Assets/` 所在这一层）
-6. 打开 `Assets/_Project/Scenes/Arena.unity`，按 Play
-
-> 第一次打开时 Unity 会自动生成 `Library/`、`Packages/`、`ProjectSettings/`。
-> **首次提交顺序：先 `.gitignore` 等配置，再提交 Unity 项目**（见 `docs/9天实训启动方案.md` §2④），否则 `Library/` 会被一起推上去。
+   路径用纯英文、不要中文和空格（推荐 `D:\git\GRAVITY`）
+3. **不要把项目放在 OneDrive / 坚果云 / 百度网盘同步目录里**——云同步会和 `.godot/` 打架
+4. 双击 `project.godot`，Godot 会打开工程
+5. F5 运行
 
 ## 怎么出包
 
-用共用构建脚本 `Assets/Editor/DSHBuild.cs`（命令行 `-executeMethod FlickCut.DSHBuild.BuildWindows`），**不要自己另写一套**。
-
-- **第一次用先在编辑器里点一次** `Tools > 闪切 > 出一份 Windows 包`，确认能过；过了再记命令行参数（脚本头部注释里写着）
-- `Build Settings` 里必须已勾选 `Arena.unity`，否则脚本会直接报错退出——这是故意的，省得出一份空包还以为成功
-- 出包在**普通终端**里跑。受限沙箱会因 WMI / named pipe 被禁而失败，报 `Upm-32312`，看起来像"UPM 坏了"
-- 拷贝给别人时，**整个 `Build/` 目录一起拷**。只拷 exe 会"双击没反应"（缺 `UnityPlayer.dll`、`*_Data/`、`MonoBleedingEdge/`、`D3D12/`）
-- 参考基线：空场景 89 MB / 13.5 秒
+- **先确认导出模板已下载**（这是第一次出包唯一会卡住的地方）
+- Windows：`项目 > 导出 > Windows Desktop > 导出项目`，输出到 `build/win/`
+- 拷贝给别人时**整个目录一起打包**，只发 exe 会缺 `pck`
+- 出包用普通终端，不要在受限沙箱里跑
 
 ## 分工（6 人）
 
 | 人 | 角色 | 负责 |
 |---|---|---|
-| 珈百璃 | 程序 1 · 技术负责人 | 移动/蓄力/闪切判定、`GameFlow`、主场景 |
-| 叶一谦 | 程序 2 · 系统 | 敌人、经验升级、结算，4 张卡数值与文案 |
-| 落叶归粥 | 程序 3 · 工具/测试 | 场景、预制体、HUD 绑定、每日出包、bug 记录 |
-| _风扇 | 美术 A | 玩家 / 敌人造型、切割刀光 |
-| 三尺 | 美术 B | 场地、HUD、卡面、结算页、色彩规范 |
-| 马权 | 策划 | P 级裁决、验收脚本、试玩组织、演示编排 |
+| 珈百璃 | 程序 1 · 技术负责人 | 引力场与蓄力（T2/T4/T8）、主场景、出包 |
+| 叶一谦 | 程序 2 · 系统 | 小行星生成与飞行、碰撞与血量、互撞判定 |
+| 落叶归粥 | 程序 3 · 工具/测试 | HUD、结算页、重开、每日出包、bug 记录 |
+| _风扇 | 美术 A | 玩家星球、小行星、被吸进来的轨迹表现 |
+| 三尺 | 美术 B | 场地、HUD、结算页、色彩规范 |
+| 马权 | 策划 | 范围裁决、验收脚本、试玩组织、路演编排 |
+
+> 落叶归粥只会 Python —— **GDScript 就是 Python 近亲**，这次他能真正写代码，不再只是拖引用。
 
 ## 四条团队纪律
 
-1. **每晚 23:00 前必须 push，没 push 等于没做。** GitHub 是唯一真相源
-2. **P0 没全绿不碰 P1，P1 没全绿不碰 P2。** 报不出编号的活先问策划
+1. **每晚 23:00 前必须 push，没 push 等于没做。**
+2. **P0 没全绿不碰 P1。** 报不出编号的活先问策划
 3. **不许用"我这边能跑"当答复。** 要能跑别人的包
-4. **代码只走 PR 进 `main`，不直推。** 八步流程（切分支 → 写 → commit → push → PR → CI → review → 删分支 → pull）见 `docs/工程规范.md` §5.9；**CI 全绿才能合并**，检查项见 §5.10
+4. **代码只走 PR 进 `main`，不直推。** 八步流程见 `docs/工程规范.md` §5.9
 
 ## 冻结时间
 
-- **功能冻结：11/7 23:00**（之后只许 `fix:` / `polish:`）
-- **代码冻结：11/8 23:00**（之后只许打包与素材整理）
+- **功能冻结：11/7 22:00**（之后只许 `fix:` / `polish:`）
+- **代码冻结：11/8 10:00**（之后只出包，不动代码）
+- **上传完成：11/8 13:00** / **发到官网：11/8 15:00**
 
 ## 文档导航
 
 | 文件 | 用途 |
 |---|---|
-| `docs/00_范围与不做清单.md` | **最高优先级**，P0/P1/P2 与不做清单 |
-| `docs/01_验收清单.md` | 6 条演示脚本，验收就按这个演 |
-| `docs/02_日程与分工.md` | 逐日安排 |
-| `docs/03_接口契约.md` | 三个程序之间的调用约定 |
-| `docs/04_数值表.md` | 从原型抄来的标准答案 |
-| `docs/工程规范.md` | 命名 / 存放 / 代码 / Git 细则，**全员必读** |
-| `docs/9天实训启动方案.md` | 完整方案（背景、风险、AI 协作规则） |
+| `docs/00_实训硬要求.md` | **最高优先级**：启动会原文、真实工时、里程碑、交付方式 |
+| `docs/01_重力_核心机制与切片.md` | 机制、数值、P0/P1、任务拆分、试玩阈值 |
+| `docs/工程规范.md` | 命名 / 存放 / 代码 / Git 细则（Unity 相关章节待改） |
 | `docs/06_试玩与反馈记录.md` | 试玩反馈台账 |
-| `docs/07_答辩大纲.md` | 3 分钟演示脚本与"代码是你写的吗"怎么答 |
+| `docs/07_答辩大纲.md` | 3 分钟路演脚本（内容待改） |
 | `docs/08_以后再说.md` | 新想法丢这里，会上不讨论 |
-| `docs/05_会议记录/` | 每次开会记一份，改了什么、定了什么 |
-| `docs/招募文案.md` | **已失效留档**：队伍已满 6 人，不再招 |
-| `references/` | 前置浏览器原型与设计文档，**不参与构建** |
+| `docs/05_会议记录/` | 每次开会记一份 |
+| `references/` | 旧原型与旧设计文档，**不参与构建** |
