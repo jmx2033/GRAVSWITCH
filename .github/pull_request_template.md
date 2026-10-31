@@ -1,9 +1,10 @@
-<!-- 标题格式：<type>(<scope>): 描述 [P编号]  例：feat(slash): 三段刃形按蓄力进度切换 [P1-1] -->
-<!-- type: feat / fix / art / docs / chore / refactor / polish（共 7 个，冻结期只用 fix 与 polish）；scope: charge slash enemy ui build repo levelup -->
+<!-- 标题格式：<type>(<scope>): 描述 [P编号]  例：feat(gravity): 进入重力区后角色贴天花板 [P0-2] -->
+<!-- type: feat / fix / art / docs / chore / refactor / polish（共 7 个，冻结期只用 fix 与 polish） -->
+<!-- scope: player gravity level ui build repo（共 6 个，仓库与文档类一律用 repo） -->
 
 ## 改了什么
 
-<!-- 一句话。写"三段刃形按蓄力进度切换"，不要写"更新" -->
+<!-- 一句话。写"重力区进入后方向平滑转向 0.12 秒"，不要写"更新" -->
 
 ## 怎么验证
 
@@ -15,13 +16,13 @@
 
 ## 自查（打勾再提交）
 
-- [ ] 只改了属于自己的文件（归属见 `docs/03_接口契约.md`）
-- [ ] 没有改 `Arena.unity`（除非你是珈百璃）
-- [ ] 没有 `public` 字段，用的是 `[SerializeField] private`
-- [ ] public 方法都有中文 `/// <summary>`
-- [ ] 没有直接写 `Time.timeScale`，没有直接扣血
-- [ ] 没有用 `FindObjectOfType` / `FindObjectsOfType`（Unity 6 已废弃）
-- [ ] 没有引入 URP / 新 Input System / Cinemachine / 第三方包
-- [ ] 单文件没超过 200 行（超了已在描述里说明理由）
-- [ ] `git add` 之前看过 `git status`，没有 `Library/`、`.csproj`、`_Scratch/`
+- [ ] 只改动自己负责的模块（分工见 `README.md`「分工」一表）
+- [ ] 没有改别人的 `.tscn` / `.tres`（要改先说过）
+- [ ] **起跳方向写的是 `up_direction * JUMP_SPEED`，没有写死 `velocity.y`**
+- [ ] 没有直接改 `config.gd` 里的跳跃参数（只有珈百璃能改）
+- [ ] 缩进全是 Tab，没有混空格
+- [ ] 没有用 `get_node("../../..")` 这种深路径，跨节点用 signal
+- [ ] 没有引入 addon / 第三方插件 / shader
+- [ ] 单文件没超过 150 行（超了已在描述里说明理由）
+- [ ] `git add` 之前看过 `git status`，没有 `.godot/`、`build/`、`.exe`、`_scratch/`
 - [ ] **这段代码我能口述"输入什么、输出什么、谁调用它"**

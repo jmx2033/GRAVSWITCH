@@ -1,59 +1,41 @@
-# ===== Unity 生成物（绝不提交）=====
-# 重要：下面这些目录规则一律加前导 / ，锚定到仓库根。
-# 裸写 Build/ 会连同 Assets/_Project/Scripts/Build/（卡池模块）一起被忽略，
+# ===== Godot 生成物（绝不提交）=====
+# 目录规则一律加前导 / 锚定仓库根。裸写 build/ 会连带忽略任何叫 build 的代码目录，
 # 表现为"文件写了但 git status 里看不到"，极难排查。
-/[Ll]ibrary/
-/[Tt]emp/
-/[Oo]bj/
+/.godot/
 /[Bb]uild/
-/[Bb]uilds/
-/[Ll]ogs/
-/[Uu]ser[Ss]ettings/
-/[Mm]emoryCaptures/
+/[Ee]xport/
 
-# Visual Studio / Rider / VS Code 缓存
-.vs/
-.idea/
-.vscode/
-*.csproj
-*.unityproj
-*.sln
-*.suo
-*.tmp
-*.user
-*.userprefs
-*.pidb
-*.booproj
-*.svd
-*.pdb
-*.mdb
-*.opendb
-*.VC.db
-
-# Unity 生成
-sysinfo.txt
+# ===== 出包产物 =====
+# 走 Release 附件或网盘，不进 Git（根目录 build/ 已在上面忽略）
+*.exe
+*.pck
+*.zip
 *.apk
-*.aab
-*.unitypackage
-*.app
 
-# 崩溃与日志
-crashlytics-build.properties
+# ===== 编辑器 / 系统垃圾 =====
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.swp
+*.bak
+
+# VS Code / Rider / JetBrains 缓存
+.vscode/
+.idea/
+
+# ===== 崩溃与日志 =====
 *.log
+godot.log
 
 # ===== 本项目自定义 =====
 
-# 临时试验区：随便试，不进仓库（保留说明文件本身）
-Assets/_Scratch/*
-!Assets/_Scratch/README.md
-
-# 出包产物：走 Release 附件，不进 Git（根目录的 Build/ 已在上面忽略）
-*.exe
-
-# 大型原始素材：放网盘或 Release，仓库只放导出后的 png/wav
+# 大型原始素材：放网盘，仓库只放导出后的 png/wav
+# （Godot 不吃 .psd / .aseprite 源文件，只吃导出的 png）
 *.psd
 *.ai
 *.blend
+*.aseprite
 
 # 本地工具与记忆，不属于交付物
 .workbuddy/
@@ -61,3 +43,9 @@ Assets/_Scratch/*
 # Python 检查器的字节码缓存（Tools/ci 本地自测时生成）
 __pycache__/
 *.pyc
+
+# ===== 以下文件必须提交，别加进来 =====
+# project.godot        工程的入口，没有它别人打不开
+# export_presets.cfg   导出预设，六个人共用同一套
+# *.import             每个资源的导入设置，删了会重新导入并产生大量无关改动
+# *.uid（Godot 4.4+）  脚本的稳定 ID，删了场景里的引用会断

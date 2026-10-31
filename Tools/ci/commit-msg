@@ -15,14 +15,14 @@ fail() {
   printf '  本次信息：%s\n' "$subject" >&2
   printf '  正确格式：<type>(<scope>): <描述> [P编号]\n' >&2
   printf '  type  ∈ feat/fix/art/docs/chore/refactor/polish\n' >&2
-  printf '  scope ∈ charge/slash/enemy/ui/build/repo/levelup\n' >&2
-  printf '  示例：feat(slash): 三段刃形按蓄力进度切换 [P1-1]\n' >&2
+  printf '  scope ∈ player/gravity/level/ui/build/repo\n' >&2
+  printf '  示例：feat(gravity): 重力区进入后方向平滑转向 [P0-2]\n' >&2
   printf '  说明：docs/工程规范.md §5.2；想改规则先找策划，不要用 --no-verify 绕过\n\n' >&2
   exit 1
 }
 
 types='feat|fix|art|docs|chore|refactor|polish'
-scopes='charge|slash|enemy|ui|build|repo|levelup'
+scopes='player|gravity|level|ui|build|repo'
 
 printf '%s' "$subject" | grep -Eq "^($types)\(($scopes)\): .+" \
   || fail '格式不符（注意 type 与 scope 都要在表里，冒号后有一个空格）'

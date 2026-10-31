@@ -61,16 +61,16 @@ namespace FlickCut
 class TestCommitSubject(unittest.TestCase):
     def test_valid(self):
         valid = [
-            "feat(slash): 三段刃形按蓄力进度切换 [P1-1]",
-            "fix(enemy): 敌人死亡后经验球未回收 [P0-4]",
-            "art(ui): 卡面描边加粗到 2px [P1-5]",
+            "feat(level): 教学关重力区改成朝上 [P1-1]",
+            "fix(level): 出界后没有触发死亡 [P0-3]",
+            "art(ui): 重力区色块描边加粗到 2px [P1-3]",
             "docs(repo): 补全员必装清单",
             "chore(repo): 忽略 Library 与 _Scratch",
-            "refactor(charge): 抽出蓄力进度计算 [P0-2]",
-            "polish(ui): 卡面描边加粗到 2px [P1-5]",
-            "polish(charge): 蓄力音效尾巴缩短 [P1-4]",
+            "refactor(player): 抽出重力方向插值 [P0-2]",
+            "polish(ui): 重力区色块描边加粗到 2px [P1-3]",
+            "polish(player): 翻转音效尾巴缩短 [P1-4]",
             "fix(repo): .gitignore 的 Build 规则误伤模块",
-            "feat(slash): 三段刃形 [P1-1] (#12)",
+            "feat(level): 教学关重力区 [P1-1] (#12)",
         ]
         for s in valid:
             self.assertEqual(validate_subject(s), [], f"不应报错：{s}")
@@ -80,13 +80,13 @@ class TestCommitSubject(unittest.TestCase):
             "update",
             "改了一下",
             "feat: 没有 scope",
-            "feat(slash): 缺 P 编号",
-            "feat(slash):改前没空格 [P1-1]",
-            "feat(slash): 最终版 [P1-1]",
-            "fix(enemy): 修好了。 [P0-4]",
+            "feat(level): 缺 P 编号",
+            "feat(level):改前没空格 [P1-1]",
+            "feat(level): 最终版 [P1-1]",
+            "fix(level): 修好了。 [P0-3]",
             "feat(other): scope 不在表里 [P0-1]",
-            "feat(slash): 短 [P1-1]",
-            "polish(ui): 卡面描边加粗到 3px",
+            "feat(level): 短 [P1-1]",
+            "polish(ui): 重力区色块描边加粗到 3px",
             "",
         ]
         for s in invalid:
@@ -94,7 +94,7 @@ class TestCommitSubject(unittest.TestCase):
 
     def test_merge_and_revert_skipped(self):
         self.assertEqual(validate_subject("Merge branch 'main' into x"), [])
-        self.assertEqual(validate_subject('Revert "feat(slash): x [P1-1]"'), [])
+        self.assertEqual(validate_subject('Revert "feat(level): x [P1-1]"'), [])
 
 
 class TestPublicField(unittest.TestCase):
@@ -209,7 +209,7 @@ class TestRepoRules(unittest.TestCase):
         lower = self.touch("Assets/_Project/Scripts/Enemy/chaser.cs")
         chinese = self.touch("Assets/_Project/Art/Player/玩家.png")
         good = self.touch("Assets/_Project/Art/Player/spr_player_base.png")
-        good2 = self.touch("Assets/_Project/Audio/SFX/sfx_slash_tier1.wav")
+        good2 = self.touch("Assets/_Project/Audio/SFX/sfx_flip.wav")
         paths = [final, renew, lower, chinese, good, good2]
         flagged = {i.path for i in check_naming(self.root, paths)}
         self.assertEqual(flagged, {final, lower, chinese})

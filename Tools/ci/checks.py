@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""闪切协议仓库 CI 静态检查器。
+"""GRAVSWITCH 仓库 CI 静态检查器。
 
 只依赖 Python 标准库，不跑 Unity、不需要许可证。
 检查对象是「已入库的文件」（git ls-files），不是工作区里的临时文件。
@@ -8,7 +8,7 @@
 用法：
     python Tools/ci/checks.py all                      # 全部静态检查
     python Tools/ci/checks.py hygiene|meta|naming|csharp|links
-    python Tools/ci/checks.py commit --message "feat(slash): 三段刃形 [P1-1]"
+    python Tools/ci/checks.py commit --message "feat(gravity): 重力区转向 [P0-2]"
     python Tools/ci/checks.py commit --file .git/COMMIT_EDITMSG
     python Tools/ci/checks.py commits --range origin/main..HEAD
 
@@ -34,7 +34,7 @@ WARN_BYTES = 10 * 1024 * 1024
 # polish = 冻结期（11/7 23:00 后）只改表现、不改逻辑的提交，README 与启动方案 §6.2 都用到这个词，
 # 所以它必须在这里合法，否则冻结第一天所有人的提交都会被自家钩子拦下。
 COMMIT_TYPES = ("feat", "fix", "art", "docs", "chore", "refactor", "polish")
-COMMIT_SCOPES = ("charge", "slash", "enemy", "ui", "build", "repo", "levelup")
+COMMIT_SCOPES = ("player", "gravity", "level", "ui", "build", "repo")
 # scope=repo 是仓库与工程维护，不属于 P0/P1/P2 功能分级，因此不要求 P 编号。
 P_TAG_EXEMPT_SCOPES = {"repo"}
 P_TAG_RE = re.compile(r"\[(?:P[012]-\d+|P0-lite)\]")
@@ -138,7 +138,7 @@ def validate_subject(subject: str) -> list[str]:
             "格式必须是 <type>(<scope>): <描述> [P编号]，"
             "type ∈ " + "/".join(COMMIT_TYPES) + "，"
             "scope ∈ " + "/".join(COMMIT_SCOPES) +
-            "（例：feat(slash): 三段刃形按蓄力进度切换 [P1-1]）"
+            "（例：feat(gravity): 重力区进入后方向平滑转向 [P0-2]）"
         ]
 
     body = m.group("body")
@@ -347,7 +347,7 @@ def emit(issues: list[Issue]) -> tuple[int, int]:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="闪切协议仓库静态检查")
+    ap = argparse.ArgumentParser(description="GRAVSWITCH 仓库静态检查")
     ap.add_argument("mode", choices=list(CHECKS) + ["all", "commit", "commits"])
     ap.add_argument("--message")
     ap.add_argument("--file")

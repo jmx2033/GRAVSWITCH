@@ -34,7 +34,7 @@ if bash "$hooks/commit-msg" "$tmp" >/dev/null 2>&1; then
 fi
 printf '自检 1/3 通过：非法信息「update」已被拦截\n'
 
-printf 'feat(slash): 三段刃形按蓄力进度切换 [P1-1]\n' > "$tmp"
+printf 'feat(gravity): 重力区进入后方向平滑转向 [P0-2]\n' > "$tmp"
 if ! bash "$hooks/commit-msg" "$tmp" >/dev/null 2>&1; then
   printf '自检失败：合规提交信息被误拦截\n' >&2
   exit 1
