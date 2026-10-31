@@ -1,6 +1,6 @@
 name: CI
 
-# 只做静态检查，不在云端编译 Unity（Actions 机器没有 Unity 许可证）。
+# 只做静态检查，不在云端运行 Godot（Actions 机器没装引擎，也没必要）。
 # 触发：对 main 的 PR、main 上的推送，以及手动触发。
 
 on:
