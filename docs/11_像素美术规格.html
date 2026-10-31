@@ -265,6 +265,23 @@
 
 <p>全小写下划线，<b>不加版本号</b>（<code>_v2</code>、<code>_final</code>、<code>_new</code> 一律不许）。改了就覆盖，历史在 Git 里。</p>
 
+<h3>文件放哪个目录（美术只往 Art/ 里放）</h3>
+
+<table>
+  <tr><th>路径</th><th>放什么</th><th>谁维护</th></tr>
+  <tr><td class="num">Art/player/</td><td>spr_player.png</td><td>美术</td></tr>
+  <tr><td class="num">Art/tiles/</td><td>tile_cave.png · tile_spike.png</td><td>美术</td></tr>
+  <tr><td class="num">Art/bg/</td><td>bg_cave.png</td><td>美术</td></tr>
+  <tr><td class="num">Art/ui/</td><td>ui_button.png · icon_arrow_up.png</td><td>美术</td></tr>
+  <tr><td class="num">Art/fonts/</td><td>SmileySans.ttf</td><td>美术</td></tr>
+  <tr><td class="num">Scenes/</td><td>game.tscn · player.tscn · level_0…3.tscn</td><td>程序</td></tr>
+  <tr><td class="num">Scripts/</td><td>core/ player/ level/ ui/</td><td>程序</td></tr>
+  <tr><td class="num">Audio/sfx/</td><td>sfx_jump.wav · sfx_die.wav</td><td>程序</td></tr>
+  <tr><td class="num">project.godot · export_presets.cfg</td><td>工程根目录，<b>必须提交</b></td><td>技术负责人</td></tr>
+</table>
+
+<p><b>三条不许</b>：不在 <code>Art/</code> 之外放图；不建「新建文件夹」这种默认名；不把 psd / aseprite 源文件放进仓库（源文件自己留着，仓库只放导出的 png）。</p>
+
 <p><b>导出</b>：PNG、透明背景、1:1 原始像素、不加锐化不加抗锯齿不加滤镜、透明区必须是真透明（不要填白）。<span class="bad">不要用 JPG</span>——JPG 会把边缘糊成噪点。</p>
 
 <h2>八、UI 与字体（11/2 用，但现在就要知道）</h2>
@@ -321,6 +338,14 @@
 <h2>十一、玩法与画面（不清楚从哪下手就先看这节）</h2>
 
 <p>前面十节讲规格，这节讲<strong>这游戏玩起来是什么样、画面里该有什么</strong>。</p>
+
+<h3>0. 重力是这游戏唯一的机制，不是机关之一</h3>
+
+<p>四关里每一关都有重力区，而且重力区是画面里最大的一块彩色区域——不是偶尔出现的道具。玩家所有判断都绕着一句话转：<b>我现在被往哪个方向拽。</b>尖刺、坑、平台、可动平台都只是这条规则的应用，它们本身不带新规则。</p>
+
+<div class="callout">
+所以：紫色和那个白色箭头要画得足够清楚。<b>它是整个游戏最重要的一个视觉符号，比角色还重要。</b>角色画糊了玩家只是看不清自己，重力区画糊了玩家不知道该往哪走。
+</div>
 
 <h3>1. 玩家在一关里只做五件事</h3>
 
