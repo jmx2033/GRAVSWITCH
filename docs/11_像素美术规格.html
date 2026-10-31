@@ -318,6 +318,83 @@
   <li><b>不许画「暗洞穴」。</b>不画光源、不画阴影渐变、不画雾。纵深靠三档明度，不靠光。</li>
 </ol>
 
+<h2>十一、玩法与画面（不清楚从哪下手就先看这节）</h2>
+
+<p>前面十节讲规格，这节讲<strong>这游戏玩起来是什么样、画面里该有什么</strong>。</p>
+
+<h3>1. 玩家在一关里只做五件事</h3>
+
+<table>
+  <tr><th>步</th><th>玩家做什么</th><th>你要画的东西</th></tr>
+  <tr><td class="num">1</td><td>按 ← → 在地上走</td><td>地面砖，朝上那一面有 3px 高光边</td></tr>
+  <tr><td class="num">2</td><td>按空格跳上 2 格高的台阶</td><td>台阶的侧壁 + 顶面</td></tr>
+  <tr><td class="num">3</td><td>从台阶顶跨过 4 格宽的坑</td><td>坑里<b>什么都不画</b>，露出最暗的背景</td></tr>
+  <tr><td class="num">4</td><td>走进紫色区域，人被推向天花板</td><td>半透明紫底 + 一个白色朝上箭头</td></tr>
+  <tr><td class="num">5</td><td>沿着天花板走到发光的门</td><td>门洞；天花板内表面也要有一条 3px 高光边</td></tr>
+</table>
+
+<div class="callout">
+<b>全程只有两个动作：左右走、跳。</b>没有攻击、没有道具、没有血量、没有敌人、没有计分。玩家只有一种死法：掉进坑里。所以也不需要「受伤」素材。
+</div>
+
+<p><b>教学关的实际布局</b>（这就是要画的第 0 关，20×11 格，一屏）：</p>
+
+<svg viewBox="20 50 640 352" width="100%" style="display:block;border:1px solid #E7E4E0;border-radius:8px;max-width:640px" xmlns="http://www.w3.org/2000/svg">
+  <rect x="20" y="50" width="640" height="352" fill="#100D14"/>
+  <rect x="52" y="82" width="576" height="10" fill="#1C1720"/>
+  <path d="M60,82 L200,82 L186,140 L120,158 L74,128 Z" fill="#1C1720"/>
+  <path d="M230,82 L400,82 L386,132 L300,148 L246,110 Z" fill="#1C1720"/>
+  <rect x="436" y="82" width="192" height="288" fill="#9B7FD4" fill-opacity="0.22" stroke="#D9C7FF" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <path d="M532,150 L510,196 L524,196 L524,258 L540,258 L540,196 L554,196 Z" fill="#D9C7FF" fill-opacity="0.85"/>
+  <g fill="#2E2530">
+    <rect x="20" y="50" width="640" height="32"/>
+    <rect x="20" y="82" width="32" height="288"/>
+    <rect x="628" y="82" width="32" height="288"/>
+    <rect x="116" y="306" width="96" height="64"/>
+    <rect x="20" y="370" width="192" height="32"/>
+    <rect x="340" y="370" width="320" height="32"/>
+  </g>
+  <g fill="#6B5560">
+    <rect x="20" y="79" width="640" height="3"/>
+    <rect x="116" y="306" width="96" height="3"/>
+    <rect x="20" y="370" width="192" height="3"/>
+    <rect x="340" y="370" width="320" height="3"/>
+  </g>
+  <g fill="#4A3B45">
+    <rect x="116" y="309" width="96" height="6"/>
+    <rect x="20" y="373" width="192" height="6"/>
+    <rect x="340" y="373" width="320" height="6"/>
+  </g>
+  <rect x="599" y="86" width="26" height="24" fill="#100D14" stroke="#FFF2E0" stroke-width="2"/>
+  <rect x="607" y="94" width="10" height="8" fill="#FFF2E0" fill-opacity="0.55"/>
+  <rect x="58" y="342" width="20" height="28" rx="2" fill="#7FE8FF" stroke="#3A8FA8" stroke-width="1.5"/>
+  <rect x="70" y="350" width="3" height="4" fill="#100D14"/>
+</svg>
+
+<p style="font-size:12px;color:#8A8F98">青 = 玩家（20×28），紫 = 重力区（箭头朝上），发光的框 = 终点，中间那片空洞就是坑。远景那两块暗色是从洞顶垂下来的岩体，不是平台，不能站。</p>
+
+<h3>2. 环境背景：一个封闭的洞穴横截面</h3>
+
+<ul>
+  <li><b>没有天空、没有地平线、没有云、没有远景山。</b>画面四边都是岩壁，玩家看到的是洞穴内部的一刀切面。</li>
+  <li>洞腔内部填 <code>#100D14</code>，上面叠 <code>#1C1720</code> 的岩体剪影（从洞顶往下垂的形状）表示纵深。</li>
+  <li>纵深只有四档：<code>#100D14</code> 洞腔 → <code>#1C1720</code> 远景岩体 → <code>#2E2530</code> 砖块 → <code>#4A3B45</code> + <code>#6B5560</code> 能站的表面。</li>
+  <li><b>不画</b>：光源、光晕、阴影渐变、雾、熔岩、水滴、飘尘、粒子。</li>
+</ul>
+
+<h3>3. 风格：一个方块最多三档色</h3>
+
+<table>
+  <tr><th>判据</th><th>值</th></tr>
+  <tr><td>1 个美术像素</td><td>= 1 个屏幕像素，不做「先画大再缩小」</td></tr>
+  <tr><td>一个 32×32 方块内的明度</td><td class="num">最多 3 档</td></tr>
+  <tr><td>角色 20×28 的细节量</td><td>1 个眼睛点 + 2–3 层身体色 + 手脚各 2–3 像素</td></tr>
+  <tr><td>外轮廓</td><td>不描 1px 黑边，用明度差分离（黑边在暗背景里等于消失）</td></tr>
+  <tr><td>半透明</td><td>只允许重力区那一层紫色</td></tr>
+</table>
+
+<p>640×360 在 1080p 上是 3 倍整数放大，一个美术像素变成 3×3 的方块。细节多画一档，投到墙上就是一团噪点；两个人各画一套，风格也会分叉。</p>
+
 <footer>
 GRAVSWITCH · 像素美术规格 · 2026-10-31<br>
 配套文档：<code>01_重力_核心机制与切片.md</code> 第五节（跳跃参数）、<code>03_四关设计.md</code>（关卡布局与符号表）
