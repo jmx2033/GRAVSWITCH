@@ -62,18 +62,21 @@
 <h1>GRAVSWITCH · 像素美术规格</h1>
 <div class="sub">重力主题 2D 平台跳跃解谜 · Godot 4.7.2 · 8 天实训项目 · 这份看完就能开工</div>
 
-<h2>一、三句话定调</h2>
+<h2>一、四句话定调</h2>
 
-<p>主题是<b>地心间隙里的山洞</b>。这个主题成立，而且是 8 天里最省钱的选择。但有三条必须先说清。</p>
+<p>主题是<b>地心洞穴的间隙</b>——地壳深处裂开的一条缝，上下都是岩壁。这个主题成立，而且是 8 天里最省钱的选择。但有四条必须先说清。</p>
 
 <h3>1. 做「亮的洞穴」，不做「暗的洞穴」</h3>
-<p>洞穴天然让人想到黑暗，但 2D 像素做光照（点光源、暗角、雾气）成本极高，而且会直接破坏玩法——<b>玩家必须一眼看清重力区往哪个方向</b>。所以纵深靠<b>三档色调分层</b>：近景亮、中景中、远景暗。不画光。</p>
+<p>洞穴天然让人想到黑暗，但 2D 像素做光照（点光源、暗角、雾气）成本极高，而且会直接破坏玩法——<b>玩家必须一眼看清磁场往哪个方向</b>。所以纵深靠<b>三档色调分层</b>：近景亮、中景中、远景暗。不画光。</p>
 
-<h3>2. 做「色块洞穴」，不做「写实岩石」</h3>
-<p>岩石纹理是最容易画成墙纸的东西：拼十格就看出重复。地形只用 6 种 tile，靠<b>轮廓不齐 + 三档明度</b>区分，不靠纹理细节。这样既省钱又好看。</p>
+<h3>2. 做「色块洞穴」，不做「写实岩石」，而且是 Q 版</h3>
+<p>岩石纹理是最容易画成墙纸的东西：拼十格就看出重复。地形只用 6 种 tile，靠<b>轮廓不齐 + 三档明度 + 切角</b>区分，不靠纹理细节。Q 版指的是<b>比例（2 头身）和圆角</b>，不是细节量——<b>Q 版会让画面更简单，不是更复杂</b>。</p>
 
 <h3>3. 颜色只编码三件事</h3>
-<p><b>紫 = 重力区，橙 = 危险，青 = 你。</b>方向靠箭头，不靠颜色。四向各配一色看起来聪明，实际是让玩家记四个含义、让你们多画四套素材。</p>
+<p><b>紫 = 磁场（改重力），橙 = 危险，青 = 你。</b>方向靠箭头，不靠颜色。四向各配一色看起来聪明，实际是让玩家记四个含义、让你们多画四套素材。</p>
+
+<h3>4. 全场只有磁场会动</h3>
+<p>世界是死的，磁场是活的。这一条同时解决两个问题：<b>一眼能看出「哪块地方特殊」</b>，以及<b>不会因为满屏都在动而看不清方位</b>。</p>
 
 <h2>二、画布与尺寸</h2>
 
@@ -145,31 +148,55 @@
 <b>底色已改过</b>：从 <code>#0B0E14</code> 换成 <code>#100D14</code>。原来那个是冷蓝黑，配太空题材用的；现在是地心洞穴，岩壁是暖紫棕，冷底会把画面压灰，而且玩家是青色，跟冷底同色系会融进去。换成暖紫黑之后，青色玩家在暗处是跳出来的。
 </div>
 
-<h2>四、角色</h2>
+<h2>四、角色 · 像素 Q 版</h2>
 
 <div class="grid2">
   <div>
     <div class="fig">
       <svg viewBox="0 0 92 124" width="92" height="124" shape-rendering="crispEdges" style="background:#100D14;border:1px solid #E3E1DE;border-radius:4px">
-        <rect x="0" y="0" width="80" height="112" fill="#3A8FA8"/>
-        <rect x="4" y="4" width="72" height="36" fill="#7FE8FF"/>
-        <rect x="4" y="44" width="72" height="40" fill="#7FE8FF"/>
-        <rect x="8" y="88" width="24" height="20" fill="#7FE8FF"/>
-        <rect x="48" y="88" width="24" height="20" fill="#7FE8FF"/>
-        <rect x="0" y="48" width="16" height="32" fill="#3A8FA8"/>
-        <rect x="64" y="48" width="16" height="32" fill="#3A8FA8"/>
-        <rect x="20" y="20" width="12" height="12" fill="#3A8FA8"/>
-        <rect x="44" y="20" width="12" height="12" fill="#3A8FA8"/>
-        <rect x="4" y="4" width="16" height="8" fill="#D6F7FF"/>
+        <polygon points="12,56 68,56 68,100 64,104 16,104 12,100" fill="#3A8FA8"/>
+        <polygon points="16,60 64,60 64,96 60,100 20,100 16,96" fill="#7FE8FF"/>
+        <rect x="20" y="104" width="16" height="8" fill="#3A8FA8"/>
+        <rect x="44" y="104" width="16" height="8" fill="#3A8FA8"/>
+        <polygon points="16,0 64,0 72,8 72,48 64,56 16,56 8,48 8,8" fill="#3A8FA8"/>
+        <polygon points="16,4 64,4 68,8 68,48 64,52 16,52 12,48 12,8" fill="#7FE8FF"/>
+        <rect x="16" y="4" width="24" height="4" fill="#F2F5FF"/>
+        <rect x="22" y="16" width="8" height="12" fill="#3A8FA8"/>
+        <rect x="46" y="16" width="8" height="12" fill="#3A8FA8"/>
+        <rect x="22" y="12" width="4" height="4" fill="#F2F5FF"/>
       </svg>
     </div>
-    <div class="cap">20 × 28，放大 4 倍看</div>
+    <div class="cap">Q 版 2 头身 · 20 × 28，放大 4 倍看</div>
   </div>
   <div>
-    <p><b>只用 3 个颜色</b>：主色 <code>#7FE8FF</code>、暗部 <code>#3A8FA8</code>（同时当描边）、一处高光 <code>#D6F7FF</code>。</p>
-    <p>体积靠<b>形状和描边</b>出，不靠渐变——12 色做不了渐变，硬做会脏。</p>
-    <p>外轮廓必须有 1px 深色描边，否则在暗背景里会融进去。最省事的做法：先铺一层暗色底，再用主色往里缩 1px 画。</p>
+    <p><b>Q 版 = 2 头身。</b>头 16×14、身 14×12、脚 4×4×2，加起来正好 28 高；宽 20 由头决定，肩比头窄 2px。</p>
+    <p><b>只用 3 个颜色</b>：主色 <code>#7FE8FF</code>、暗部兼描边 <code>#3A8FA8</code>、一处高光 <code>#F2F5FF</code>。体积靠形状和描边出，不靠渐变。</p>
+    <p><b>脸只有两个点。</b>眼睛是 2×3 的竖点，中距 6px，靠朝向那边整体偏 1px。<b>不画嘴</b>——20×28 画不下，画了就是噪点。</p>
   </div>
+</div>
+
+<table>
+  <tr><th>部位</th><th>尺寸</th><th>位置</th></tr>
+  <tr><td>头</td><td class="num">16 × 14</td><td>水平居中（左右各留 2px），顶对齐 y=0</td></tr>
+  <tr><td>身</td><td class="num">14 × 12</td><td>头正下方，居中</td></tr>
+  <tr><td>腿 / 脚</td><td class="num">各 4 × 4</td><td>底部贴 y=28，两脚间距 4px</td></tr>
+  <tr><td>眼睛</td><td class="num">各 2 × 3 竖点</td><td>头上半部，两眼中距 6px，朝哪边整体偏 1px</td></tr>
+  <tr><td>嘴巴</td><td>不画</td><td>20×28 画不下嘴</td></tr>
+  <tr><td>描边</td><td class="num">1px #3A8FA8</td><td>只描角色，不描地形</td></tr>
+</table>
+
+<h3>Q 版的三个动作要点（比画得精细重要得多）</h3>
+
+<table>
+  <tr><th>动作</th><th>怎么做</th><th>效果</th></tr>
+  <tr><td>idle 2 帧</td><td>整体上下移 1px，脚不动</td><td>呼吸感</td></tr>
+  <tr><td>run 4 帧</td><td>身体上下颠 1px + 腿前后各 2px，<b>头不动</b></td><td>弹跳感；头一晃就晕</td></tr>
+  <tr><td>jump / fall</td><td>jump 整体拉长 1px，fall 整体压扁 1px</td><td>不用额外画帧</td></tr>
+  <tr><td>die 3 帧</td><td>压扁 + 左右各弹 2px</td><td>Q 版死法要可爱，不见血</td></tr>
+</table>
+
+<div class="callout">
+<b>描边澄清</b>（此前两份文档自相矛盾，这里定死）：角色<b>要</b> 1px 描边，颜色是 <code>#3A8FA8</code> 深青，<b>不是黑</b>；地形<b>不要</b>描边，靠明度差分。后面「不描 1px 黑边」那条只针对地形。
 </div>
 
 <table>
@@ -240,14 +267,85 @@
 
 <p><b>tileset 图布局</b>：一张横排 PNG，每格 32×32，<b>间距 0，不要留边距</b>。Godot 建 TileSet 时填纹理区域 32×32、分离值全 0。</p>
 
-<h2>六、重力区与危险</h2>
+<h3>Q 版化的两条（几乎不花时间，但一眼能看出来）</h3>
 
-<h3>重力区不画纹理</h3>
-<p>它是半透明色块 + 白色箭头，在 Godot 里用 ColorRect 加 <code>#9B7FD4</code>、透明度约 0.24 就能做，不需要图。面板上你们要交的只有<b>四种箭头图标</b>（16×16 或 24×24）：上、右、下、左，颜色 <code>#D9C7FF</code>，一张横排 sheet。</p>
-<p>边框用<b>像素虚线</b>（8px 实 5px 空），四角各一个小方块标记。不要做成实心大方块——实心会盖掉地形，玩家看不出这块区域贴着什么。</p>
+<ul>
+  <li><b>所有「外露的角」切 2px 斜角。</b>直角看起来像工程图，切角看起来像 Q 版。只切玩家能看见的那个角（顶面两端、侧面上下端），被邻居挡住的角不用切。</li>
+  <li><b>砖面只给 3 档明度，不加第二层纹理。</b></li>
+</ul>
+
+<p class="bad"><b>不要做的 Q 版化</b>：不加圆点、不加笑脸、不在砖上画小石头。32px 一格塞任何装饰都会变成噪点，而且是两个人画风分叉最快的来源。</p>
+
+<h2>六、磁场（文档里叫「重力区」）与危险</h2>
+
+<div class="callout">
+<b>先说命名，这条会直接打架。</b>文档和群里习惯叫「重力区」，美术表现叫<b>磁场</b>，但代码和场景名<b>一律用 <code>gravity_zone</code></b>。不要因为叫磁场就把代码名改了——CI 的提交 scope 是 <code>gravity</code>，已有脚本和场景都按这个走，改一次全队要跟着改。
+</div>
+
+<p><b>磁场靠什么体现重力方向：靠里面悬浮的石粒。</b>重力看不见，但石粒看得见——<b>石粒朝哪边飘，重力就朝哪边</b>。这是玩家读方向的主要依据，比箭头更直观，因为它就是「有东西在往那边掉」。箭头是第二重保险，保证三米外和投影仪上也一眼读得到。</p>
+
+<div class="fig">
+  <svg viewBox="0 0 576 192" width="100%" style="max-width:576px;background:#100D14;border:1px solid #E3E1DE;border-radius:4px" shape-rendering="crispEdges">
+    <rect x="0" y="0" width="576" height="20" fill="#4A3B45"/>
+    <rect x="0" y="14" width="576" height="6" fill="#6B5560"/>
+    <rect x="0" y="150" width="576" height="42" fill="#4A3B45"/>
+    <rect x="0" y="150" width="576" height="6" fill="#6B5560"/>
+    <rect x="0" y="20" width="576" height="130" fill="#9B7FD4" fill-opacity="0.26"/>
+    <rect x="6" y="26" width="564" height="118" fill="none" stroke="#9B7FD4" stroke-width="12"/>
+    <g fill="#D9C7FF">
+      <rect x="0" y="20" width="24" height="24"/>
+      <rect x="552" y="20" width="24" height="24"/>
+      <rect x="0" y="126" width="24" height="24"/>
+      <rect x="552" y="126" width="24" height="24"/>
+    </g>
+    <g fill="#FFF2E0" fill-opacity="0.55">
+      <rect x="60" y="60" width="12" height="12"/>
+      <rect x="140" y="110" width="12" height="12"/>
+      <rect x="76" y="132" width="12" height="12"/>
+      <rect x="250" y="50" width="12" height="12"/>
+      <rect x="330" y="96" width="12" height="12"/>
+      <rect x="240" y="134" width="12" height="12"/>
+      <rect x="440" y="64" width="12" height="12"/>
+      <rect x="516" y="110" width="12" height="12"/>
+      <rect x="408" y="132" width="12" height="12"/>
+    </g>
+    <polygon points="288,50 324,110 300,110 300,146 276,146 276,110 252,110" fill="#F2F5FF" stroke="#D9C7FF" stroke-width="3"/>
+  </svg>
+</div>
+
+<p style="font-size:12px;color:#8A8F98">半透明紫 = 场体（底下压着的墙还看得见），外框 = 2px 实线边界 + 四角加粗，小点 = 悬浮石粒（<b>唯一会动的东西</b>，朝箭头方向匀速漂），白箭头 = 方向，必须比所有石粒都亮。粒子的疏密是静态示意图，实际是连续漂移。</p>
+
+<h3>三层，只有石粒会动</h3>
+
+<table>
+  <tr><th>层</th><th>画法</th><th>谁来画</th><th>会动吗</th></tr>
+  <tr><td>场体</td><td>ColorRect + <code>#9B7FD4</code>，不透明度 <b>0.22–0.30</b></td><td>程序</td><td>不动</td></tr>
+  <tr><td>边界</td><td>2px 实线 <code>#9B7FD4</code> + 四角各一个 4×4 加粗角标</td><td>程序</td><td>不动</td></tr>
+  <tr><td><b>悬浮石粒</b></td><td>每 32×32 格 <b>3 颗</b>，每颗 <b>2×2px</b>，<code>#FFF2E0</code> 不透明度 0.55</td><td>程序</td><td><b>唯一会动的</b>：沿箭头方向匀速漂 10 px/s，出界从反方向重入</td></tr>
+  <tr><td>方向箭头</td><td>16×16，白芯 <code>#F2F5FF</code> + <code>#D9C7FF</code> 描边</td><td><b>美术</b></td><td>不动</td></tr>
+</table>
+
+<div class="callout">
+<b>为什么边界不用虚线</b>：8 实 5 空的虚线在 640×360 上会被 3 倍整数缩放放大成一条条 24px 的长杠，看起来像在闪。改成 <b>2px 实线 + 四角加粗</b>，一样能说明「这是区域不是墙」，而且不闪。<br><br>
+<b>为什么石粒不用贴图做</b>：石粒必须连续漂移才读得出方向，3 帧贴图只能原地抖；而且每格都循环同一张图，会拼出肉眼可见的重复。石粒由程序用 ColorRect 生成，每颗相位错开。
+</div>
+
+<h3>三条硬限制</h3>
+
+<ol>
+  <li><b>石粒必须比箭头暗。</b>箭头是纯 <code>#F2F5FF</code> 实心加描边，石粒是 <code>#FFF2E0</code> 且 0.55 不透明度——一眼分得出主次。一样亮就是一片雪，方向反而读不出来。</li>
+  <li><b>每格 3 颗、每颗 2×2。</b>4 颗以上或 3×3 以上，看起来是沙尘不是碎石，还会跟角色撞色。</li>
+  <li><b>场体不透明度上限 0.30。</b>超过之后玩家看不出这块紫里哪面墙能站，会直接走进坑里。</li>
+</ol>
+
+<h3>磁场这块，美术只交一个箭头</h3>
+
+<p>磁场其余三层全是程序画的，美术要交的只有<b>一个朝上的箭头图标，16×16</b>：三角底宽 12px、高 10px、杆宽 4px，垂直居中。太小在 3 倍放大后读不出方向，太大就盖住地形。</p>
+
+<p>四向靠 <b>90° 整数旋转</b>（像素 90° 旋转无损，任意角度才糊），引擎 <code>rotation_degrees</code> 填 0 / 90 / 180 / 270。<b>不要画四个。</b>原来要求四个，现在只要一个，省三份活。</p>
 
 <h3>尖刺</h3>
-<p>32×32 一格，三角朝上，只画一个方向，布置时旋转。底部必须有<b>基座</b>（3–4px 深色条），否则看起来像浮在地面上。尖端加 <code>#FFF2E0</code> 白边，暗处才看得见轮廓。</p>
+<p>32×32 一格，三角朝上，只画一个方向，布置时旋转。底部必须有<b>基座</b>（3–4px 深色条），否则看起来像浮在地面上。尖端加 <code>#FFF2E0</code> 白边，暗处才看得见轮廓。Q 版化：尖角切 1px，改「圆头三角」，一个像素的改动，气质差很多。</p>
 
 <h3>可动平台</h3>
 <p>直接复用 tile 的上表面和下表面，不单独做素材。</p>
@@ -270,10 +368,11 @@
 <table>
   <tr><th>路径</th><th>放什么</th><th>谁维护</th></tr>
   <tr><td class="num">Art/player/</td><td>spr_player.png</td><td>美术</td></tr>
+  <tr><td class="num">Art/field/</td><td>icon_arrow_up.png</td><td>美术</td></tr>
   <tr><td class="num">Art/tiles/</td><td>tile_cave.png · tile_spike.png</td><td>美术</td></tr>
   <tr><td class="num">Art/bg/</td><td>bg_cave.png</td><td>美术</td></tr>
-  <tr><td class="num">Art/ui/</td><td>ui_button.png · icon_arrow_up.png</td><td>美术</td></tr>
-  <tr><td class="num">Art/fonts/</td><td>SmileySans.ttf</td><td>美术</td></tr>
+  <tr><td class="num">Art/ui/</td><td>ui_button.png</td><td>美术</td></tr>
+  <tr><td class="num">Art/fonts/</td><td>SmileySans.ttf（目录名全小写）</td><td>美术</td></tr>
   <tr><td class="num">Scenes/</td><td>game.tscn · player.tscn · level_0…3.tscn</td><td>程序</td></tr>
   <tr><td class="num">Scripts/</td><td>core/ player/ level/ ui/</td><td>程序</td></tr>
   <tr><td class="num">Audio/sfx/</td><td>sfx_jump.wav · sfx_die.wav</td><td>程序</td></tr>
@@ -284,7 +383,31 @@
 
 <p><b>导出</b>：PNG、透明背景、1:1 原始像素、不加锐化不加抗锯齿不加滤镜、透明区必须是真透明（不要填白）。<span class="bad">不要用 JPG</span>——JPG 会把边缘糊成噪点。</p>
 
-<h2>八、UI 与字体（11/2 用，但现在就要知道）</h2>
+<h2>八、交期</h2>
+
+<table>
+  <tr><th>时间</th><th>交什么</th><th>谁</th></tr>
+  <tr><td><b>10/31 今晚</b></td><td>先用纯色块代替角色：一个 20×28 的青方块，能跑就行</td><td>谁都快</td></tr>
+  <tr><td><b>11/1 上午</b></td><td>tile 6 格 + 尖刺 + <b>一个朝上箭头</b>（16×16）</td><td>一人一半</td></tr>
+  <tr><td><b>11/1 晚上</b></td><td>角色完整 11 帧</td><td>风扇</td></tr>
+  <tr><td><b>11/2</b></td><td>背景 + 主菜单与通关页 UI</td><td>三尺</td></tr>
+</table>
+
+<div class="callout">
+<b>今晚不要画正式素材。</b>关卡目前只画完了教学关，现在画的贴图很可能对不上实际布局。今晚只做一件事：用色块把角色跑起来，验证自己的导出流程能进 Godot。<br><br>
+这不是拖延，是省返工。平台游戏最经典的浪费就是美术按「看着能跳过去」画了整套地形，程序跑不过去，全部重画。
+</div>
+
+<h2>九、四条禁令</h2>
+
+<ol>
+  <li><b>加颜色要登记。</b>新色接着 P13 排下去，写进第三节的表并注明用在哪，再过一次灰度判据。不登记就画，下一关没人知道那个色是什么。</li>
+  <li><b>不许画超出画布的内容。</b>角色在 32×32 里画，超出的部分在 Godot 里会被切掉，看起来像 bug。</li>
+  <li><b>不许画「暗洞穴」。</b>不画光源、不画阴影渐变、不画雾。纵深靠三档明度，不靠光。</li>
+  <li><b>除了磁场里的石粒，什么都不许动。</b>全游戏唯一的动态是石粒漂移。不画背景飘尘、水滴、视差、环境动画。这不是省事——满屏都在动，玩家就分不清哪个动的东西在告诉他方向。</li>
+</ol>
+
+<h2>十、UI 与字体（11/2 用，但现在就要知道）</h2>
 
 <div class="callout">
 <b>Godot 4 的内置字体不含中文字形。</b>界面上写「继续」「通关」会显示成一排方框 □□□。这不是编码问题，不是你写错了，是那个字体文件里根本没有这些字。
@@ -311,29 +434,6 @@
 </table>
 
 <p><b>不做的</b>：血条（一碰就死，没有血量）、计时、小地图、设置菜单、音量滑块。一屏一关的游戏不需要这些。</p>
-
-<h2>九、交期</h2>
-
-<table>
-  <tr><th>时间</th><th>交什么</th><th>谁</th></tr>
-  <tr><td><b>10/31 今晚</b></td><td>先用纯色块代替角色：一个 20×28 的青方块，能跑就行</td><td>谁都快</td></tr>
-  <tr><td><b>11/1 上午</b></td><td>tile 6 格 + 尖刺 + 四个方向箭头</td><td>一人一半</td></tr>
-  <tr><td><b>11/1 晚上</b></td><td>角色完整 11 帧</td><td>风扇</td></tr>
-  <tr><td><b>11/2</b></td><td>背景 + 主菜单与通关页 UI</td><td>三尺</td></tr>
-</table>
-
-<div class="callout">
-<b>今晚不要画正式素材。</b>关卡目前只画完了教学关，现在画的贴图很可能对不上实际布局。今晚只做一件事：用色块把角色跑起来，验证自己的导出流程能进 Godot。<br><br>
-这不是拖延，是省返工。平台游戏最经典的浪费就是美术按「看着能跳过去」画了整套地形，程序跑不过去，全部重画。
-</div>
-
-<h2>十、三条禁令</h2>
-
-<ol>
-  <li><b>加颜色要登记。</b>新色接着 P13 排下去，写进第三节的表并注明用在哪，再过一次灰度判据。不登记就画，下一关没人知道那个色是什么。</li>
-  <li><b>不许画超出画布的内容。</b>角色在 32×32 里画，超出的部分在 Godot 里会被切掉，看起来像 bug。</li>
-  <li><b>不许画「暗洞穴」。</b>不画光源、不画阴影渐变、不画雾。纵深靠三档明度，不靠光。</li>
-</ol>
 
 <h2>十一、玩法与画面（不清楚从哪下手就先看这节）</h2>
 
@@ -392,33 +492,46 @@
   </g>
   <rect x="599" y="86" width="26" height="24" fill="#100D14" stroke="#FFF2E0" stroke-width="2"/>
   <rect x="607" y="94" width="10" height="8" fill="#FFF2E0" fill-opacity="0.55"/>
-  <rect x="58" y="342" width="20" height="28" rx="2" fill="#7FE8FF" stroke="#3A8FA8" stroke-width="1.5"/>
-  <rect x="70" y="350" width="3" height="4" fill="#100D14"/>
+  <rect x="60" y="342" width="16" height="14" fill="#3A8FA8"/>
+  <rect x="61" y="343" width="14" height="12" fill="#7FE8FF"/>
+  <rect x="61" y="356" width="14" height="12" fill="#3A8FA8"/>
+  <rect x="62" y="357" width="12" height="10" fill="#7FE8FF"/>
+  <rect x="61" y="368" width="5" height="2" fill="#3A8FA8"/>
+  <rect x="70" y="368" width="5" height="2" fill="#3A8FA8"/>
+  <rect x="64" y="347" width="2" height="3" fill="#3A8FA8"/>
+  <rect x="69" y="347" width="2" height="3" fill="#3A8FA8"/>
 </svg>
 
-<p style="font-size:12px;color:#8A8F98">青 = 玩家（20×28），紫 = 重力区（箭头朝上），发光的框 = 终点，中间那片空洞就是坑。远景那两块暗色是从洞顶垂下来的岩体，不是平台，不能站。</p>
+<p style="font-size:12px;color:#8A8F98">青 = 玩家（Q 版 2 头身 20×28），紫 = 磁场（箭头朝上，石粒朝箭头方向漂），发光的框 = 终点，中间那片空洞就是坑。远景那两块暗色是从洞顶垂下来的岩体，不是平台，不能站。</p>
 
-<h3>2. 环境背景：一个封闭的洞穴横截面</h3>
+<h3>2. 环境背景：地心洞穴的一条间隙</h3>
 
 <ul>
-  <li><b>没有天空、没有地平线、没有云、没有远景山。</b>画面四边都是岩壁，玩家看到的是洞穴内部的一刀切面。</li>
-  <li>洞腔内部填 <code>#100D14</code>，上面叠 <code>#1C1720</code> 的岩体剪影（从洞顶往下垂的形状）表示纵深。</li>
+  <li><b>这是一条纵向裂开的洞腔</b>：上下都是岩壁，左右是两根岩柱，玩家在缝里往上走。<b>没有天空、没有地平线、没有云、没有远景山。</b></li>
+  <li>这个设定顺带把玩法解释了：上下都是石头，所以「倒着站天花板」不用额外跟玩家解释——他看得见头顶也是岩壁。</li>
+  <li>洞腔内部填 <code>#100D14</code>，上面叠 <code>#1C1720</code> 的岩体剪影，从裂缝上下两端伸进来。<b>边缘必须不规则</b>，画成方框就变成房间，不是洞穴。</li>
   <li>纵深只有四档：<code>#100D14</code> 洞腔 → <code>#1C1720</code> 远景岩体 → <code>#2E2530</code> 砖块 → <code>#4A3B45</code> + <code>#6B5560</code> 能站的表面。</li>
-  <li><b>不画</b>：光源、光晕、阴影渐变、雾、熔岩、水滴、飘尘、粒子。</li>
+  <li><b>动态只有一个：磁场里漂移的石粒。</b>其余一律静止——不画光源、光晕、阴影渐变、雾、熔岩、水滴、飘尘、背景视差。</li>
 </ul>
 
-<h3>3. 风格：一个方块最多三档色</h3>
+<h3>3. 风格：像素 Q 版，一个方块最多三档色</h3>
 
 <table>
   <tr><th>判据</th><th>值</th></tr>
   <tr><td>1 个美术像素</td><td>= 1 个屏幕像素，不做「先画大再缩小」</td></tr>
+  <tr><td>角色头身比</td><td><b>2 头身</b>：头 16×14 + 身 14×12 = 28 高，宽 20</td></tr>
+  <tr><td>角色脸</td><td>两只 <b>2×3</b> 竖点眼睛，中距 6px，<b>不画嘴</b></td></tr>
   <tr><td>一个 32×32 方块内的明度</td><td class="num">最多 3 档</td></tr>
-  <tr><td>角色 20×28 的细节量</td><td>1 个眼睛点 + 2–3 层身体色 + 手脚各 2–3 像素</td></tr>
-  <tr><td>外轮廓</td><td>不描 1px 黑边，用明度差分离（黑边在暗背景里等于消失）</td></tr>
-  <tr><td>半透明</td><td>只允许重力区那一层紫色</td></tr>
+  <tr><td>外露的角</td><td>切 <b>2px</b> 斜角（Q 版最省钱的信号）</td></tr>
+  <tr><td>角色描边</td><td>1px <code>#3A8FA8</code> 深青，<b>不是黑</b></td></tr>
+  <tr><td>地形描边</td><td><b>不描</b>，靠明度差分离（1px 黑边在暗背景里等于消失）</td></tr>
+  <tr><td>半透明</td><td>只允许两处：磁场场体 0.30 上限、石粒 0.55</td></tr>
+  <tr><td>动态</td><td><b>只有磁场里的石粒会动</b>，其余全静止</td></tr>
 </table>
 
 <p>640×360 在 1080p 上是 3 倍整数放大，一个美术像素变成 3×3 的方块。细节多画一档，投到墙上就是一团噪点；两个人各画一套，风格也会分叉。</p>
+
+<div class="callout"><b>Q 版不等于加点细节。</b>恰恰相反：Q 版是把形状做圆、比例拉成 2 头身、去掉一切装饰。20×28 这个尺寸上加细节，只会让它变成一团青色噪点，不会让它更可爱。</div>
 
 <footer>
 GRAVSWITCH · 像素美术规格 · 2026-10-31<br>
