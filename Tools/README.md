@@ -26,12 +26,19 @@ python Tools/ci/checks.py commits --range origin/main..HEAD
 
 ## 出包
 
-**全队共用同一份构建脚本**：`Assets/Editor/DSHBuild.cs`（已在 10/30 实测可用）。
+**全队共用同一份构建脚本**：`Assets/Editor/DSHBuild.cs`。
+10/30 出包成功（Mono2x / 0 错误 / 13.54 秒 / 89 MB）用的是同 API 的**测试脚本**——那个脚本会新建空场景并覆盖 Build Settings，只适合验证链路，不能当产品脚本。仓库这份是它的改写版：**保留同一套 API，去掉"覆盖场景列表"和"新建场景"两个行为**，改为读 `Build Settings` 里已勾选的场景。
+
+- 已逐条比对：`BuildPlayerOptions` / `BuildPipeline.BuildPlayer` / `BuildSummary` / `BuildResult` / `EditorApplication.Exit` / `EditorBuildSettings.scenes` 均在实测脚本里跑过
+- 未被实测覆盖的只有 `Application.isBatchMode`（防止在编辑器里点菜单时把编辑器关掉）与 `[MenuItem]`，都是长期稳定 API
+- **所以第一次用先点一次菜单 `Tools > 闪切 > 出一份 Windows 包`**：能出包说明编译与链路都通；报错就把日志贴出来，别自己猜着改
+
 不要各写一套构建命令——六个人六种出包方式，是这类项目最常见的分叉点。
 
 用法要点：
 
-- 命令行 `-executeMethod` 调用，改场景名与输出路径即可复用
+- 命令行 `-executeMethod FlickCut.DSHBuild.BuildWindows`
+- `Build Settings` 必须先勾选 `Arena.unity`，没有勾选时脚本会主动报错退出（故意这样，避免出一份空包还以为成功）
 - 后端 **Mono2x**，不要切 IL2CPP
 - **在普通终端里跑**。受限沙箱会因 WMI / named pipe 被禁而失败：
   报 `Unable to open database file` + `Upm-32312` 超时 → Unity 直接退出，

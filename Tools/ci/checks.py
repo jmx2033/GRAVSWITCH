@@ -31,7 +31,9 @@ ROOT = Path(__file__).resolve().parents[2]
 MAX_BYTES = 50 * 1024 * 1024
 WARN_BYTES = 10 * 1024 * 1024
 
-COMMIT_TYPES = ("feat", "fix", "art", "docs", "chore", "refactor")
+# polish = 冻结期（11/7 23:00 后）只改表现、不改逻辑的提交，README 与启动方案 §6.2 都用到这个词，
+# 所以它必须在这里合法，否则冻结第一天所有人的提交都会被自家钩子拦下。
+COMMIT_TYPES = ("feat", "fix", "art", "docs", "chore", "refactor", "polish")
 COMMIT_SCOPES = ("charge", "slash", "enemy", "ui", "build", "repo", "levelup")
 # scope=repo 是仓库与工程维护，不属于 P0/P1/P2 功能分级，因此不要求 P 编号。
 P_TAG_EXEMPT_SCOPES = {"repo"}
@@ -150,7 +152,7 @@ def validate_subject(subject: str) -> list[str]:
     if len(s) > 72:
         problems.append("标题超过 72 字符，细节请写进提交正文，不要堆在标题里")
 
-    needs_p = m.group("type") in {"feat", "fix", "art"} and m.group("scope") not in P_TAG_EXEMPT_SCOPES
+    needs_p = m.group("type") in {"feat", "fix", "art", "polish"} and m.group("scope") not in P_TAG_EXEMPT_SCOPES
     if needs_p and not P_TAG_RE.search(body):
         problems.append(
             "功能/修复/美术提交必须带 P 编号，如 [P0-3] [P1-4]（编号见 docs/00_范围与不做清单.md）"

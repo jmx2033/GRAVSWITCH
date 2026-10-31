@@ -67,6 +67,8 @@ class TestCommitSubject(unittest.TestCase):
             "docs(repo): 补全员必装清单",
             "chore(repo): 忽略 Library 与 _Scratch",
             "refactor(charge): 抽出蓄力进度计算 [P0-2]",
+            "polish(ui): 卡面描边加粗到 2px [P1-5]",
+            "polish(charge): 蓄力音效尾巴缩短 [P1-4]",
             "fix(repo): .gitignore 的 Build 规则误伤模块",
             "feat(slash): 三段刃形 [P1-1] (#12)",
         ]
@@ -84,6 +86,7 @@ class TestCommitSubject(unittest.TestCase):
             "fix(enemy): 修好了。 [P0-4]",
             "feat(other): scope 不在表里 [P0-1]",
             "feat(slash): 短 [P1-1]",
+            "polish(ui): 卡面描边加粗到 3px",
             "",
         ]
         for s in invalid:

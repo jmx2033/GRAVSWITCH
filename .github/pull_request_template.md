@@ -1,5 +1,5 @@
 <!-- 标题格式：<type>(<scope>): 描述 [P编号]  例：feat(slash): 三段刃形按蓄力进度切换 [P1-1] -->
-<!-- type: feat / fix / polish / chore / docs；scope: charge slash enemy ui build repo levelup -->
+<!-- type: feat / fix / art / docs / chore / refactor / polish（共 7 个，冻结期只用 fix 与 polish）；scope: charge slash enemy ui build repo levelup -->
 
 ## 改了什么
 
