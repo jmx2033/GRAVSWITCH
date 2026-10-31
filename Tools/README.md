@@ -1,5 +1,29 @@
 # Tools —— 构建与辅助脚本
 
+## CI 检查器（`Tools/ci/`，10/31 新增）
+
+| 文件 | 作用 |
+|---|---|
+| `checks.py` | 五项静态检查：仓库卫生 / `.meta` 配对 / 命名 / C# 硬约束 / 提交信息与文档链接。**只用 Python 标准库** |
+| `test_checks.py` | 检查器自测（16 项，含"不该报的不能报"）。CI 每次先跑自测再查仓库 |
+| `commit-msg` | 本地提交信息钩子，**只用 bash + grep + sed，不需要 Python** |
+| `install-hooks.sh` | 把钩子装进 `.git/hooks/`，装完自动做正反两次自检 |
+
+**六个人 clone 后都要执行一次：**
+
+```bash
+bash Tools/ci/install-hooks.sh
+```
+
+有 Python 的话也可以本地跑全量检查（没有就交给 PR 上的 CI）：
+
+```bash
+python Tools/ci/checks.py all
+python Tools/ci/checks.py commits --range origin/main..HEAD
+```
+
+规则与误报处理见 `docs/工程规范.md` §5.2、§5.10。**改检查器必须同时补自测。**
+
 ## 出包
 
 **全队共用同一份构建脚本**：`Assets/Editor/DSHBuild.cs`（已在 10/30 实测可用）。

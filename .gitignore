@@ -57,3 +57,7 @@ Assets/_Scratch/*
 
 # 本地工具与记忆，不属于交付物
 .workbuddy/
+
+# Python 检查器的字节码缓存（Tools/ci 本地自测时生成）
+__pycache__/
+*.pyc

@@ -39,9 +39,10 @@
 2. **配 SSH 并以 SSH 地址克隆**：`git clone git@github.com:jmx2033/FLICKCUT-PROTOCOL.git`
    先做 `工程规范.md` §5.0 的第 1–4 步（生成密钥 → 贴到 GitHub → `ssh -T` 验证 → 22 端口不通改走 443）。**地址必须是 `git@github.com:` 开头，带 `https://` 的不合规。**
    路径用纯英文、不要中文和空格（推荐 `D:\git\FLICKCUT-PROTOCOL`）
-3. **不要把项目放在 OneDrive / 坚果云 / 百度网盘同步目录里**——云同步会和 `Library/`、`.meta` 打架
-4. 用 Unity 打开本目录（`Assets/` 所在这一层）
-5. 打开 `Assets/_Project/Scenes/Arena.unity`，按 Play
+3. **装提交信息钩子**：`bash Tools/ci/install-hooks.sh`（一次即可，只用 Git Bash，**不需要装 Python**）
+4. **不要把项目放在 OneDrive / 坚果云 / 百度网盘同步目录里**——云同步会和 `Library/`、`.meta` 打架
+5. 用 Unity 打开本目录（`Assets/` 所在这一层）
+6. 打开 `Assets/_Project/Scenes/Arena.unity`，按 Play
 
 > 第一次打开时 Unity 会自动生成 `Library/`、`Packages/`、`ProjectSettings/`。
 > **首次提交顺序：先 `.gitignore` 等配置，再提交 Unity 项目**（见 `docs/9天实训启动方案.md` §2④），否则 `Library/` 会被一起推上去。
@@ -70,7 +71,7 @@
 1. **每晚 23:00 前必须 push，没 push 等于没做。** GitHub 是唯一真相源
 2. **P0 没全绿不碰 P1，P1 没全绿不碰 P2。** 报不出编号的活先问策划
 3. **不许用"我这边能跑"当答复。** 要能跑别人的包
-4. **代码只走 PR 进 `main`，不直推。** 八步流程（切分支 → 写 → commit → push → PR → CI → review → 删分支 → pull）见 `docs/工程规范.md` §5.9
+4. **代码只走 PR 进 `main`，不直推。** 八步流程（切分支 → 写 → commit → push → PR → CI → review → 删分支 → pull）见 `docs/工程规范.md` §5.9；**CI 全绿才能合并**，检查项见 §5.10
 
 ## 冻结时间
 

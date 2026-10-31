@@ -1,0 +1,43 @@
+name: CI
+
+# 只做静态检查，不在云端编译 Unity（Actions 机器没有 Unity 许可证）。
+# 触发：对 main 的 PR、main 上的推送，以及手动触发。
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-checks:
+    name: 静态检查与提交信息校验
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取仓库（含完整历史，用于检查 PR 内的提交信息）
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 准备 Python（检查器只用标准库，无需装依赖）
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 检查器自测（先证明检查器本身不误报、不漏报）
+        run: python Tools/ci/test_checks.py
+
+      - name: 仓库静态检查（卫生 / .meta 配对 / 命名 / C# 硬约束 / 文档链接）
+        run: python Tools/ci/checks.py all
+
+      - name: 提交信息格式（仅 PR，检查本次 PR 引入的每条提交）
+        if: github.event_name == 'pull_request'
+        run: python Tools/ci/checks.py commits --range "origin/${{ github.base_ref }}..HEAD"
