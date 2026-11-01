@@ -4,10 +4,11 @@
 
 | 文件 | 作用 |
 |---|---|
-| `checks.py` | 静态检查：仓库卫生 / 命名 / 提交信息与文档链接。**只用 Python 标准库** |
+| `checks.py` | 静态检查：仓库卫生 / 命名 / GDScript 硬约束 / 提交信息与文档链接。**只用 Python 标准库** |
 | `test_checks.py` | 检查器自测（含"不该报的不能报"）。CI 每次先跑自测再查仓库 |
 | `commit-msg` | 本地提交信息钩子，**只用 bash + grep + sed，不需要 Python** |
 | `install-hooks.sh` | 把钩子装进 `.git/hooks/`，装完自动做正反两次自检 |
+| `level_editor.html` | 关卡格子编辑器。双击用浏览器打开，点格子出 20×11 字符图，不用装任何东西 |
 
 **六个人 clone 后都要执行一次：**
 
@@ -24,8 +25,10 @@ python Tools/ci/checks.py commits --range origin/main..HEAD
 
 规则与误报处理见 `docs/工程规范.md` §5.2、§5.10。**改检查器必须同时补自测。**
 
-> 两项 Unity 时期的规则（`.meta` 配对、C# 硬约束）已停用：仓库里已无 `Assets/`，不会命中。
-> GDScript 版规则待重写，候选：禁用 `get_node("../../..")` 硬编码路径、禁止在 `_process` 里 `load()`。
+> Unity 时期的两项规则（`.meta` 配对、C# 硬约束）已于 10/31 删除，替换为 Godot 版：
+> 卫生检查加拦 `.godot/`，命名检查改查 `Art/ Audio/ Scripts/ Scenes/` 四棵子树，
+> C# 检查换成 **GDScript 硬约束**（Godot 3 写法、写死 `velocity.y`、`../../` 深路径）。
+> 自测 14 项，`python Tools/ci/test_checks.py`。
 
 ## 出包
 
@@ -43,7 +46,7 @@ python Tools/ci/checks.py commits --range origin/main..HEAD
 godot --headless --export-release "Windows Desktop" build/win/GRAVSWITCH.exe
 ```
 
-Web 版：
+Web 版（**进阶项，默认不做**。这段留着，是为了真有余力的时候不用重新查）：
 
 ```bash
 godot --headless --export-release "Web" build/web/index.html

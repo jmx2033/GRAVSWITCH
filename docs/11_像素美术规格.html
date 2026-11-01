@@ -148,7 +148,7 @@
 <b>底色已改过</b>：从 <code>#0B0E14</code> 换成 <code>#100D14</code>。原来那个是冷蓝黑，配太空题材用的；现在是地心洞穴，岩壁是暖紫棕，冷底会把画面压灰，而且玩家是青色，跟冷底同色系会融进去。换成暖紫黑之后，青色玩家在暗处是跳出来的。
 </div>
 
-<h2>四、角色 · 像素 Q 版</h2>
+<h2>四、角色 · 青色宝石小人</h2>
 
 <div class="grid2">
   <div>
@@ -156,21 +156,25 @@
       <svg viewBox="0 0 92 124" width="92" height="124" shape-rendering="crispEdges" style="background:#100D14;border:1px solid #E3E1DE;border-radius:4px">
         <polygon points="12,56 68,56 68,100 64,104 16,104 12,100" fill="#3A8FA8"/>
         <polygon points="16,60 64,60 64,96 60,100 20,100 16,96" fill="#7FE8FF"/>
+        <polygon points="52,60 64,60 64,96 60,100 44,100" fill="#3A8FA8"/>
         <rect x="20" y="104" width="16" height="8" fill="#3A8FA8"/>
         <rect x="44" y="104" width="16" height="8" fill="#3A8FA8"/>
         <polygon points="16,0 64,0 72,8 72,48 64,56 16,56 8,48 8,8" fill="#3A8FA8"/>
         <polygon points="16,4 64,4 68,8 68,48 64,52 16,52 12,48 12,8" fill="#7FE8FF"/>
+        <polygon points="44,52 64,52 68,48 68,24" fill="#3A8FA8"/>
         <rect x="16" y="4" width="24" height="4" fill="#F2F5FF"/>
         <rect x="22" y="16" width="8" height="12" fill="#3A8FA8"/>
         <rect x="46" y="16" width="8" height="12" fill="#3A8FA8"/>
         <rect x="22" y="12" width="4" height="4" fill="#F2F5FF"/>
       </svg>
     </div>
-    <div class="cap">Q 版 2 头身 · 20 × 28，放大 4 倍看</div>
+    <div class="cap">青色宝石小人 · 20 × 28，放大 4 倍看</div>
   </div>
   <div>
-    <p><b>Q 版 = 2 头身。</b>头 16×14、身 14×12、脚 4×4×2，加起来正好 28 高；宽 20 由头决定，肩比头窄 2px。</p>
-    <p><b>只用 3 个颜色</b>：主色 <code>#7FE8FF</code>、暗部兼描边 <code>#3A8FA8</code>、一处高光 <code>#F2F5FF</code>。体积靠形状和描边出，不靠渐变。</p>
+    <p><b>玩家是什么（11/1 定）</b>：一块被磁化了、会走路会跳的<b>青色宝石小人</b>。这一句同时解决两件事——形状有了，机制也解释了：<b>磁性在他身上，不用再给他挂道具</b>。他进磁场就被拉走，因为他自己就是那块磁石。</p>
+    <p><b>宝石感全靠一条对角线</b>：亮面 <code>#7FE8FF</code> 压左上，暗面 <code>#3A8FA8</code> 压右下，头和身<b>各一条</b>，不描第二层边、不做渐变。20×28 放不下三层切面，切多了就是噪点。</p>
+    <p><b>光永远从左上来。</b>倒过来站天花板时<b>不改亮暗</b>——改了等于多画一套图，玩家还会以为人翻面了。</p>
+    <p><b>只用 3 个颜色</b>：主色 <code>#7FE8FF</code>、暗部兼描边 <code>#3A8FA8</code>、一处高光 <code>#F2F5FF</code>。体积靠形状和那条对角线出，不靠渐变。</p>
     <p><b>脸只有两个点。</b>眼睛是 2×3 的竖点，中距 6px，靠朝向那边整体偏 1px。<b>不画嘴</b>——20×28 画不下，画了就是噪点。</p>
   </div>
 </div>
@@ -266,6 +270,11 @@
 </div>
 
 <p><b>tileset 图布局</b>：一张横排 PNG，每格 32×32，<b>间距 0，不要留边距</b>。Godot 建 TileSet 时填纹理区域 32×32、分离值全 0。</p>
+
+<div class="callout">
+<b>你交到哪为止：交这一张 <code>tile_cave.png</code> 就完事。</b>不用摆关、不用建 TileSet、不用配碰撞——那些是策划和程序的活（见 <code>03</code> 第七节）。画完、按格切好、导出，地形这块你这边就结束了。<br>
+另外：Godot 4.7 里摆格子用的节点叫 <code>TileMapLayer</code>，不是 <code>TileMap</code>（已废弃）。照网上教程找 <code>TileMap</code> 找不到，不是你操作错了。
+</div>
 
 <h3>Q 版化的两条（几乎不花时间，但一眼能看出来）</h3>
 
