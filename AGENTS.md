@@ -101,13 +101,13 @@
 - **跳跃参数（重力加速度、跳跃初速、最大速度、土狼时间、跳预输入、转向过渡）只有技术负责人能改**，改完全队重测
 - 节点之间用 **signal** 通信，不要 `get_node("../../..")` 这种深路径
 - 状态只有四个：`MENU / PLAYING / DEAD / WIN`，写在 `game.gd` 里
-- 关卡用 `level_0.tscn` … `level_3.tscn`，主场景只负责切关
+- 关卡用 `level_0.tscn` … `level_3.tscn`（放 `Scenes/`），主场景只负责切关
 
 ## 工作顺序：先竖切，后铺开
 
 **第一条能玩的链路优先，完整框架其次。** 顺序是：
 
-1. 空目录结构建好（10 分钟，只是建文件夹，不写代码）
+1. 空目录结构建好（10 分钟，只是建文件夹，不写代码）：根下 `Art/`、`Audio/sfx/`、`Scripts/{core,player,level,ui}/`、`Scenes/`（关卡场景与 `tileset_cave.tres`）；空目录用 `.gitkeep` 占位，美术子目录见 `docs/11` 第七节
 2. 一个场景 → 一个 `CharacterBody2D` 方块 → 能左右走、能跳 → 出一次 Windows 包
 3. 这条通了，才开始加重力区、加关卡、加 UI
 
@@ -133,7 +133,7 @@ level_1 (Node2D)
 └─ Player   (玩家场景实例)
 ```
 
-**TileSet 只建一次**，存 `levels/tileset_cave.tres` 进仓库，四关共用：
+**TileSet 只建一次**，存 `Scenes/tileset_cave.tres` 进仓库，四关共用：
 
 | 项 | 值 |
 |---|---|

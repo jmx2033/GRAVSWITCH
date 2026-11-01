@@ -1,11 +1,14 @@
 # 统一换行：六台 Windows 机器协作，避免整文件"假改动"
 * text=auto eol=lf
 
-# Unity 场景与预制体按文本处理（不要开 LFS，见 docs/9天实训启动方案.md §3.3）
-*.unity text
-*.prefab text
-*.asset text
-*.meta text
+# Godot 工程文本类型（显式声明，防止将来被当二进制改坏）
+*.godot  text eol=lf
+*.tscn   text eol=lf
+*.tres   text eol=lf
+*.gd     text eol=lf
+*.cfg    text eol=lf
+*.import text eol=lf
+*.uid    text eol=lf
 
 # 二进制明确标记，防止被当文本改坏
 *.png binary

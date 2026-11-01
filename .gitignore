@@ -37,8 +37,15 @@ godot.log
 *.blend
 *.aseprite
 
-# 本地工具与记忆，不属于交付物
+# 本地工具与记忆：个人笔记，不进仓库（CI 的 hygiene 检查也禁止 .workbuddy 入库）。
+# 要让团队看到的内容必须整理进 docs/ —— 放在这里别人 clone 不到。
 .workbuddy/
+
+# 各人自己的试验目录（规范 §6：_scratch/你的名字/），不进仓库
+/_scratch/
+
+# 与项目无关的编辑器 / 工具残留
+/.slidep/
 
 # Python 检查器的字节码缓存（Tools/ci 本地自测时生成）
 __pycache__/
