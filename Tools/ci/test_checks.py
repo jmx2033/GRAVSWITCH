@@ -172,6 +172,11 @@ class TestRepoRules(unittest.TestCase):
         font = self.touch("Art/fonts/SmileySans.ttf")
         self.assertEqual(check_naming(self.root, [uid, font]), [])
 
+    def test_import_file_not_forbidden(self):
+        """.import 是 Godot 每次导入生成的正常文件，必须能提交。"""
+        imp = self.touch("Art/tiles/tile_cave.png.import")
+        self.assertEqual(check_hygiene(self.root, [imp]), [])
+
     def test_docs_chinese_names_not_checked(self):
         doc = self.touch("docs/11_像素美术规格.md", b"# x")
         self.assertEqual(check_naming(self.root, [doc]), [])

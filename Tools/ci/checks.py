@@ -49,8 +49,12 @@ FORBIDDEN_EXTS = {
     ".psd", ".ai", ".aseprite", ".ase", ".blend",   # 源文件自己在本地留，仓库只放导出的 png
     ".dll", ".csproj", ".sln", ".user", ".pdb", ".mdb",
     ".tmp", ".log",
-    ".import",                    # Godot 3 的导入文件，4.x 已不再生成
 }
+# 反过来，下面几个是 Godot 的正常产物，必须提交，不在禁用列表里：
+#   *.import   每个导入资源的设置，删了会重新导入并产生大量无关改动
+#   *.uid      脚本与资源的稳定 ID（4.4+），删了场景里的引用会断
+#   project.godot / export_presets.cfg
+# 曾经把 .import 误列进本表，那会让美术第一次提交 tile_cave.png.import 就被 CI 判死。
 # Godot 的目录结构与命名前缀，见 docs/11_像素美术规格.md 第七节。
 # 只查这四棵子树：docs/ 里全是中文文件名，不能按代码规则要求。
 NAMING_ROOTS = ("Art/", "Audio/", "Scripts/", "Scenes/")
