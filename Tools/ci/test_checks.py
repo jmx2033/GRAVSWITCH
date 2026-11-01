@@ -16,45 +16,35 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from checks import (  # noqa: E402
-    check_csharp, check_hygiene, check_links, check_meta,
-    check_naming, is_public_field, validate_subject,
+    check_gdscript, check_hygiene, check_links, check_naming, validate_subject,
 )
 
-VALID_CS = """using UnityEngine;
-namespace FlickCut
-{
-    public class PlayerController : MonoBehaviour
-    {
-        [SerializeField] private float moveSpeed = 5f;
-        public const int MaxEnemyCount = 30;
-        public static readonly int MaxTier = 3;
-        public event System.Action OnDeath;
-        public int Hp { get; private set; }
-        public string DisplayName => name;
-        /// <summary>按输入方向移动。</summary>
-        public void Move() { }
-        private void Bind()
-        {
-            var manager = FindFirstObjectByType<EnemyManager>();
-            var all = FindObjectsByType<EnemyChaser>();
-        }
-    }
-}
+VALID_GD = """extends CharacterBody2D
+
+@export var jump_speed: float = 590.0
+@onready var sprite: Sprite2D = $Sprite2D
+@onready var coyote: float = 0.0
+
+var gravity_scale: float = 1.0
+
+
+## 每帧按当前重力方向移动。
+func _physics_process(delta: float) -> void:
+    var g: Vector2 = get_gravity()
+    velocity += g * gravity_scale * delta
+    if Input.is_action_just_pressed("jump") and is_on_floor():
+        velocity += up_direction * jump_speed
+    move_and_slide()
 """
 
-BAD_CS = """using UnityEngine;
-namespace FlickCut
-{
-    public class Foo : MonoBehaviour
-    {
-        public int hp;
-        public float speed = 3f;
-        public System.Collections.Generic.List<int> enemies;
-        private Rigidbody2D rb;
-        private void A() { var e = FindObjectOfType<Foo>(); }
-        private void B() { Time.timeScale = 0.2f; }
-    }
-}
+BAD_GD = """extends KinematicBody2D
+
+export var speed = 200
+onready var sprite = get_node("../../Sprite")
+
+func _physics_process(delta):
+    velocity.y = -620
+    var other = $../../Player
 """
 
 
@@ -65,11 +55,11 @@ class TestCommitSubject(unittest.TestCase):
             "fix(level): 出界后没有触发死亡 [P0-3]",
             "art(ui): 重力区色块描边加粗到 2px [P1-3]",
             "docs(repo): 补全员必装清单",
-            "chore(repo): 忽略 Library 与 _Scratch",
+            "chore(repo): 忽略 .godot 与导出产物",
             "refactor(player): 抽出重力方向插值 [P0-2]",
             "polish(ui): 重力区色块描边加粗到 2px [P1-3]",
             "polish(player): 翻转音效尾巴缩短 [P1-4]",
-            "fix(repo): .gitignore 的 Build 规则误伤模块",
+            "fix(repo): .gitignore 的 build 规则误伤模块",
             "feat(level): 教学关重力区 [P1-1] (#12)",
         ]
         for s in valid:
@@ -97,37 +87,7 @@ class TestCommitSubject(unittest.TestCase):
         self.assertEqual(validate_subject('Revert "feat(level): x [P1-1]"'), [])
 
 
-class TestPublicField(unittest.TestCase):
-    def test_not_fields(self):
-        safe = [
-            "public class PlayerController : MonoBehaviour",
-            "public void Move() { }",
-            "public int Hp { get; private set; }",
-            "public string DisplayName => name;",
-            "public const int MaxEnemyCount = 30;",
-            "public static readonly int MaxTier = 3;",
-            "public event System.Action OnDeath;",
-            "public delegate void SlashHandler(Vector2 dir);",
-            "    [SerializeField] private float speed = 5f;",
-            "private int hp;",
-            "public enum Tier { One, Two }",
-        ]
-        for line in safe:
-            self.assertFalse(is_public_field(line), f"误报：{line}")
-
-    def test_real_fields(self):
-        bad = [
-            "public int hp;",
-            "    public float speed = 3f;",
-            "public List<Enemy> enemies;",
-            "public static int counter;",
-            "public EnemyChaser chaser = null;",
-        ]
-        for line in bad:
-            self.assertTrue(is_public_field(line), f"漏报：{line}")
-
-
-class TestCSharp(unittest.TestCase):
+class TestGDScript(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.root = Path(self.tmp.name)
@@ -142,31 +102,31 @@ class TestCSharp(unittest.TestCase):
         return rel
 
     def test_valid_script_passes(self):
-        rel = self.write("Assets/_Project/Scripts/Player/PlayerController.cs", VALID_CS)
-        self.assertEqual(check_csharp(self.root, [rel]), [])
+        rel = self.write("Scripts/player/player.gd", VALID_GD)
+        self.assertEqual(check_gdscript(self.root, [rel]), [])
 
     def test_violations_all_reported(self):
-        rel = self.write("Assets/_Project/Scripts/Combat/Foo.cs", BAD_CS)
-        messages = "\n".join(i.message for i in check_csharp(self.root, [rel]))
-        for expected in ["public 字段", "Rigidbody2D", "FindObjectOfType", "Time.timeScale"]:
+        rel = self.write("Scripts/player/bad_player.gd", BAD_GD)
+        messages = "\n".join(i.message for i in check_gdscript(self.root, [rel]))
+        for expected in ["KinematicBody2D", "export var", "onready var", "velocity.y", "深路径"]:
             self.assertIn(expected, messages)
-        self.assertEqual(len(check_csharp(self.root, [rel])), 6)
-
-    def test_timescale_allowed_in_gameflow(self):
-        src = "namespace FlickCut\n{\n    public class GameFlow\n    {\n        private void Slow() { Time.timeScale = 0.2f; }\n    }\n}\n"
-        rel = self.write("Assets/_Project/Scripts/Core/GameFlow.cs", src)
-        self.assertEqual(check_csharp(self.root, [rel]), [])
-
-    def test_wrong_namespace_and_file_scoped(self):
-        rel = self.write("Assets/_Project/Scripts/Core/A.cs", "namespace FlashCut\n{\n    public class A { }\n}\n")
-        self.assertTrue(any("FlickCut" in i.message for i in check_csharp(self.root, [rel])))
-        rel2 = self.write("Assets/_Project/Scripts/Core/B.cs", "namespace FlickCut;\npublic class B { }\n")
-        self.assertTrue(any("file-scoped" in i.message for i in check_csharp(self.root, [rel2])))
+        self.assertEqual(len(check_gdscript(self.root, [rel])), 6)
 
     def test_commented_out_code_not_reported(self):
-        src = "namespace FlickCut\n{\n    public class C\n    {\n        // var x = FindObjectOfType<C>();\n        /* Rigidbody2D rb; */\n    }\n}\n"
-        rel = self.write("Assets/_Project/Scripts/Core/C.cs", src)
-        self.assertEqual(check_csharp(self.root, [rel]), [])
+        src = (
+            "extends CharacterBody2D\n\n"
+            "func _ready() -> void:\n"
+            "    # velocity.y = -620\n"
+            "    # onready var x = $../../Y\n"
+            "    pass\n"
+        )
+        rel = self.write("Scripts/player/ok.gd", src)
+        self.assertEqual(check_gdscript(self.root, [rel]), [])
+
+    def test_hash_inside_string_not_treated_as_comment(self):
+        src = 'extends Node\n\nfunc _ready() -> void:\n    print("a#b")\n'
+        rel = self.write("Scripts/core/log.gd", src)
+        self.assertEqual(check_gdscript(self.root, [rel]), [])
 
 
 class TestRepoRules(unittest.TestCase):
@@ -185,35 +145,36 @@ class TestRepoRules(unittest.TestCase):
 
     def test_root_build_forbidden_but_module_allowed(self):
         bad = self.touch("Build/app.exe")
-        good = self.touch("Assets/_Project/Scripts/Build/CardPool.cs")
+        good = self.touch("Scripts/level/level_builder.gd")
         issues = check_hygiene(self.root, [bad, good])
         self.assertEqual(len(issues), 2)          # Build/ 目录 + .exe 后缀
         self.assertTrue(all(i.path == bad for i in issues))
 
-    def test_meta_pairing(self):
-        lonely = self.touch("Assets/_Project/Art/Player/spr_player_base.png")
-        issues = check_meta(self.root, [lonely])
-        self.assertEqual(len(issues), 1)
-        self.touch(lonely + ".meta")
-        self.assertEqual(check_meta(self.root, [lonely, lonely + ".meta"]), [])
-        orphan = self.touch("Assets/_Project/Art/Player/spr_gone.png.meta")
-        self.assertEqual(len(check_meta(self.root, [lonely, lonely + ".meta", orphan])), 1)
-
-    def test_gitkeep_needs_no_meta(self):
-        keep = self.touch("Assets/_Project/Scenes/.gitkeep")
-        self.assertEqual(check_meta(self.root, [keep]), [])
+    def test_godot_cache_dir_forbidden(self):
+        bad = self.touch(".godot/imported/spr_player.png-abc.ctex")
+        self.assertEqual(len(check_hygiene(self.root, [bad])), 1)
 
     def test_naming(self):
-        final = self.touch("Assets/_Project/Art/Player/spr_player_final.png")
-        renew = self.touch("Assets/_Project/Audio/SFX/sfx_renew.wav")
-        lower = self.touch("Assets/_Project/Scripts/Enemy/chaser.cs")
-        chinese = self.touch("Assets/_Project/Art/Player/玩家.png")
-        good = self.touch("Assets/_Project/Art/Player/spr_player_base.png")
-        good2 = self.touch("Assets/_Project/Audio/SFX/sfx_flip.wav")
-        paths = [final, renew, lower, chinese, good, good2]
+        final = self.touch("Art/player/spr_player_final.png")
+        pascal = self.touch("Scripts/player/GravityZone.gd")
+        chinese = self.touch("Art/player/玩家.png")
+        good = self.touch("Art/player/spr_player.png")
+        good2 = self.touch("Art/tiles/tile_cave.png")
+        good3 = self.touch("Audio/sfx/sfx_jump.wav")
+        good4 = self.touch("Scripts/player/gravity_zone.gd")
+        good5 = self.touch("Scenes/level_0.tscn")
+        paths = [final, pascal, chinese, good, good2, good3, good4, good5]
         flagged = {i.path for i in check_naming(self.root, paths)}
-        self.assertEqual(flagged, {final, lower, chinese})
-        self.assertNotIn(renew, flagged)          # renew 结尾不是 _new，不应误报
+        self.assertEqual(flagged, {final, pascal, chinese})
+
+    def test_uid_and_font_not_flagged(self):
+        uid = self.touch("Scripts/player/player.gd.uid")
+        font = self.touch("Art/fonts/SmileySans.ttf")
+        self.assertEqual(check_naming(self.root, [uid, font]), [])
+
+    def test_docs_chinese_names_not_checked(self):
+        doc = self.touch("docs/11_像素美术规格.md", b"# x")
+        self.assertEqual(check_naming(self.root, [doc]), [])
 
     def test_links(self):
         self.touch("docs/target.md", b"# t")
@@ -224,7 +185,7 @@ class TestRepoRules(unittest.TestCase):
         self.assertEqual(issues[0].path, bad)
 
     def test_size_limit(self):
-        big = self.touch("Assets/big.png", b"x" * 2048)
+        big = self.touch("Art/player/spr_big.png", b"x" * 2048)
         issues = check_hygiene(self.root, [big], max_bytes=1024)
         self.assertTrue(any("超过上限" in i.message for i in issues))
 

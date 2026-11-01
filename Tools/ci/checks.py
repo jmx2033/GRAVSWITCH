@@ -7,7 +7,7 @@
 
 用法：
     python Tools/ci/checks.py all                      # 全部静态检查
-    python Tools/ci/checks.py hygiene|meta|naming|csharp|links
+    python Tools/ci/checks.py hygiene|naming|gdscript|links
     python Tools/ci/checks.py commit --message "feat(gravity): 重力区转向 [P0-2]"
     python Tools/ci/checks.py commit --file .git/COMMIT_EDITMSG
     python Tools/ci/checks.py commits --range origin/main..HEAD
@@ -40,41 +40,44 @@ P_TAG_EXEMPT_SCOPES = {"repo"}
 P_TAG_RE = re.compile(r"\[(?:P[012]-\d+|P0-lite)\]")
 
 FORBIDDEN_TOP_DIRS = {
-    "library", "temp", "obj", "build", "builds", "logs",
-    "usersettings", "memorycaptures", ".vs", ".idea", ".workbuddy",
+    ".godot",                     # Godot 4.x 导入缓存，体积大、每次打开都变
+    "build", "builds", "export",  # 出包产物
+    "logs", ".vscode", ".idea", ".workbuddy",
 }
 FORBIDDEN_EXTS = {
-    ".exe", ".dll", ".apk", ".aab", ".unitypackage",
-    ".psd", ".ai", ".blend",
-    ".csproj", ".sln", ".user", ".pdb", ".mdb", ".tmp", ".log",
+    ".exe", ".pck", ".apk", ".aab", ".zip",
+    ".psd", ".ai", ".aseprite", ".ase", ".blend",   # 源文件自己在本地留，仓库只放导出的 png
+    ".dll", ".csproj", ".sln", ".user", ".pdb", ".mdb",
+    ".tmp", ".log",
+    ".import",                    # Godot 3 的导入文件，4.x 已不再生成
 }
-# 只有这些 Unity 资源类型强制要求同名 .meta；.md / .gitkeep 不参与。
-META_REQUIRED_EXTS = {
-    ".cs", ".png", ".jpg", ".jpeg", ".wav", ".mp3", ".ogg",
-    ".unity", ".prefab", ".asset", ".mat", ".anim", ".controller",
-    ".ttf", ".otf", ".shader",
-}
-ART_RE = re.compile(r"^(spr|ui|vfx|tex)_[a-z0-9_]+\.(png|jpg|jpeg)$")
+# Godot 的目录结构与命名前缀，见 docs/11_像素美术规格.md 第七节。
+# 只查这四棵子树：docs/ 里全是中文文件名，不能按代码规则要求。
+NAMING_ROOTS = ("Art/", "Audio/", "Scripts/", "Scenes/")
+ART_RE = re.compile(r"^(spr|tile|bg|ui|icon)_[a-z0-9_]+\.(png|jpg|jpeg)$")
 AUDIO_RE = re.compile(r"^(sfx|bgm)_[a-z0-9_]+\.(wav|mp3|ogg)$")
-SCRIPT_RE = re.compile(r"^[A-Z][A-Za-z0-9]*\.cs$")
+GD_RE = re.compile(r"^[a-z][a-z0-9_]*\.gd$")
+TSCN_RE = re.compile(r"^[a-z][a-z0-9_]*\.tscn$")
 BAD_NAME_CHARS = re.compile(r"[\s()]")
 NON_ASCII = re.compile(r"[^\x00-\x7f]")
-BAD_STEM_SUFFIX = re.compile(r"(?:^|_)(?:new|final)\d*$", re.IGNORECASE)
+BAD_STEM_SUFFIX = re.compile(r"(?:^|_)(?:new|final|v\d+)$", re.IGNORECASE)
 
-BANNED_CS_TOKENS = (
-    ("FindObjectOfType", "Unity 6 已废弃，改用 FindFirstObjectByType"),
-    ("FindObjectsOfType", "Unity 6 已废弃，改用 FindObjectsByType"),
-    ("Rigidbody2D", "本项目不用物理引擎，判定手写（线段-圆距离）"),
-    ("Cinemachine", "禁止引入第三方包"),
-    ("DG.Tweening", "禁止引入 DOTween"),
-    ("UnityEngine.InputSystem", "项目用旧版 Input Manager"),
-    ("UnityEngine.Rendering.Universal", "项目用 Built-In，不上 URP"),
+# Godot 3 的写法和 AGENTS.md 明令禁止的两条，进 4.7 会直接报错或当场撞墙。
+# 三个 @ 开头的注解必须用负向后顾：`@export var` 里含有子串 `export var`，
+# 纯子串匹配会把正确写法一起判死。
+BANNED_GD_PATTERNS = (
+    (re.compile(r"\bKinematicBody2D\b"), "KinematicBody2D", "Godot 3 类名，改 CharacterBody2D"),
+    (re.compile(r"\bSpatial\b"), "Spatial", "Godot 3 类名，改 Node3D"),
+    (re.compile(r"\byield\s*\("), "yield(", "Godot 3 语法，改 await"),
+    (re.compile(r"(?<!@)\bexport\s+var\b"), "export var", "Godot 3 语法，改 @export var"),
+    (re.compile(r"(?<!@)\bexport\s*\("), "export(", "Godot 3 语法，改 @export("),
+    (re.compile(r"(?<!@)\bonready\s+var\b"), "onready var", "Godot 3 语法，改 @onready var"),
+    (re.compile(r"\.instance\s*\("), ".instance(", "Godot 3 写法，改 .instantiate()"),
+    (re.compile(r"\bOS\.get_ticks_msec\b"), "OS.get_ticks_msec", "改 Time.get_ticks_msec()"),
+    (re.compile(r"get_tree\(\)\.change_scene\("), "get_tree().change_scene(", "改 change_scene_to_file()"),
 )
-PUBLIC_FIELD_RE = re.compile(
-    r"^\s*public\s+(?:static\s+|readonly\s+)?"
-    r"[\w<>\[\],\.\?]+\s+\w+\s*(?:=\s*[^;]+)?;\s*$"
-)
-NAMESPACE_RE = re.compile(r"^\s*namespace\s+([\w\.]+)\s*([;{])", re.MULTILINE)
+VELOCITY_Y_HARDCODE = re.compile(r"velocity\.y\s*=\s*-")
+DEEP_NODE_PATH = re.compile(r'(?:get_node\(\s*|\$)\s*"?((?:\.\./){2,})')
 MD_LINK_RE = re.compile(r"!?\[[^\]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
 
 
@@ -155,7 +158,7 @@ def validate_subject(subject: str) -> list[str]:
     needs_p = m.group("type") in {"feat", "fix", "art", "polish"} and m.group("scope") not in P_TAG_EXEMPT_SCOPES
     if needs_p and not P_TAG_RE.search(body):
         problems.append(
-            "功能/修复/美术提交必须带 P 编号，如 [P0-3] [P1-4]（编号见 docs/00_范围与不做清单.md）"
+            "功能/修复/美术提交必须带 P 编号，如 [P0-3] [P1-4]（编号见 docs/00_实训硬要求.md）"
         )
     return problems
 
@@ -168,7 +171,7 @@ def check_hygiene(root: Path, files: list[str], max_bytes: int = MAX_BYTES) -> l
         p = Path(rel)
         top = p.parts[0].lower() if p.parts else ""
         if top in FORBIDDEN_TOP_DIRS:
-            issues.append(err(rel, "引擎生成物或本地目录不应入库（Library/Build/Logs 等）"))
+            issues.append(err(rel, "引擎生成物或本地目录不应入库（.godot/build/logs 等）"))
         if p.suffix.lower() in FORBIDDEN_EXTS:
             issues.append(err(rel, f"{p.suffix} 文件不应入库（出包产物 / IDE 缓存 / 大型源素材）"))
         full = root / rel
@@ -181,35 +184,20 @@ def check_hygiene(root: Path, files: list[str], max_bytes: int = MAX_BYTES) -> l
     return issues
 
 
-# ---------------------------------------------------------------- .meta 配对
-
-def check_meta(root: Path, files: list[str]) -> list[Issue]:
-    issues: list[Issue] = []
-    fileset = set(files)
-    for rel in files:
-        if not rel.startswith("Assets/") or rel.startswith("Assets/_Scratch/"):
-            continue
-        p = Path(rel)
-        if p.name == ".gitkeep":
-            continue
-        if p.suffix == ".meta":
-            target = rel[:-5]
-            if target not in fileset and not (root / target).is_dir():
-                issues.append(err(rel, "孤立的 .meta：对应的资源已不存在，请一并删除"))
-        elif p.suffix.lower() in META_REQUIRED_EXTS and rel + ".meta" not in fileset:
-            issues.append(err(rel, "缺少同名 .meta，别人拉下来会丢失引用（在 Unity 里打开一次即可生成）"))
-    return issues
-
-
 # ---------------------------------------------------------------- 命名规范
 
 def check_naming(root: Path, files: list[str]) -> list[Issue]:
+    """只查 Art/ Audio/ Scripts/ Scenes/ 四棵子树。
+
+    docs/ 里本来就全是中文文件名，所以不做全局非 ASCII 拦截，
+    否则每篇文档都会被自己的检查器判死。
+    """
     issues: list[Issue] = []
     for rel in files:
-        if not rel.startswith("Assets/") or rel.startswith("Assets/_Scratch/"):
+        if not rel.startswith(NAMING_ROOTS):
             continue
         p = Path(rel)
-        if p.name == ".gitkeep" or p.suffix == ".meta":
+        if p.name == ".gitkeep" or p.suffix.lower() in {".uid", ".import"}:
             continue
         for part in p.parts:
             if NON_ASCII.search(part):
@@ -218,76 +206,75 @@ def check_naming(root: Path, files: list[str]) -> list[Issue]:
             if BAD_NAME_CHARS.search(part):
                 issues.append(err(rel, "路径含空格或括号，禁止"))
                 break
-        stem = p.stem
-        if BAD_STEM_SUFFIX.search(stem):
-            issues.append(err(rel, "文件名以 new/final 结尾，禁止（用 Git 管版本，不靠文件名）"))
+        if BAD_STEM_SUFFIX.search(p.stem):
+            issues.append(err(rel, "文件名带 new/final/_v2，禁止（改用 Git 管版本）"))
 
-        under_scripts = rel.startswith("Assets/_Project/Scripts/") or rel.startswith("Assets/Editor/")
-        if under_scripts and p.suffix == ".cs" and not SCRIPT_RE.match(p.name):
-            issues.append(err(rel, "脚本文件名必须 PascalCase 且与类名一致，如 EnemyChaser.cs"))
-        if rel.startswith("Assets/_Project/Art/") and p.suffix.lower() in {".png", ".jpg", ".jpeg"}:
+        low = p.suffix.lower()
+        if rel.startswith("Art/") and low in {".png", ".jpg", ".jpeg"}:
             if not ART_RE.match(p.name):
-                issues.append(err(rel, "美术资源命名：spr_/ui_/vfx_/tex_ 前缀 + 小写下划线，如 spr_player_base.png"))
-        if rel.startswith("Assets/_Project/Audio/") and p.suffix.lower() in {".wav", ".mp3", ".ogg"}:
+                issues.append(err(rel, "美术命名：spr_/tile_/bg_/ui_/icon_ 前缀 + 小写下划线，如 spr_player.png"))
+        elif rel.startswith("Audio/") and low in {".wav", ".mp3", ".ogg"}:
             if not AUDIO_RE.match(p.name):
-                issues.append(err(rel, "音频命名：sfx_/bgm_ 前缀 + 小写下划线，三段蓄力音效用 tier1-3"))
+                issues.append(err(rel, "音频命名：sfx_/bgm_ 前缀 + 小写下划线，如 sfx_jump.wav"))
+        elif rel.startswith("Scripts/") and low == ".gd":
+            if not GD_RE.match(p.name):
+                issues.append(err(rel, "脚本名必须 snake_case 且与节点同名，如 player.gd、gravity_zone.gd"))
+        elif rel.startswith("Scenes/") and low == ".tscn":
+            if not TSCN_RE.match(p.name):
+                issues.append(err(rel, "场景名必须 snake_case，如 level_0.tscn、player.tscn"))
     return issues
 
 
-# ---------------------------------------------------------------- C# 硬约束
+# ---------------------------------------------------------------- GDScript 硬约束
 
-def strip_comments(src: str) -> list[str]:
-    """去掉块注释与行注释后按行返回。字符串里的 // 会被一并截断，
-    对本文件检查的关键字没有影响。"""
-    src = re.sub(r"/\*.*?\*/", "", src, flags=re.S)
+def strip_gd_comments(src: str) -> list[str]:
+    """去掉 GDScript 的行注释后按行返回。
+
+    逐字符判断引号，所以 `"http://x"` 里的 `//`、`"a#b"` 里的 `#`
+    都不会被当成注释截断。
+    """
     lines = []
     for line in src.splitlines():
-        idx = line.find("//")
-        lines.append(line[:idx] if idx != -1 else line)
+        quote = ""
+        cut = len(line)
+        for i, ch in enumerate(line):
+            if quote:
+                if ch == quote:
+                    quote = ""
+            elif ch in "\"'":
+                quote = ch
+            elif ch == "#":
+                cut = i
+                break
+        lines.append(line[:cut])
     return lines
 
 
-def is_public_field(line: str) -> bool:
-    s = line.strip()
-    if not s.startswith("public "):
-        return False
-    if " event " in s or s.startswith("public event "):
-        return False                      # 事件是本项目推荐的跨模块通信方式
-    if " const " in s or " static readonly " in s:
-        return False                      # 常量允许 public
-    if "=>" in s:
-        return False                      # 表达式属性
-    if "(" in s.split("=")[0]:
-        return False                      # 方法 / 构造函数 / 委托
-    return bool(PUBLIC_FIELD_RE.match(line))
-
-
-def check_csharp(root: Path, files: list[str]) -> list[Issue]:
+def check_gdscript(root: Path, files: list[str]) -> list[Issue]:
     issues: list[Issue] = []
     for rel in files:
-        if not rel.startswith("Assets/") or not rel.endswith(".cs"):
+        if not rel.endswith(".gd"):
             continue
         src = read_text(root / rel)
         if not src:
             continue
-        lines = strip_comments(src)
-
-        ns = NAMESPACE_RE.search(src)
-        if ns is None:
-            issues.append(err(rel, "缺少 namespace，所有脚本统一 namespace FlickCut"))
-        elif ns.group(2) == ";":
-            issues.append(err(rel, "不要用 C# 10 的 file-scoped namespace，本项目用 C# 8.0"))
-        elif ns.group(1) != "FlickCut":
-            issues.append(err(rel, f"命名空间是 {ns.group(1)}，必须统一为 FlickCut"))
-
-        for lineno, line in enumerate(lines, start=1):
-            if is_public_field(line):
-                issues.append(err(rel, "不要用 public 字段，改 [SerializeField] private", lineno))
-            for token, why in BANNED_CS_TOKENS:
-                if token in line:
-                    issues.append(err(rel, f"禁用 {token}：{why}", lineno))
-            if "Time.timeScale" in line and Path(rel).name != "GameFlow.cs":
-                issues.append(err(rel, "时间缩放只能通过 GameFlow.TimeScale，不得直接写 Time.timeScale", lineno))
+        for lineno, line in enumerate(strip_gd_comments(src), start=1):
+            for pattern, label, why in BANNED_GD_PATTERNS:
+                if pattern.search(line):
+                    issues.append(err(rel, f"禁用 {label}：{why}", lineno))
+            if VELOCITY_Y_HARDCODE.search(line):
+                issues.append(err(
+                    rel,
+                    "跳跃不要写死 velocity.y 负数：重力翻转后会朝墙里撞。"
+                    "用 up_direction * JUMP_SPEED（见 AGENTS.md 物理一节）",
+                    lineno,
+                ))
+            if DEEP_NODE_PATH.search(line):
+                issues.append(err(
+                    rel,
+                    "禁止 ../../ 深路径取节点：父节点一改就全断。用 signal 或 @onready 引用同级节点",
+                    lineno,
+                ))
     return issues
 
 
@@ -314,9 +301,8 @@ def check_links(root: Path, files: list[str]) -> list[Issue]:
 
 CHECKS = {
     "hygiene": check_hygiene,
-    "meta": check_meta,
     "naming": check_naming,
-    "csharp": check_csharp,
+    "gdscript": check_gdscript,
     "links": check_links,
 }
 

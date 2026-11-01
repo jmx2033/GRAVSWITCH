@@ -35,7 +35,7 @@ jobs:
       - name: 检查器自测（先证明检查器本身不误报、不漏报）
         run: python Tools/ci/test_checks.py
 
-      - name: 仓库静态检查（卫生 / .meta 配对 / 命名 / C# 硬约束 / 文档链接）
+      - name: 仓库静态检查（卫生 / 命名 / GDScript 硬约束 / 文档链接）
         run: python Tools/ci/checks.py all
 
       - name: 提交信息格式（仅 PR，检查本次 PR 引入的每条提交）
