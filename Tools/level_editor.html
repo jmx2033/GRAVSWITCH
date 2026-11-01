@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>关卡格子编辑器 · GRAVSWITCH</title>
+<style>
+  :root{
+    --bg:#100D14; --panel:#1A1620; --line:#2E2530; --rock:#4A3B45;
+    --plat:#6B5A63; --spike:#FF8A3D; --mag:#9B7FD4; --cyan:#7FE8FF;
+    --gold:#F5D76E; --text:#E8E2E9; --muted:#8C8190; --cell:30px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font:14px/1.6 "Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    padding:20px 24px 40px;
+  }
+  h1{font-size:18px; margin:0 0 2px; letter-spacing:.5px}
+  .sub{color:var(--muted); font-size:12px; margin-bottom:16px}
+  main{display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap}
+
+  /* ---------- 左：网格 ---------- */
+  .board{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px}
+  .tabs{display:flex; gap:6px; margin-bottom:12px}
+  .tab{
+    background:transparent; border:1px solid var(--line); color:var(--muted);
+    padding:4px 12px; border-radius:6px; cursor:pointer; font-size:13px;
+  }
+  .tab.on{border-color:var(--cyan); color:var(--cyan)}
+  .gridwrap{display:grid; grid-template-columns:22px auto; grid-template-rows:18px auto; gap:4px; align-items:start}
+  .ruler{display:grid; grid-template-columns:repeat(20,var(--cell)); font-size:9px; color:var(--muted)}
+  .ruler span{text-align:center}
+  .ruler.v{grid-template-columns:22px; grid-template-rows:repeat(11,var(--cell)); display:grid}
+  .ruler.v span{line-height:var(--cell); text-align:right; padding-right:3px}
+  .grid{
+    display:grid; grid-template-columns:repeat(20,var(--cell));
+    grid-template-rows:repeat(11,var(--cell));
+    border:1px solid var(--line); background:#0C0A10; user-select:none;
+  }
+  .c{position:relative; border-right:1px solid rgba(46,37,48,.55); border-bottom:1px solid rgba(46,37,48,.55);
+     display:flex; align-items:center; justify-content:center; font-size:13px; cursor:crosshair}
+  .c:hover{outline:1px solid rgba(127,232,255,.55); outline-offset:-1px; z-index:2}
+  .c.s-rock{background:var(--rock)}
+  .c.s-plat{background:var(--plat)}
+  .c.s-plat::before{content:""; position:absolute; left:0; right:0; top:0; height:4px; background:#9B8A94}
+  .c.s-spike{background:transparent; color:var(--spike); font-size:15px}
+  .c.s-mag{background:rgba(155,127,212,.22); color:rgba(232,226,233,.9); box-shadow:inset 0 0 0 1px rgba(155,127,212,.45)}
+  .c.s-spawn{background:rgba(127,232,255,.18); color:var(--cyan); font-weight:700}
+  .c.s-goal{background:rgba(245,215,110,.18); color:var(--gold); font-weight:700}
+
+  /* ---------- 右：面板 ---------- */
+  aside{width:330px; display:flex; flex-direction:column; gap:14px}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:12px 14px}
+  .card h2{font-size:12px; color:var(--muted); font-weight:600; margin:0 0 10px; letter-spacing:1px}
+  .pal{display:grid; grid-template-columns:repeat(5,1fr); gap:6px}
+  .sw{
+    border:1px solid var(--line); background:#0C0A10; border-radius:6px; cursor:pointer;
+    padding:8px 0; text-align:center; color:var(--text); font-size:15px; line-height:1.1
+  }
+  .sw small{display:block; font-size:9px; color:var(--muted); margin-top:3px}
+  .sw.on{border-color:var(--cyan); box-shadow:0 0 0 1px var(--cyan) inset}
+  .btns{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+  button.act{
+    background:#231C29; border:1px solid var(--line); color:var(--text);
+    border-radius:6px; padding:8px; cursor:pointer; font-size:13px
+  }
+  button.act:hover{border-color:var(--cyan)}
+  button.act.primary{background:#1E3A3F; border-color:var(--cyan); color:var(--cyan)}
+  .diag{font-size:12px; line-height:1.8}
+  .diag .ok{color:#7FD4A0}
+  .diag .bad{color:var(--spike)}
+  pre{
+    margin:10px 0 0; background:#0C0A10; border:1px solid var(--line); border-radius:6px;
+    padding:10px; font:12px/1.35 "Cascadia Mono",Consolas,monospace; color:#B9D9C8;
+    overflow:auto; white-space:pre;
+  }
+  textarea{
+    width:100%; height:48px; background:#0C0A10; border:1px solid var(--line); border-radius:6px;
+    color:var(--text); font:12px/1.4 Consolas,monospace; padding:8px; margin-top:8px; resize:vertical
+  }
+  .hint{font-size:11px; color:var(--muted); margin-top:8px}
+  kbd{background:#231C29; border:1px solid var(--line); border-radius:3px; padding:0 4px; font-size:10px; color:var(--text)}
+</style>
+</head>
+<body>
+<h1>关卡格子编辑器</h1>
+<div class="sub">20 × 11 格 · 点格子填符号 · 右侧一键复制成文本，粘进 docs/03 或交给程序</div>
+
+<main>
+  <section class="board">
+    <div class="tabs" id="tabs"></div>
+    <div class="gridwrap">
+      <div></div>
+      <div class="ruler" id="rulerTop"></div>
+      <div class="ruler v" id="rulerLeft"></div>
+      <div class="grid" id="grid"></div>
+    </div>
+    <div class="hint">
+      左键按住可连续涂 · 右键擦成空 · 快捷键 <kbd>#</kbd> <kbd>=</kbd> <kbd>^</kbd> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> <kbd>o</kbd> <kbd>F</kbd> <kbd>.</kbd> 切符号 · <kbd>Ctrl+Z</kbd> 撤销
+    </div>
+  </section>
+
+  <aside>
+    <div class="card">
+      <h2>符号</h2>
+      <div class="pal" id="pal"></div>
+    </div>
+
+    <div class="card">
+      <h2>检查</h2>
+      <div class="diag" id="diag"></div>
+    </div>
+
+    <div class="card">
+      <h2>导出 / 导入</h2>
+      <div class="btns">
+        <button class="act primary" id="copyBtn">复制文本</button>
+        <button class="act" id="loadBtn">从文本导入</button>
+        <button class="act" id="clearBtn">清空本关</button>
+        <button class="act" id="undoBtn">撤销</button>
+      </div>
+      <pre id="out"></pre>
+      <textarea id="inp" placeholder="把格子文本粘到这里，再点「从文本导入」"></textarea>
+    </div>
+  </aside>
+</main>
+
+<script>
+const W = 20, H = 11;
+
+// 1 朝上 2 朝右 3 朝下 4 朝左
+const SYM = [
+  {k:'#', name:'实心砖',  cls:'s-rock',  show:''},
+  {k:'=', name:'单向平台', cls:'s-plat',  show:''},
+  {k:'^', name:'尖刺',    cls:'s-spike', show:'▲'},
+  {k:'1', name:'重力↑',   cls:'s-mag',   show:'↑'},
+  {k:'2', name:'重力→',   cls:'s-mag',   show:'→'},
+  {k:'3', name:'重力↓',   cls:'s-mag',   show:'↓'},
+  {k:'4', name:'重力←',   cls:'s-mag',   show:'←'},
+  {k:'o', name:'出生点',  cls:'s-spawn', show:'o'},
+  {k:'F', name:'终点',    cls:'s-goal',  show:'F'},
+  {k:'.', name:'空',      cls:'',        show:''}
+];
+const CLS_OF = {};
+SYM.forEach(s => CLS_OF[s.k] = s);
+
+const LEVEL0 = [
+  '####################',
+  '#............11111F#',
+  '#............111111#',
+  '#............111111#',
+  '#............111111#',
+  '#............111111#',
+  '#............111111#',
+  '#............111111#',
+  '#..###.......111111#',
+  '#o.###.......111111#',
+  '######....##########'
+];
+
+function blank(){
+  const g = [];
+  for (let y = 0; y < H; y++){
+    let row = '';
+    for (let x = 0; x < W; x++) row += (y === 0 || y === H-1 || x === 0 || x === W-1) ? '#' : '.';
+    g.push(row);
+  }
+  return g;
+}
+
+const STORE = 'gravswitch_levels_v1';
+let levels, cur = 0, paint = '#', painting = false, history = [];
+
+function load(){
+  try{
+    const raw = JSON.parse(localStorage.getItem(STORE));
+    if (Array.isArray(raw) && raw.length === 4) return raw.map(normalize);
+  }catch(e){}
+  const init = [LEVEL0, blank(), blank(), blank()];
+  return init.map(normalize);
+}
+function normalize(g){
+  const out = [];
+  for (let y = 0; y < H; y++){
+    let row = (g && g[y]) ? String(g[y]) : '';
+    row = row.replace(/[^#=^1234oF.]/g, '').slice(0, W);
+    while (row.length < W) row += '.';
+    out.push(row);
+  }
+  return out;
+}
+function save(){ try{ localStorage.setItem(STORE, JSON.stringify(levels)); }catch(e){} }
+
+levels = load();
+
+/* ---------------- 建 DOM ---------------- */
+const tabsEl = document.getElementById('tabs');
+for (let i = 0; i < 4; i++){
+  const b = document.createElement('button');
+  b.className = 'tab' + (i === 0 ? ' on' : '');
+  b.textContent = '关 ' + i;
+  b.onclick = () => { cur = i; refresh(); };
+  tabsEl.appendChild(b);
+}
+
+const palEl = document.getElementById('pal');
+SYM.forEach(s => {
+  const b = document.createElement('div');
+  b.className = 'sw' + (s.k === '#' ? ' on' : '');
+  b.innerHTML = (s.show || s.k) + '<small>' + s.name + '</small>';
+  b.onclick = () => setPaint(s.k);
+  b.dataset.k = s.k;
+  palEl.appendChild(b);
+});
+
+const rulerTop = document.getElementById('rulerTop');
+for (let x = 1; x <= W; x++){
+  const s = document.createElement('span');
+  s.textContent = x % 5 === 0 ? x : '';
+  rulerTop.appendChild(s);
+}
+const rulerLeft = document.getElementById('rulerLeft');
+for (let y = 1; y <= H; y++){
+  const s = document.createElement('span');
+  s.textContent = y;
+  rulerLeft.appendChild(s);
+}
+
+const gridEl = document.getElementById('grid');
+const cells = [];
+for (let y = 0; y < H; y++){
+  for (let x = 0; x < W; x++){
+    const d = document.createElement('div');
+    d.className = 'c';
+    d.dataset.x = x; d.dataset.y = y;
+    d.addEventListener('mousedown', e => {
+      e.preventDefault();
+      if (e.button === 2) return;
+      pushHistory();
+      painting = true;
+      put(x, y, e.shiftKey ? '.' : paint);
+    });
+    d.addEventListener('mouseenter', () => { if (painting) put(x, y, paint); });
+    d.addEventListener('contextmenu', e => {
+      e.preventDefault();
+      pushHistory();
+      put(x, y, '.');
+    });
+    gridEl.appendChild(d);
+    cells.push(d);
+  }
+}
+document.addEventListener('mouseup', () => { painting = false; });
+
+/* ---------------- 操作 ---------------- */
+function cellAt(x, y){ return cells[y * W + x]; }
+
+function put(x, y, k){
+  const exclusive = (k === 'o' || k === 'F');
+  // 出生点和终点各只允许一个
+  if (exclusive){
+    levels[cur] = levels[cur].map(r => r.split('').map(ch => ch === k ? '.' : ch).join(''));
+  }
+  const row = levels[cur][y];
+  levels[cur][y] = row.slice(0, x) + k + row.slice(x + 1);
+  if (exclusive){
+    for (let yy = 0; yy < H; yy++) for (let xx = 0; xx < W; xx++) paintCell(xx, yy);
+  }else{
+    paintCell(x, y);
+  }
+  refreshOut();
+  save();
+}
+
+function paintCell(x, y){
+  const k = levels[cur][y][x];
+  const d = cellAt(x, y);
+  const def = CLS_OF[k] || CLS_OF['.'];
+  d.className = 'c ' + def.cls;
+  d.textContent = def.show;
+}
+
+function refresh(){
+  [...tabsEl.children].forEach((b, i) => b.classList.toggle('on', i === cur));
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) paintCell(x, y);
+  refreshOut();
+}
+
+function setPaint(k){
+  paint = k;
+  [...palEl.children].forEach(b => b.classList.toggle('on', b.dataset.k === k));
+}
+
+function pushHistory(){
+  history.push(levels[cur].join('\n'));
+  if (history.length > 60) history.shift();
+}
+
+function undo(){
+  if (!history.length) return;
+  levels[cur] = history.pop().split('\n').map(r => (r + '.'.repeat(W)).slice(0, W));
+  refresh();
+  save();
+}
+
+/* ---------------- 检查 ---------------- */
+function refreshOut(){
+  const g = levels[cur];
+  document.getElementById('out').textContent = g.join('\n');
+
+  const flat = g.join('');
+  const nSpawn = (flat.match(/o/g) || []).length;
+  const nGoal = (flat.match(/F/g) || []).length;
+  const openEdge = [];
+  if (g[0].replace(/#/g, '').length) openEdge.push('顶边');
+  let sideOpen = false;
+  for (let y = 1; y < H-1; y++) if (g[y][0] !== '#' || g[y][W-1] !== '#') sideOpen = true;
+  if (sideOpen) openEdge.push('左右边');
+  const pit = g[H-1].replace(/#/g, '').length;
+
+  const mag = [0,0,0,0];
+  for (const ch of flat) if (ch >= '1' && ch <= '4') mag[+ch - 1]++;
+  const rock = (flat.match(/#/g) || []).length;
+
+  const lines = [];
+  lines.push(nSpawn === 1 ? '<span class="ok">✓ 出生点 1 个</span>' : '<span class="bad">✗ 出生点 ' + nSpawn + ' 个（要 1 个）</span>');
+  lines.push(nGoal === 1 ? '<span class="ok">✓ 终点 1 个</span>' : '<span class="bad">✗ 终点 ' + nGoal + ' 个（要 1 个）</span>');
+  lines.push(openEdge.length
+    ? '<span class="bad">! ' + openEdge.join('、') + ' 有缺口，角色会跑出屏幕</span>'
+    : '<span class="ok">✓ 顶边与左右封闭</span>');
+  lines.push(pit ? '<span class="ok">底边 ' + pit + ' 格是坑（掉下去算死，正常）</span>' : '<span class="ok">底边全封闭</span>');
+  lines.push('<span class="ok">实心 ' + rock + ' 格 · 重力区 ↑' + mag[0] + ' →' + mag[1] + ' ↓' + mag[2] + ' ←' + mag[3] + '</span>');
+  document.getElementById('diag').innerHTML = lines.join('<br>');
+}
+
+/* ---------------- 按钮 ---------------- */
+document.getElementById('copyBtn').onclick = async () => {
+  const txt = levels[cur].join('\n');
+  try{
+    await navigator.clipboard.writeText(txt);
+  }catch(e){
+    const t = document.createElement('textarea');
+    t.value = txt; document.body.appendChild(t); t.select();
+    document.execCommand('copy'); t.remove();
+  }
+  const b = document.getElementById('copyBtn');
+  b.textContent = '已复制 ✓';
+  setTimeout(() => b.textContent = '复制文本', 1200);
+};
+
+document.getElementById('undoBtn').onclick = undo;
+
+document.getElementById('clearBtn').onclick = () => {
+  if (!confirm('清空关 ' + cur + ' 的所有格子？')) return;
+  pushHistory();
+  levels[cur] = blank();
+  refresh(); save();
+};
+
+document.getElementById('loadBtn').onclick = () => {
+  const txt = document.getElementById('inp').value;
+  const rows = txt.split(/\r?\n/).filter(l => l.trim().length);
+  if (!rows.length) return alert('先把格子文本粘进下面的框里');
+  pushHistory();
+  levels[cur] = normalize(rows);
+  refresh(); save();
+};
+
+/* ---------------- 键盘 ---------------- */
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z'){ e.preventDefault(); undo(); return; }
+  if (e.target.tagName === 'TEXTAREA') return;
+  if ('#=^1234oF.'.includes(e.key)) setPaint(e.key);
+});
+
+refresh();
+</script>
+</body>
+</html>
