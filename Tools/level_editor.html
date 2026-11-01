@@ -44,6 +44,7 @@
   .c.s-rock{background:var(--rock)}
   .c.s-plat{background:var(--plat)}
   .c.s-plat::before{content:""; position:absolute; left:0; right:0; top:0; height:4px; background:#9B8A94}
+  .c.s-mplat{background:rgba(124,143,166,.28); color:#C3D3E4; box-shadow:inset 0 0 0 1px #7C8FA6; font-size:12px}
   .c.s-spike{background:transparent; color:var(--spike); font-size:15px}
   .c.s-mag{background:rgba(155,127,212,.22); color:rgba(232,226,233,.9); box-shadow:inset 0 0 0 1px rgba(155,127,212,.45)}
   .c.s-spawn{background:rgba(127,232,255,.18); color:var(--cyan); font-weight:700}
@@ -133,6 +134,7 @@ const W = 20, H = 11;
 const SYM = [
   {k:'#', name:'实心砖',  cls:'s-rock',  show:''},
   {k:'=', name:'单向平台', cls:'s-plat',  show:''},
+  {k:'~', name:'可动平台', cls:'s-mplat', show:'↔'},
   {k:'^', name:'尖刺',    cls:'s-spike', show:'▲'},
   {k:'1', name:'重力↑',   cls:'s-mag',   show:'↑'},
   {k:'2', name:'重力→',   cls:'s-mag',   show:'→'},
@@ -322,6 +324,8 @@ function refreshOut(){
   const mag = [0,0,0,0];
   for (const ch of flat) if (ch >= '1' && ch <= '4') mag[+ch - 1]++;
   const rock = (flat.match(/#/g) || []).length;
+  const nMove = (flat.match(/~/g) || []).length;
+  const unknown = [...new Set(flat.split('').filter(ch => !CLS_OF[ch]))];
 
   const lines = [];
   lines.push(nSpawn === 1 ? '<span class="ok">✓ 出生点 1 个</span>' : '<span class="bad">✗ 出生点 ' + nSpawn + ' 个（要 1 个）</span>');
@@ -331,6 +335,8 @@ function refreshOut(){
     : '<span class="ok">✓ 顶边与左右封闭</span>');
   lines.push(pit ? '<span class="ok">底边 ' + pit + ' 格是坑（掉下去算死，正常）</span>' : '<span class="ok">底边全封闭</span>');
   lines.push('<span class="ok">实心 ' + rock + ' 格 · 重力区 ↑' + mag[0] + ' →' + mag[1] + ' ↓' + mag[2] + ' ←' + mag[3] + '</span>');
+  if (nMove) lines.push('<span class="ok">可动平台 ' + nMove + ' 格（会来回走，玩家能站上去）</span>');
+  if (unknown.length) lines.push('<span class="bad">✗ 有程序不认识的符号：' + unknown.join(' ') + ' —— 换成符号表里的</span>');
   document.getElementById('diag').innerHTML = lines.join('<br>');
 }
 
@@ -371,7 +377,7 @@ document.getElementById('loadBtn').onclick = () => {
 document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z'){ e.preventDefault(); undo(); return; }
   if (e.target.tagName === 'TEXTAREA') return;
-  if ('#=^1234oF.'.includes(e.key)) setPaint(e.key);
+  if ('#=~^1234oF.'.includes(e.key)) setPaint(e.key);
 });
 
 refresh();

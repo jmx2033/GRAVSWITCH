@@ -357,7 +357,13 @@
 <p>32×32 一格，三角朝上，只画一个方向，布置时旋转。底部必须有<b>基座</b>（3–4px 深色条），否则看起来像浮在地面上。尖端加 <code>#FFF2E0</code> 白边，暗处才看得见轮廓。Q 版化：尖角切 1px，改「圆头三角」，一个像素的改动，气质差很多。</p>
 
 <h3>可动平台</h3>
-<p>直接复用 tile 的上表面和下表面，不单独做素材。</p>
+<p><b>单独一张 <code>spr_platform.png</code>，不许复用 tile。</b>长得跟砖一样的话，玩家要等它开始动才知道这是平台，第一次踩上去必被甩走。</p>
+<p>96×20 一张整图：3 格宽 × 16px 厚，底下留 4px 透明。长度和行程在 <code>03</code> 里都写死了，不用拼接。</p>
+<ul>
+  <li>主体 <code>#7C8FA6</code> 钢蓝灰，顶面 2px 亮边 <code>#B4C6D8</code>，四角切 1px（跟砖同一个圆角规矩）</li>
+  <li>顶面亮边上等距点 3 个 2×2 小方点，读起来像传送带——<b>这是唯一提示「它会动」的地方</b></li>
+  <li>不画箭头、不画链条、不加光效。这两个色比地形亮一档就成立，具体值自己调，只要不跟磁场的紫打架</li>
+</ul>
 
 <h2>七、命名与导出</h2>
 
@@ -378,7 +384,7 @@
   <tr><th>路径</th><th>放什么</th><th>谁维护</th></tr>
   <tr><td class="num">Art/player/</td><td>spr_player.png</td><td>美术</td></tr>
   <tr><td class="num">Art/field/</td><td>icon_arrow_up.png</td><td>美术</td></tr>
-  <tr><td class="num">Art/tiles/</td><td>tile_cave.png · tile_spike.png</td><td>美术</td></tr>
+  <tr><td class="num">Art/tiles/</td><td>tile_cave.png · tile_spike.png · spr_platform.png</td><td>美术</td></tr>
   <tr><td class="num">Art/bg/</td><td>bg_cave.png</td><td>美术</td></tr>
   <tr><td class="num">Art/ui/</td><td>ui_button.png</td><td>美术</td></tr>
   <tr><td class="num">Art/fonts/</td><td>SmileySans.ttf（目录名全小写）</td><td>美术</td></tr>
@@ -397,7 +403,7 @@
 <table>
   <tr><th>时间</th><th>交什么</th><th>谁</th></tr>
   <tr><td><b>10/31 今晚</b></td><td>先用纯色块代替角色：一个 20×28 的青方块，能跑就行</td><td>谁都快</td></tr>
-  <tr><td><b>11/1 上午</b></td><td>tile 6 格 + 尖刺 + <b>一个朝上箭头</b>（16×16）</td><td>一人一半</td></tr>
+  <tr><td><b>11/1 上午</b></td><td>tile 6 格 + 尖刺 + 可动平台 + <b>一个朝上箭头</b>（16×16）</td><td>一人一半</td></tr>
   <tr><td><b>11/1 晚上</b></td><td>角色完整 11 帧</td><td>风扇</td></tr>
   <tr><td><b>11/2</b></td><td>背景 + 主菜单与通关页 UI</td><td>三尺</td></tr>
 </table>
