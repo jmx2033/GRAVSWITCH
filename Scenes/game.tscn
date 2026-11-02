@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://co0dxsh54ae13"]
 
 [ext_resource type="PackedScene" uid="uid://b11hj8ncr5db5" path="res://Scenes/player.tscn" id="1_ebmjs"]
+[ext_resource type="PackedScene" uid="uid://u7jbmkf7gqyg" path="res://Scenes/gravity_zone.tscn" id="2_qxrlw"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2na5r"]
 size = Vector2(765, 29)
@@ -38,3 +39,11 @@ shape = SubResource("RectangleShape2D_sam6v")
 
 [node name="Player" parent="." unique_id=1085382721 instance=ExtResource("1_ebmjs")]
 position = Vector2(320, 250)
+
+[node name="GravityZone" parent="." unique_id=285377863 instance=ExtResource("2_qxrlw")]
+position = Vector2(356, 194)
+
+[node name="GravityZone2" parent="." unique_id=37853669 instance=ExtResource("2_qxrlw")]
+position = Vector2(365, 17)
+direction = 1
+size_in_tiles = Vector2i(3, 4)

@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://u7jbmkf7gqyg"]
+
+[ext_resource type="Script" uid="uid://b1kf8xyt00rvc" path="res://Scripts/level/gravity_zone.gd" id="1_gravity"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+resource_local_to_scene = true
+size = Vector2(192, 256)
+
+[node name="GravityZone" type="Area2D" unique_id=285377863]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("1_gravity")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=964753409]
+visible = false
+position = Vector2(96, 128)
+shape = SubResource("RectangleShape2D_1")
