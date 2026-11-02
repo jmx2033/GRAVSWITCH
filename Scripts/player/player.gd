@@ -88,11 +88,8 @@ func _physics_process(delta: float) -> void:
 
 	# 起跳
 	if jump_timer > 0.0 and coyote_timer > 0.0:
-		if g == Vector2.DOWN or g == Vector2.UP:
-			velocity.y = 0.0
-		else:
-			velocity.x = 0.0
-		velocity += (-g) * Config.JUMP_SPEED
+		fall_speed = -Config.JUMP_SPEED
+		velocity = right_dir * side_speed + g * fall_speed
 		jump_timer = 0.0
 		coyote_timer = 0.0
 	
