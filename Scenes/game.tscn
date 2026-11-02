@@ -5,6 +5,9 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2na5r"]
 size = Vector2(765, 29)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sam6v"]
+size = Vector2(20, 382)
+
 [node name="Game" type="Node2D" unique_id=1598757090]
 
 [node name="Ground" type="StaticBody2D" parent="." unique_id=1673898157]
@@ -13,6 +16,25 @@ position = Vector2(320, 250)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Ground" unique_id=194819194]
 position = Vector2(18.5, 28)
 shape = SubResource("RectangleShape2D_2na5r")
+
+[node name="Ground2" type="StaticBody2D" parent="." unique_id=954397231]
+position = Vector2(320, 250)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground2" unique_id=1545927030]
+position = Vector2(10, -256)
+shape = SubResource("RectangleShape2D_2na5r")
+
+[node name="Ground3" type="StaticBody2D" parent="." unique_id=1993521543]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground3" unique_id=1899784709]
+position = Vector2(0, 181)
+shape = SubResource("RectangleShape2D_sam6v")
+
+[node name="Ground4" type="StaticBody2D" parent="." unique_id=1606097716]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground4" unique_id=1843922080]
+position = Vector2(644, 184)
+shape = SubResource("RectangleShape2D_sam6v")
 
 [node name="Player" parent="." unique_id=1085382721 instance=ExtResource("1_ebmjs")]
 position = Vector2(320, 250)
