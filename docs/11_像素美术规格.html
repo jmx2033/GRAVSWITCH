@@ -96,6 +96,10 @@
 
 <p><b>不是全锁死的。</b>真正不能动的是 5 个编码玩法信息的颜色，其余 7 个你们自己调，改完在表里写新值就行。</p>
 
+<div style="border-left:4px solid #7BFFD1;padding:8px 12px;background:#241E28">
+  <b>11/2 修订：玩家色以实际素材为准。</b>交付的 <code>spr_player.png</code> 实测用了 7 个色（#4CAEB5 主体 / #7BFFD1 亮面 / #E5FFF3 高光 / #2C6195 暗部 / #4D475C、#848598 腿脚 / 黑 眼睛），与纸面的 P06、P07 不一致——<b>纸面色板作废，以实物为准</b>；其余锁死色（地形、磁场、危险）等对应素材出来再对齐。下文的角色 SVG 只作<b>形状</b>参考，颜色看实物。
+</div>
+
 <h3>锁死（5 个 · 动之前群里说一声）</h3>
 
 <table>
@@ -110,7 +114,7 @@
   </tr>
   <tr>
     <td><span class="sw" style="background:#7FE8FF"></span></td>
-    <td class="num">#7FE8FF</td><td>玩家</td><td>全场唯一的青，混了就找不到自己</td>
+    <td class="num"><s>#7FE8FF</s></td><td>玩家</td><td><b>11/2 作废</b>：实测为 #4CAEB5 + #7BFFD1 + #E5FFF3（以实物为准）</td>
   </tr>
   <tr>
     <td><span class="sw" style="background:#9B7FD4"></span></td>
@@ -129,7 +133,7 @@
   <tr><td><span class="sw" style="background:#100D14"></span></td><td class="num">#100D14</td><td>最远背景（暖紫黑）</td></tr>
   <tr><td><span class="sw" style="background:#1C1720"></span></td><td class="num">#1C1720</td><td>远景岩层 / 剪影</td></tr>
   <tr><td><span class="sw" style="background:#6B5560"></span></td><td class="num">#6B5560</td><td>岩壁受光面与边缘高光</td></tr>
-  <tr><td><span class="sw" style="background:#3A8FA8"></span></td><td class="num">#3A8FA8</td><td>玩家暗部（同时当描边）</td></tr>
+  <tr><td><span class="sw" style="background:#2C6195"></span></td><td class="num"><s>#3A8FA8</s></td><td>玩家暗部（同时当描边）<b>— 11/2 作废</b>：实测暗部 #2C6195、描边为黑</td></tr>
   <tr><td><span class="sw" style="background:#D9C7FF"></span></td><td class="num">#D9C7FF</td><td>重力区箭头与描边</td></tr>
   <tr><td><span class="sw" style="background:#FFF2E0"></span></td><td class="num">#FFF2E0</td><td>危险的高光边、UI 文字</td></tr>
   <tr><td><span class="sw" style="background:#F2F5FF"></span></td><td class="num">#F2F5FF</td><td>纯白备用（高光点、粒子）</td></tr>
@@ -200,7 +204,7 @@
 </table>
 
 <div class="callout">
-<b>描边澄清</b>（此前两份文档自相矛盾，这里定死）：角色<b>要</b> 1px 描边，颜色是 <code>#3A8FA8</code> 深青，<b>不是黑</b>；地形<b>不要</b>描边，靠明度差分。后面「不描 1px 黑边」那条只针对地形。
+<b>描边澄清（11/2 修订）</b>：角色<b>要</b> 1px 描边，<b>颜色以实际素材为准</b>——11/2 交付版用的是黑；觉得在深色底上发闷就换深青，由美术定。地形<b>不要</b>描边，靠明度差分。
 </div>
 
 <table>
@@ -213,8 +217,8 @@
 </table>
 
 <ul>
-  <li>共 11 帧。<b>run 的 4 帧是重点</b>，其他都可以糙。</li>
-  <li>sprite sheet 横排成一行，每帧 32×32，按上面顺序从左到右。Godot 里一个 Sprite2D 填 <code>hframes = 11</code> 就能切。</li>
+  <li><b>11/2 实交 14 帧</b>（idle 6 + run 8）；jump 1 / fall 1 / die 3 共 5 帧待补，<b>全齐后 19 帧</b>。</li>
+  <li><b>11/2 改：两行布局</b>——第 1 行 idle 横排、第 2 行 walk 横排，每帧 32×32，共 <b>8 列 × 2 行 = 256×64</b>（idle 占前 6 格，后 2 格留空）。Godot 里填 <code>hframes = 8</code> + <code>vframes = 2</code>：idle 播 frame 0–5，walk 播 frame 8–15；后续帧追加到表尾。</li>
   <li><b>只画朝右</b>，朝左在引擎里用 <code>flip_h</code> 翻转，不要画两套。</li>
 </ul>
 
@@ -404,7 +408,7 @@
   <tr><th>时间</th><th>交什么</th><th>谁</th></tr>
   <tr><td><b>10/31 今晚</b></td><td>先用纯色块代替角色：一个 20×28 的青方块，能跑就行</td><td>谁都快</td></tr>
   <tr><td><b>11/1 上午</b></td><td>tile 6 格 + 尖刺 + 可动平台 + <b>一个朝上箭头</b>（16×16）</td><td>一人一半</td></tr>
-  <tr><td><b>11/1 晚上</b></td><td>角色完整 11 帧</td><td>风扇</td></tr>
+  <tr><td><b>11/1 晚上</b></td><td>角色：<b>11/2 已交</b> idle 6 + run 8（两行 256×64），jump / fall / die 待补</td><td>风扇</td></tr>
   <tr><td><b>11/2</b></td><td>背景 + 主菜单与通关页 UI</td><td>三尺</td></tr>
 </table>
 
@@ -538,7 +542,7 @@
   <tr><td>角色脸</td><td>两只 <b>2×3</b> 竖点眼睛，中距 6px，<b>不画嘴</b></td></tr>
   <tr><td>一个 32×32 方块内的明度</td><td class="num">最多 3 档</td></tr>
   <tr><td>外露的角</td><td>切 <b>2px</b> 斜角（Q 版最省钱的信号）</td></tr>
-  <tr><td>角色描边</td><td>1px <code>#3A8FA8</code> 深青，<b>不是黑</b></td></tr>
+  <tr><td>角色描边</td><td>1px，色值以实际素材为准（11/2 交付版是黑）</td></tr>
   <tr><td>地形描边</td><td><b>不描</b>，靠明度差分离（1px 黑边在暗背景里等于消失）</td></tr>
   <tr><td>半透明</td><td>只允许两处：磁场场体 0.30 上限、石粒 0.55</td></tr>
   <tr><td>动态</td><td><b>只有磁场里的石粒会动</b>，其余全静止</td></tr>
