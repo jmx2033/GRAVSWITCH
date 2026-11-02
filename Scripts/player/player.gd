@@ -88,10 +88,14 @@ func _physics_process(delta: float) -> void:
 
 	# 起跳
 	if jump_timer > 0.0 and coyote_timer > 0.0:
+		if g == Vector2.DOWN or g == Vector2.UP:
+			velocity.y = 0.0
+		else:
+			velocity.x = 0.0
 		velocity += (-g) * Config.JUMP_SPEED
 		jump_timer = 0.0
 		coyote_timer = 0.0
-
+	
 	# 交给引擎移动
 	move_and_slide()
 
@@ -106,11 +110,11 @@ func _physics_process(delta: float) -> void:
 		if anim.animation != "idle":
 			anim.play("idle")
 
-	# 9. 左右翻转：地面和空中都生效
+	# 左右翻转：地面和空中都生效
 	if axis < 0.0:
 		anim.flip_h = true
 	elif axis > 0.0:
 		anim.flip_h = false
 
-	# 10. 角色跟着重力旋转
+	# 角色跟着重力旋转
 	anim.rotation = (-current_gravity).angle() + PI / 2
