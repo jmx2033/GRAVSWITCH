@@ -73,7 +73,7 @@
 <p>岩石纹理是最容易画成墙纸的东西：拼十格就看出重复。地形只用 6 种 tile，靠<b>轮廓不齐 + 三档明度 + 切角</b>区分，不靠纹理细节。Q 版指的是<b>比例（2 头身）和圆角</b>，不是细节量——<b>Q 版会让画面更简单，不是更复杂</b>。</p>
 
 <h3>3. 颜色只编码三件事</h3>
-<p><b>紫 = 磁场（改重力），橙 = 危险，青 = 你。</b>方向靠箭头，不靠颜色。四向各配一色看起来聪明，实际是让玩家记四个含义、让你们多画四套素材。</p>
+<p><b>紫 = 磁场（改重力），橙 = 危险，青 = 你。</b>方向靠石粒和边界加亮，不靠颜色。四向各配一色看起来聪明，实际是让玩家记四个含义、让你们多画四套素材。</p>
 
 <h3>4. 全场只有磁场会动</h3>
 <p>世界是死的，磁场是活的。这一条同时解决两个问题：<b>一眼能看出「哪块地方特殊」</b>，以及<b>不会因为满屏都在动而看不清方位</b>。</p>
@@ -134,7 +134,7 @@
   <tr><td><span class="sw" style="background:#1C1720"></span></td><td class="num">#1C1720</td><td>远景岩层 / 剪影</td></tr>
   <tr><td><span class="sw" style="background:#6B5560"></span></td><td class="num">#6B5560</td><td>岩壁受光面与边缘高光</td></tr>
   <tr><td><span class="sw" style="background:#2C6195"></span></td><td class="num"><s>#3A8FA8</s></td><td>玩家暗部（同时当描边）<b>— 11/2 作废</b>：实测暗部 #2C6195、描边为黑</td></tr>
-  <tr><td><span class="sw" style="background:#D9C7FF"></span></td><td class="num">#D9C7FF</td><td>重力区箭头与描边</td></tr>
+  <tr><td><span class="sw" style="background:#D9C7FF"></span></td><td class="num">#D9C7FF</td><td>重力区边界（加亮那一侧）</td></tr>
   <tr><td><span class="sw" style="background:#FFF2E0"></span></td><td class="num">#FFF2E0</td><td>危险的高光边、UI 文字</td></tr>
   <tr><td><span class="sw" style="background:#F2F5FF"></span></td><td class="num">#F2F5FF</td><td>纯白备用（高光点、粒子）</td></tr>
 </table>
@@ -295,7 +295,7 @@
 <b>先说命名，这条会直接打架。</b>文档和群里习惯叫「重力区」，美术表现叫<b>磁场</b>，但代码和场景名<b>一律用 <code>gravity_zone</code></b>。不要因为叫磁场就把代码名改了——CI 的提交 scope 是 <code>gravity</code>，已有脚本和场景都按这个走，改一次全队要跟着改。
 </div>
 
-<p><b>磁场靠什么体现重力方向：靠里面悬浮的石粒。</b>重力看不见，但石粒看得见——<b>石粒朝哪边飘，重力就朝哪边</b>。这是玩家读方向的主要依据，比箭头更直观，因为它就是「有东西在往那边掉」。箭头是第二重保险，保证三米外和投影仪上也一眼读得到。</p>
+<p><b>磁场靠什么体现重力方向：靠里面悬浮的石粒。</b>重力看不见，但石粒看得见——<b>石粒朝哪边飘，重力就朝哪边</b>。这是玩家读方向的主要依据，比箭头更直观，因为它就是「有东西在往那边掉」。三米外和投影仪上的保险是「重力指向那一侧的边界加亮加粗」。（11/2 改：箭头已取消）</p>
 
 <div class="fig">
   <svg viewBox="0 0 576 192" width="100%" style="max-width:576px;background:#100D14;border:1px solid #E3E1DE;border-radius:4px" shape-rendering="crispEdges">
@@ -326,7 +326,7 @@
   </svg>
 </div>
 
-<p style="font-size:12px;color:#8A8F98">半透明紫 = 场体（底下压着的墙还看得见），外框 = 2px 实线边界 + 四角加粗，小点 = 悬浮石粒（<b>唯一会动的东西</b>，朝箭头方向匀速漂），白箭头 = 方向，必须比所有石粒都亮。粒子的疏密是静态示意图，实际是连续漂移。</p>
+<p style="font-size:12px;color:#8A8F98">半透明紫 = 场体（底下压着的墙还看得见），外框 = 2px 实线边界 + 四角加粗，小点 = 悬浮石粒（<b>唯一会动的东西</b>，朝箭头方向匀速漂），最亮的那条边 = 方向（箭头已取消），它必须比所有石粒都亮。粒子的疏密是静态示意图，实际是连续漂移。</p>
 
 <h3>三层，只有石粒会动</h3>
 
@@ -334,8 +334,8 @@
   <tr><th>层</th><th>画法</th><th>谁来画</th><th>会动吗</th></tr>
   <tr><td>场体</td><td>ColorRect + <code>#9B7FD4</code>，不透明度 <b>0.22–0.30</b></td><td>程序</td><td>不动</td></tr>
   <tr><td>边界</td><td>2px 实线 <code>#9B7FD4</code> + 四角各一个 4×4 加粗角标</td><td>程序</td><td>不动</td></tr>
-  <tr><td><b>悬浮石粒</b></td><td>每 32×32 格 <b>3 颗</b>、<b>每个磁场最多 24 颗</b>，每颗 <b>2×2px</b>，<code>#FFF2E0</code> 不透明度 0.55</td><td>程序</td><td><b>唯一会动的</b>：沿箭头方向匀速漂 10 px/s，出界从反方向重入</td></tr>
-  <tr><td>方向箭头</td><td>16×16，白芯 <code>#F2F5FF</code> + <code>#D9C7FF</code> 描边</td><td><b>美术</b></td><td>不动</td></tr>
+  <tr><td><b>悬浮石粒</b></td><td>每 32×32 格 <b>3 颗</b>、<b>每个磁场最多 24 颗</b>，每颗 <b>2×2px</b>，<code>#FFF2E0</code> 不透明度 0.55</td><td>程序</td><td><b>唯一会动的</b>：沿重力方向匀速漂 10 px/s，出界从反方向重入</td></tr>
+  <tr><td>方向提示</td><td>重力指向那一侧的边界<b>加亮加粗</b>（另三侧照旧 2px）</td><td>程序</td><td>不动</td></tr>
 </table>
 
 <div class="callout">
@@ -346,14 +346,14 @@
 <h3>三条硬限制</h3>
 
 <ol>
-  <li><b>石粒必须比箭头暗。</b>箭头是纯 <code>#F2F5FF</code> 实心加描边，石粒是 <code>#FFF2E0</code> 且 0.55 不透明度——一眼分得出主次。一样亮就是一片雪，方向反而读不出来。</li>
+  <li><b>石粒要和场体、边界拉开明度差。</b>石粒是 <code>#FFF2E0</code> 且 0.55 不透明度；场体更暗、边界更亮，一眼分得出主次。一样亮就是一片雪，方向反而读不出来。</li>
   <li><b>每格 3 颗、每颗 2×2，但每个磁场总数封顶 24 颗。</b>教学关那块磁场是 6×9 格，按 3 颗/格算会到 162 颗——那不是碎石，是沙尘暴，整块紫场会糊成一片。<b>面积越大密度越低</b>：小磁场（1–4 格）给 3 颗/格，大磁场按 24 颗摊开。</li>
   <li><b>场体不透明度上限 0.30。</b>超过之后玩家看不出这块紫里哪面墙能站，会直接走进坑里。</li>
 </ol>
 
-<h3>磁场这块，美术只交一个箭头</h3>
+<h3>磁场这块，美术零素材（11/2 改）</h3>
 
-<p>磁场其余三层全是程序画的，美术要交的只有<b>一个朝上的箭头图标，16×16</b>：三角底宽 12px、高 10px、杆宽 4px，垂直居中。太小在 3 倍放大后读不出方向，太大就盖住地形。</p>
+<p>磁场四层（场体、边界、加亮的那一侧、石粒）<b>全部由程序画</b>，美术这边零素材——色值由三尺定，登记在第三节那张表里。（11/2 改：原先要交的箭头图标已取消。）</p>
 
 <p>四向靠 <b>90° 整数旋转</b>（像素 90° 旋转无损，任意角度才糊），引擎 <code>rotation_degrees</code> 填 0 / 90 / 180 / 270。<b>不要画四个。</b>原来要求四个，现在只要一个，省三份活。</p>
 
@@ -366,7 +366,7 @@
 <ul>
   <li>主体 <code>#7C8FA6</code> 钢蓝灰，顶面 2px 亮边 <code>#B4C6D8</code>，四角切 1px（跟砖同一个圆角规矩）</li>
   <li>顶面亮边上等距点 3 个 2×2 小方点，读起来像传送带——<b>这是唯一提示「它会动」的地方</b></li>
-  <li>不画箭头、不画链条、不加光效。这两个色比地形亮一档就成立，具体值自己调，只要不跟磁场的紫打架</li>
+  <li>不画链条、不加光效。这两个色比地形亮一档就成立，具体值自己调，只要不跟磁场的紫打架</li>
 </ul>
 
 <h2>七、命名与导出</h2>
@@ -377,7 +377,7 @@
   <tr><td class="num">tile_</td><td>TileSet 图</td><td class="num">tile_cave.png</td></tr>
   <tr><td class="num">bg_</td><td>背景（可平铺）</td><td class="num">bg_cave.png</td></tr>
   <tr><td class="num">ui_</td><td>界面元素</td><td class="num">ui_button.png</td></tr>
-  <tr><td class="num">icon_</td><td>图标</td><td class="num">icon_arrow_up.png</td></tr>
+  <tr><td class="num">icon_</td><td>图标</td><td class="num">暂无（原 icon_arrow_up.png 已取消）</td></tr>
 </table>
 
 <p>全小写下划线，<b>不加版本号</b>（<code>_v2</code>、<code>_final</code>、<code>_new</code> 一律不许）。改了就覆盖，历史在 Git 里。</p>
@@ -387,7 +387,7 @@
 <table>
   <tr><th>路径</th><th>放什么</th><th>谁维护</th></tr>
   <tr><td class="num">Art/player/</td><td>spr_player.png</td><td>美术</td></tr>
-  <tr><td class="num">Art/field/</td><td>icon_arrow_up.png</td><td>美术</td></tr>
+  <tr><td class="num">Art/field/</td><td>（磁场零素材，程序画）</td><td>—</td></tr>
   <tr><td class="num">Art/tiles/</td><td>tile_cave.png · tile_spike.png · spr_platform.png</td><td>美术</td></tr>
   <tr><td class="num">Art/bg/</td><td>bg_cave.png</td><td>美术</td></tr>
   <tr><td class="num">Art/ui/</td><td>ui_button.png</td><td>美术</td></tr>
@@ -407,7 +407,7 @@
 <table>
   <tr><th>时间</th><th>交什么</th><th>谁</th></tr>
   <tr><td><b>10/31 今晚</b></td><td>先用纯色块代替角色：一个 20×28 的青方块，能跑就行</td><td>谁都快</td></tr>
-  <tr><td><b>11/1 上午</b></td><td>tile 6 格 + 尖刺 + 可动平台 + <b>一个朝上箭头</b>（16×16）</td><td>一人一半</td></tr>
+  <tr><td><b>11/1 上午</b></td><td>tile 6 格 + 尖刺 + 可动平台（11/2 改：箭头不做，磁场零素材）</td><td>一人一半</td></tr>
   <tr><td><b>11/1 晚上</b></td><td>角色：<b>11/2 已交</b> idle 6 + run 8（两行 256×64），jump / fall / die 待补</td><td>风扇</td></tr>
   <tr><td><b>11/2</b></td><td>背景 + 主菜单与通关页 UI</td><td>三尺</td></tr>
 </table>
@@ -463,7 +463,7 @@
 <p>四关里每一关都有重力区，而且重力区是画面里最大的一块彩色区域——不是偶尔出现的道具。玩家所有判断都绕着一句话转：<b>我现在被往哪个方向拽。</b>尖刺、坑、平台、可动平台都只是这条规则的应用，它们本身不带新规则。</p>
 
 <div class="callout">
-所以：紫色和那个白色箭头要画得足够清楚。<b>它是整个游戏最重要的一个视觉符号，比角色还重要。</b>角色画糊了玩家只是看不清自己，重力区画糊了玩家不知道该往哪走。
+所以：那片紫色和「重力指向那一侧更亮的那条边」要画得足够清楚。<b>它是整个游戏最重要的一个视觉符号，比角色还重要。</b>角色画糊了玩家只是看不清自己，重力区画糊了玩家不知道该往哪走。
 </div>
 
 <h3>1. 玩家在一关里只做五件事</h3>
@@ -473,7 +473,7 @@
   <tr><td class="num">1</td><td>按 ← → 在地上走</td><td>地面砖，朝上那一面有 3px 高光边</td></tr>
   <tr><td class="num">2</td><td>按空格跳上 2 格高的台阶</td><td>台阶的侧壁 + 顶面</td></tr>
   <tr><td class="num">3</td><td>从台阶顶跨过 4 格宽的坑</td><td>坑里<b>什么都不画</b>，露出最暗的背景</td></tr>
-  <tr><td class="num">4</td><td>走进紫色区域，人被推向天花板</td><td>半透明紫底 + 一个白色朝上箭头</td></tr>
+  <tr><td class="num">4</td><td>走进紫色区域，人被推向天花板</td><td>半透明紫场 + 往一个方向漂的石粒 + 上面那条边更亮</td></tr>
   <tr><td class="num">5</td><td>沿着天花板走到发光的门</td><td>门洞；天花板内表面也要有一条 3px 高光边</td></tr>
 </table>
 
@@ -521,7 +521,7 @@
   <rect x="69" y="347" width="2" height="3" fill="#3A8FA8"/>
 </svg>
 
-<p style="font-size:12px;color:#8A8F98">青 = 玩家（Q 版 2 头身 20×28），紫 = 磁场（箭头朝上，石粒朝箭头方向漂），发光的框 = 终点，中间那片空洞就是坑。远景那两块暗色是从洞顶垂下来的岩体，不是平台，不能站。</p>
+<p style="font-size:12px;color:#8A8F98">青 = 玩家（Q 版 2 头身 20×28），紫 = 磁场（上面那条边更亮，石粒朝重力方向漂），发光的框 = 终点，中间那片空洞就是坑。远景那两块暗色是从洞顶垂下来的岩体，不是平台，不能站。</p>
 
 <h3>2. 环境背景：地心洞穴的一条间隙</h3>
 
