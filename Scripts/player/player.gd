@@ -1,43 +1,64 @@
 extends CharacterBody2D
 
-@onready var anim: AnimatedSprite2D = $PlayerAnimated
+# 动画节点，在 _ready() 里赋值
+var anim: AnimatedSprite2D
 
-var _coyote: float = 0.0
-var _buffer: float = 0.0
+# 土狼时间倒计时
+var coyote_timer: float = 0.0
+
+# 跳预输入倒计时
+var jump_timer: float = 0.0
+
+
+func _ready() -> void:
+	anim = $PlayerAnimated
+	anim.play("idle")
 
 func _physics_process(delta: float) -> void:
+	# 1. 读重力方向
 	var g: Vector2 = Config.gravity_direction
 	up_direction = -g
 
+	# 2. 加重力，往下掉
 	velocity += g * Config.GRAVITY * delta
 
-	var axis := Input.get_axis("move_left", "move_right")
-	var target := axis * Config.MAX_SPEED
-	var rate := Config.ACCEL if absf(axis) > 0.01 else Config.DECEL
-	velocity.x = move_toward(velocity.x, target, rate * delta)
+	# 3. 左右移动
+	var axis: float = Input.get_axis("move_left", "move_right")
+	if axis != 0.0:
+		velocity.x = velocity.x + axis * Config.ACCEL * delta
+		velocity.x = clamp(velocity.x, -Config.MAX_SPEED, Config.MAX_SPEED)
+	else:
+		velocity.x = move_toward(velocity.x, 0.0, Config.DECEL * delta)
 
+	# 4. 更新土狼时间
 	if is_on_floor():
-		_coyote = Config.COYOTE_TIME
+		coyote_timer = Config.COYOTE_TIME
 	else:
-		_coyote -= delta
+		coyote_timer = coyote_timer - delta
 
+	# 5. 更新跳预输入
 	if Input.is_action_just_pressed("jump"):
-		_buffer = Config.JUMP_BUFFER_TIME
+		jump_timer = Config.JUMP_BUFFER_TIME
 	else:
-		_buffer -= delta
+		jump_timer = jump_timer - delta
 
-	if _buffer > 0.0 and _coyote > 0.0:
-		velocity += -g * Config.JUMP_SPEED
-		_buffer = 0.0
-		_coyote = 0.0
+	# 6. 起跳
+	if jump_timer > 0.0 and coyote_timer > 0.0:
+		velocity += (-g) * Config.JUMP_SPEED
+		jump_timer = 0.0
+		coyote_timer = 0.0
 
+	# 7. 交给引擎移动
 	move_and_slide()
-	_update_animation(axis)
 
-func _update_animation(axis: float) -> void:
+	# 8. 切动画
 	if not is_on_floor():
-		anim.animation = "idle"
-	elif absf(axis) > 0.01:
-		anim.animation = "run"
+		if anim.animation != "idle":
+			anim.play("idle")
+	elif axis != 0.0:
+		if anim.animation != "run":
+			anim.play("run")
+		anim.flip_h = axis < 0.0
 	else:
-		anim.animation = "idle"
+		if anim.animation != "idle":
+			anim.play("idle")
