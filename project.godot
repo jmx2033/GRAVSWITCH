@@ -55,11 +55,11 @@ restart={
 
 [layer_names]
 
-2d_render/layer_1="terrain"
-2d_render/layer_2="player"
-2d_render/layer_3="gravity_zone"
-2d_render/layer_4="spike"
-2d_render/layer_5="moving_platform"
+2d_physics/layer_1="terrain"
+2d_physics/layer_2="player"
+2d_physics/layer_3="gravity_zone"
+2d_physics/layer_4="spike"
+2d_physics/layer_5="moving_platform"
 
 [physics]
 

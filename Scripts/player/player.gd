@@ -51,14 +51,19 @@ func _physics_process(delta: float) -> void:
 	# 7. 交给引擎移动
 	move_and_slide()
 
-	# 8. 切动画
+		# 8. 切动画
 	if not is_on_floor():
 		if anim.animation != "idle":
 			anim.play("idle")
 	elif axis != 0.0:
 		if anim.animation != "run":
 			anim.play("run")
-		anim.flip_h = axis < 0.0
 	else:
 		if anim.animation != "idle":
 			anim.play("idle")
+
+	# 9. 左右翻转：地面和空中都生效
+	if axis < 0.0:
+		anim.flip_h = true
+	elif axis > 0.0:
+		anim.flip_h = false
