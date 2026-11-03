@@ -164,5 +164,6 @@ OpenGL API 3.3.0 ... - Compatibility - Using Device: ...
 | `docs/09_CSharp到GDScript速查.md` | 给会 C# 的人：语法对照 + 五个坑 + 角色控制器模板 |
 | `docs/10_策划做什么.md` | 策划的四样产出、每天三件事、试玩反馈怎么翻译成参数、砍需求的判据 |
 | `docs/11_像素美术规格.md` | **美术照着这份画**：地心洞穴间隙 + 像素 Q 版（2 头身）、12 色调色板（5 锁 7 放）、磁场与石粒、tile 种类、帧数、字体、导出设置。另有同名 `.html` 版，手机点开排版正常 |
+| `docs/12_tile_cave格位对照.md` | `Art/tiles/tile_cave.png` 的 13 块格位表：这张图怎么来的、各占哪一格、程序配碰撞与美术重标用途的待办 |
 | `docs/工程规范.md` | 协作与 Git 细则。**不用通读**：clone 后跑一次 `bash Tools/ci/install-hooks.sh`，格式错了本地就拦；要查细则再翻 §5.2 / §5.9 |
 | `docs/05_会议记录/` | 每次开会记一份 |
