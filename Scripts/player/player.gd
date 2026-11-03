@@ -3,6 +3,12 @@ extends CharacterBody2D
 ## 180° 反转的判定容差（弧度）。
 const FLIP_ANGLE_EPSILON := 0.001
 
+## 玩家死亡时发出，由 game.gd 或关卡脚本接住切 DEAD 状态。
+signal died
+
+## 玩家是否活着；死后停掉输入和重力。
+var is_alive: bool = true
+
 # 显示用的重力方向：只驱动角色贴图旋转，不影响物理。
 var current_gravity: Vector2 = Vector2.DOWN
 
@@ -36,13 +42,17 @@ var jump_timer: float = 0.0
 # 当前生效的重力区；只认最后进入的那个
 var _active_zone: Area2D = null
 
+
 func _ready() -> void:
 	anim = $PlayerAnimated
 	anim.play("idle")
 	collision = $CollisionShape2D
-	
+
 func _physics_process(delta: float) -> void:
+	if not is_alive:
+		return
 	_update_gravity(delta)
+
 
 	# 物理计算统一使用 _physics_gravity：
 	# 180° 反转时它保持原方向，等强度降到 0 后才翻向，
@@ -123,7 +133,10 @@ func _update_gravity(delta: float) -> void:
 	if target == Vector2.ZERO:
 		return
 	target = target.normalized()
-
+	
+	if _turning and not target.is_equal_approx(_turn_to):
+		_turning = false
+	
 	# 没有正在进行的转向时，检查是否需要开始新的一次转向
 	if not _turning:
 		# 已经与目标一致，不需要转向
@@ -192,3 +205,47 @@ func exit_gravity_zone(zone: Area2D) -> void:
 		return
 	_active_zone = null
 	Config.gravity_direction = Vector2.DOWN
+
+
+## 被尖刺或出界通知时调用，进入死亡状态。
+func die() -> void:
+	if not is_alive:
+		return
+	is_alive = false
+	velocity = Vector2.ZERO
+	anim.pause()
+	died.emit()
+
+
+## 重开时调用，把玩家恢复到指定位置并重置所有状态。
+func respawn(at: Vector2) -> void:
+	global_position = at
+	velocity = Vector2.ZERO
+	current_gravity = Vector2.DOWN
+	_physics_gravity = Vector2.DOWN
+	Config.gravity_direction = Vector2.DOWN
+	_gravity_scale = 1.0
+	_turning = false
+	_turn_is_flip = false
+	coyote_timer = 0.0
+	jump_timer = 0.0
+	is_alive = true
+	_active_zone = null
+	anim.rotation = 0.0
+	collision.rotation = 0.0
+	anim.play("idle")
+
+
+
+
+
+##测试区域
+## 按 R
+#func _input(event: InputEvent) -> void:
+	#if event.is_action_pressed("restart"):
+		#if is_alive:
+			#print(">>> 调用 die()")
+			#die()
+		#else:
+			#print(">>> 调用 respawn()")
+			#respawn(Vector2(320, 200))
