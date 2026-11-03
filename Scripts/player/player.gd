@@ -15,17 +15,19 @@ var current_gravity: Vector2 = Vector2.DOWN
 # 实际参与物理的重力方向；180° 反转时保持原方向，等强度降到 0 后再翻向。
 var _physics_gravity: Vector2 = Vector2.DOWN
 
-# 物理重力强度倍率：普通转向始终为 1；
-# 180° 反转时按 1 → 0 → 1 变化，避免过渡期间出现侧向重力。
+# 当前物理重力强度倍率（以 Config.GRAVITY 为 1g）：
+# 无区为 1，向下区为 2，失重为 0；转向时在旧/新强度之间过渡。
 var _gravity_scale: float = 1.0
 
 # 当前转向状态
 var _turning: bool = false  # 是否正在转向
 var _turn_is_flip: bool = false  # 本次是否为 180° 反转
-var _turn_from: Vector2 = Vector2.DOWN  # 转向起点
-var _turn_to: Vector2 = Vector2.DOWN  # 转向终点
+var _turn_from: Vector2 = Vector2.DOWN  # 转向起点方向
+var _turn_to: Vector2 = Vector2.DOWN  # 转向终点方向
 var _turn_angle: float = 0.0  # 起点到终点的有符号夹角
 var _turn_elapsed: float = 0.0  # 已转向时间，用于计算进度
+var _turn_start_scale: float = 1.0  # 转向开始时的重力强度
+var _turn_target_scale: float = 1.0  # 转向结束时的重力强度
 
 # 动画节点，在 _ready() 里赋值
 var anim: AnimatedSprite2D
@@ -39,8 +41,8 @@ var coyote_timer: float = 0.0
 # 跳预输入倒计时
 var jump_timer: float = 0.0
 
-# 当前生效的重力区；只认最后进入的那个
-var _active_zone: Area2D = null
+# 玩家当前重叠的重力区 -> 拉力方向；叠加时按各区的加速度贡献计算
+var _gravity_dirs: Dictionary = {}
 
 
 func _ready() -> void:
@@ -60,7 +62,7 @@ func _physics_process(delta: float) -> void:
 	var g: Vector2 = _physics_gravity
 	up_direction = -g
 
-	# 加重力，往下掉；_gravity_scale 只在 180° 反转时小于 1
+	# 施加合力重力；_gravity_scale 是当前强度（普通 1g、向下区 2g、失重 0 等）
 	velocity += g * Config.GRAVITY * _gravity_scale * delta
 
 	# 左右移动（沿"垂直于重力"的方向，不是世界 x 轴）
@@ -125,30 +127,46 @@ func _physics_process(delta: float) -> void:
 
 
 ## 推进重力转向。
-## 90° 转向：物理方向和显示方向一起匀速旋转。
-## 180° 反转：显示方向平滑转半圈，物理重力沿原轴按 1 → 0 → 1 衰减再反向，
-## 中点是失重状态，不会出现把角色往侧面拉的横向重力。
+## 目标加速度由基础重力和所有重叠区叠加得到：方向负责旋转，强度负责加速度大小。
+## 180° 反转时前半程沿旧方向衰减到 0，后半程沿新方向增强，避免侧向甩动。
 func _update_gravity(delta: float) -> void:
-	var target: Vector2 = Config.gravity_direction
-	if target == Vector2.ZERO:
-		return
-	target = target.normalized()
-	
-	if _turning and not target.is_equal_approx(_turn_to):
+	var target_accel: Vector2 = Config.gravity_acceleration
+
+	# 合力为 0：失重。保留当前朝向，但不再产生重力加速度。
+	if target_accel.is_zero_approx():
+		_physics_gravity = current_gravity
+		_gravity_scale = 0.0
 		_turning = false
-	
+		_turn_is_flip = false
+		return
+
+	var target: Vector2 = target_accel.normalized()
+	var target_strength: float = target_accel.length() / Config.GRAVITY
+
+	if _turning:
+		if not target.is_equal_approx(_turn_to):
+			_turning = false
+		else:
+			_turn_target_scale = target_strength
+
 	# 没有正在进行的转向时，检查是否需要开始新的一次转向
 	if not _turning:
-		# 已经与目标一致，不需要转向
+		# 方向已经一致：只更新强度，不需要转向
 		if target.is_equal_approx(_physics_gravity):
 			current_gravity = _physics_gravity
-			_gravity_scale = 1.0
+			_gravity_scale = target_strength
+			# 180° 反转前半程离开重力区时，目标会变回旧方向；
+			# 这里提前返回，必须清掉禁止起跳标记，否则会永久不能跳
+			_turning = false
+			_turn_is_flip = false
 			return
-		# 记录转向的起点、终点和夹角
+		# 记录转向的起点、终点、夹角和强度
 		_turn_from = _physics_gravity
 		_turn_to = target
 		_turn_angle = _turn_from.angle_to(_turn_to)
 		_turn_elapsed = 0.0
+		_turn_start_scale = _gravity_scale
+		_turn_target_scale = target_strength
 		# 夹角接近 180° 时按翻转处理
 		_turn_is_flip = absf(_turn_angle) > PI - FLIP_ANGLE_EPSILON
 		_turning = true
@@ -166,16 +184,18 @@ func _update_gravity(delta: float) -> void:
 	current_gravity = _turn_from.rotated(_turn_angle * weight).normalized()
 
 	if _turn_is_flip:
-		# 180° 反转：signed_scale 从 1 线性降到 -1。
-		# 前半程物理方向仍是起点，经过 0 后换成终点，
-		# 因此重力始终沿同一条轴，只是先减弱到 0 再反向增强。
-		var signed_scale: float = lerpf(1.0, -1.0, weight)
-		_gravity_scale = absf(signed_scale)
-		_physics_gravity = _turn_from if signed_scale >= 0.0 else _turn_to
+		# 180° 反转：前半程沿旧方向把强度降到 0，
+		# 后半程沿新方向把强度升到目标值。
+		if weight < 0.5:
+			_physics_gravity = _turn_from
+			_gravity_scale = lerpf(_turn_start_scale, 0.0, weight * 2.0)
+		else:
+			_physics_gravity = _turn_to
+			_gravity_scale = lerpf(0.0, _turn_target_scale, (weight - 0.5) * 2.0)
 	else:
-		# 90° 转向：物理方向跟随显示方向，强度保持不变
-		_gravity_scale = 1.0
+		# 小于 180° 的转向：物理方向跟随显示方向，强度同步插值
 		_physics_gravity = current_gravity
+		_gravity_scale = lerpf(_turn_start_scale, _turn_target_scale, weight)
 
 	# 到达终点，结束本次转向并精确对齐目标
 	if _turn_elapsed >= turn_time:
@@ -186,25 +206,45 @@ func _update_gravity(delta: float) -> void:
 func _finish_gravity_turn() -> void:
 	_physics_gravity = _turn_to
 	current_gravity = _turn_to
-	_gravity_scale = 1.0
+	_gravity_scale = _turn_target_scale
 	_turning = false
 	_turn_is_flip = false
 
 
-## 进入重力区：记录当前区，并把目标重力切到该区的拉力方向。
+## 进入重力区：记录该区的拉力方向，并重算所有重叠区的合力。
 func enter_gravity_zone(zone: Area2D, gravity_direction: Vector2) -> void:
 	if gravity_direction == Vector2.ZERO:
 		return
-	_active_zone = zone
-	Config.gravity_direction = gravity_direction
+	_gravity_dirs[zone] = gravity_direction
+	_apply_gravity_zones()
 
 
-## 离开重力区：只有离开当前生效的区，才把目标重力恢复为向下。
+## 离开重力区：移除该区的拉力，并重算剩余重叠区的合力。
 func exit_gravity_zone(zone: Area2D) -> void:
-	if zone != _active_zone:
-		return
-	_active_zone = null
-	Config.gravity_direction = Vector2.DOWN
+	_gravity_dirs.erase(zone)
+	_apply_gravity_zones()
+
+
+## 重算重力：基础向下重力 + 所有重叠区的贡献。
+func _apply_gravity_zones() -> void:
+	var total := Vector2.DOWN * Config.GRAVITY
+	for direction in _gravity_dirs.values():
+		var pull: Vector2 = direction
+		total += _zone_gravity(pull)
+	Config.gravity_acceleration = total
+
+
+## 单个重力区提供的加速度：
+## 向上区 2g（多出的 1g 抵消基础重力，净向上 1g）；
+## 向下区 1g；
+## 左/右区 1g 水平 + 1g 向上（抵消基础重力，净水平 1g）。
+func _zone_gravity(direction: Vector2) -> Vector2:
+	var pull: Vector2 = direction * Config.GRAVITY
+	if direction.is_equal_approx(Vector2.UP):
+		return pull * 2.0
+	if direction.is_equal_approx(Vector2.DOWN):
+		return pull
+	return pull + Vector2.UP * Config.GRAVITY
 
 
 ## 被尖刺或出界通知时调用，进入死亡状态。
@@ -223,14 +263,14 @@ func respawn(at: Vector2) -> void:
 	velocity = Vector2.ZERO
 	current_gravity = Vector2.DOWN
 	_physics_gravity = Vector2.DOWN
-	Config.gravity_direction = Vector2.DOWN
+	Config.gravity_acceleration = Vector2.DOWN * Config.GRAVITY
 	_gravity_scale = 1.0
 	_turning = false
 	_turn_is_flip = false
 	coyote_timer = 0.0
 	jump_timer = 0.0
 	is_alive = true
-	_active_zone = null
+	_gravity_dirs.clear()
 	anim.rotation = 0.0
 	collision.rotation = 0.0
 	anim.play("idle")
