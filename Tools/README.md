@@ -28,7 +28,7 @@ python Tools/ci/checks.py commits --range origin/main..HEAD
 > Unity 时期的两项规则（`.meta` 配对、C# 硬约束）已于 10/31 删除，替换为 Godot 版：
 > 卫生检查加拦 `.godot/`，命名检查改查 `Art/ Audio/ Scripts/ Scenes/` 四棵子树，
 > C# 检查换成 **GDScript 硬约束**（Godot 3 写法、写死 `velocity.y`、`../../` 深路径）。
-> 自测 15 项，`python Tools/ci/test_checks.py`。
+> 自测 17 项，`python Tools/ci/test_checks.py`。
 
 ## 出包
 

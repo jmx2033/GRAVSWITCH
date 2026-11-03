@@ -38,6 +38,16 @@ jobs:
       - name: 仓库静态检查（卫生 / 命名 / GDScript 硬约束 / 文档链接）
         run: python Tools/ci/checks.py all
 
-      - name: 提交信息格式（仅 PR，检查本次 PR 引入的每条提交）
-        if: github.event_name == 'pull_request'
-        run: python Tools/ci/checks.py commits --range "origin/${{ github.base_ref }}..HEAD"
+      - name: 提交信息校验（PR 查本次引入的提交；push 到 main 查本次推送的提交）
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            RANGE="origin/${{ github.base_ref }}..HEAD"
+          else
+            RANGE="${{ github.event.before }}..${{ github.sha }}"
+            # 首次推送 / 强推时 before 是全 0，退化成只查最新一条
+            case "$RANGE" in
+              0000000*..*) RANGE="HEAD~1..HEAD" ;;
+            esac
+          fi
+          echo "检查范围：$RANGE"
+          python Tools/ci/checks.py commits --range "$RANGE"

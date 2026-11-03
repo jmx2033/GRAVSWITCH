@@ -93,12 +93,22 @@ class Issue:
     message: str
 
 
+def _with_loc(path: str, message: str, line: int) -> str:
+    """把路径拼进消息里。
+
+    GitHub Actions 的注释正文只显示 message（路径写在注释的元数据里），
+    本地日志的定位段也依赖它——所以拼进来，两个地方都能一眼看出是哪个文件。
+    """
+    loc = f"{path}:{line}" if line else path
+    return f"{loc}: {message}"
+
+
 def err(path: str, message: str, line: int = 0) -> Issue:
-    return Issue("error", path, line, message)
+    return Issue("error", path, line, _with_loc(path, message, line))
 
 
 def warn(path: str, message: str, line: int = 0) -> Issue:
-    return Issue("warning", path, line, message)
+    return Issue("warning", path, line, _with_loc(path, message, line))
 
 
 def git_files(root: Path) -> list[str]:
@@ -330,8 +340,8 @@ def emit(issues: list[Issue]) -> tuple[int, int]:
         if github:
             print(f"::{i.level} file={i.path},line={i.line or 1}::{i.message}")
         else:
-            loc = f"{i.path}:{i.line}" if i.line else i.path
-            print(f"[{i.level.upper()}] {loc} — {i.message}")
+            # message 里已经带了路径（见 err/warn），这里不再重复拼。
+            print(f"[{i.level.upper()}] {i.message}")
     print(f"\n检查完成：{errors} 个错误，{warnings} 个提示")
     return errors, warnings
 

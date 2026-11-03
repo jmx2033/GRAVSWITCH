@@ -16,7 +16,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from checks import (  # noqa: E402
-    check_gdscript, check_hygiene, check_links, check_naming, validate_subject,
+    check_gdscript, check_hygiene, check_links, check_naming, err, validate_subject, warn,
 )
 
 VALID_GD = """extends CharacterBody2D
@@ -193,6 +193,24 @@ class TestRepoRules(unittest.TestCase):
         big = self.touch("Art/player/spr_big.png", b"x" * 2048)
         issues = check_hygiene(self.root, [big], max_bytes=1024)
         self.assertTrue(any("超过上限" in i.message for i in issues))
+
+
+class TestIssueMessage(unittest.TestCase):
+    """报错消息必须自带路径。
+
+    GitHub Actions 的注释正文只显示 message（路径在注释的元数据里），
+    CI 日志的定位段也依赖它——缺了就看不出是哪个文件（11/3 加）。
+    """
+
+    def test_message_contains_path(self):
+        i = err("Art/tiles/tile.png", "美术命名不合规")
+        self.assertIn("Art/tiles/tile.png", i.message)
+        self.assertTrue(i.message.startswith("Art/tiles/tile.png"))
+
+    def test_message_contains_line_when_given(self):
+        i = warn("Scripts/player/player.gd", "单文件超长", line=12)
+        self.assertIn("Scripts/player/player.gd:12", i.message)
+        self.assertEqual(i.level, "warning")
 
 
 if __name__ == "__main__":
