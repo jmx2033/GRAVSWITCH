@@ -12,6 +12,9 @@ var coyote_timer: float = 0.0
 # 跳预输入倒计时
 var jump_timer: float = 0.0
 
+# 当前生效的重力区；只认最后进入的那个
+var _active_zone: Area2D = null
+
 
 func _ready() -> void:
 	anim = $PlayerAnimated
@@ -115,3 +118,19 @@ func _physics_process(delta: float) -> void:
 
 	# 角色跟着重力旋转
 	anim.rotation = (-current_gravity).angle() + PI / 2
+
+
+## 进入重力区：记录当前区，并把目标重力切到该区的拉力方向。
+func enter_gravity_zone(zone: Area2D, gravity_direction: Vector2) -> void:
+	if gravity_direction == Vector2.ZERO:
+		return
+	_active_zone = zone
+	Config.gravity_direction = gravity_direction
+
+
+## 离开重力区：只有离开当前生效的区，才把目标重力恢复为向下。
+func exit_gravity_zone(zone: Area2D) -> void:
+	if zone != _active_zone:
+		return
+	_active_zone = null
+	Config.gravity_direction = Vector2.DOWN
