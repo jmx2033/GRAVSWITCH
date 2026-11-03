@@ -92,8 +92,8 @@ func _physics_process(delta: float) -> void:
 	else:
 		jump_timer = jump_timer - delta
 
-	# 起跳
-	if jump_timer > 0.0 and coyote_timer > 0.0:
+	# 起跳（180° 反转的失重期不许跳，否则会顺着翻转后的重力飞出去）
+	if jump_timer > 0.0 and coyote_timer > 0.0 and not _turn_is_flip:
 		fall_speed = -Config.JUMP_SPEED
 		velocity = right_dir * side_speed + g * fall_speed
 		jump_timer = 0.0
