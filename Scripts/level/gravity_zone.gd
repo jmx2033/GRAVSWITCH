@@ -146,7 +146,7 @@ func _draw_pull_edge() -> void:
 	draw_rect(edge, EDGE_HIGHLIGHT_COLOR)
 
 
-## 把 direction 枚举换成对应的单位向量（重力拉力方向）。
+## 把 direction 枚举换成对应的单位向量（重力拉力方向）。 
 func _pull() -> Vector2:
 	var pull: Vector2 = DIRS[clampi(direction, 0, DIRS.size() - 1)]
 	return pull
