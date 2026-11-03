@@ -38,13 +38,22 @@ position = Vector2(644, 184)
 shape = SubResource("RectangleShape2D_sam6v")
 
 [node name="Player" parent="." unique_id=1085382721 instance=ExtResource("1_ebmjs")]
-position = Vector2(320, 250)
+position = Vector2(227, 246)
 
 [node name="GravityZone" parent="." unique_id=285377863 instance=ExtResource("2_qxrlw")]
-position = Vector2(332, 24)
-direction = 1
+position = Vector2(84, 224)
 size_in_tiles = Vector2i(2, 2)
 
 [node name="GravityZone2" parent="." unique_id=37853669 instance=ExtResource("2_qxrlw")]
-position = Vector2(349, 175)
+position = Vector2(461, 175)
 size_in_tiles = Vector2i(3, 8)
+
+[node name="GravityZone3" parent="." unique_id=1292054527 instance=ExtResource("2_qxrlw")]
+position = Vector2(589, 187)
+direction = 3
+size_in_tiles = Vector2i(4, 2)
+
+[node name="GravityZone4" parent="." unique_id=998343648 instance=ExtResource("2_qxrlw")]
+position = Vector2(483, 61)
+direction = 1
+size_in_tiles = Vector2i(3, 3)

@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://ri1sfnbbhe5h" path="res://Scripts/player/player.gd" id="1_cvnsp"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2na5r"]
-size = Vector2(19, 25)
+size = Vector2(20, 28)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_n7ghd"]
 atlas = ExtResource("1_4flbx")
@@ -117,15 +117,15 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="Player" type="CharacterBody2D" groups=["player"] unique_id=1085382721]
+[node name="Player" type="CharacterBody2D" unique_id=1085382721 groups=["player"]]
 collision_layer = 2
 collision_mask = 17
 script = ExtResource("1_cvnsp")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=627174386]
-position = Vector2(-0.5, 0.5)
 shape = SubResource("RectangleShape2D_2na5r")
 
 [node name="PlayerAnimated" type="AnimatedSprite2D" parent="." unique_id=28649686]
 sprite_frames = SubResource("SpriteFrames_sam6v")
 animation = &"idle"
+offset = Vector2(1, 0)

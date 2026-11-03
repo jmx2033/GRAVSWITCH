@@ -24,6 +24,9 @@ var _turn_elapsed: float = 0.0  # 已转向时间，用于计算进度
 # 动画节点，在 _ready() 里赋值
 var anim: AnimatedSprite2D
 
+# 碰撞盒节点，在 _ready() 里赋值
+var collision: CollisionShape2D
+
 # 土狼时间倒计时
 var coyote_timer: float = 0.0
 
@@ -33,11 +36,11 @@ var jump_timer: float = 0.0
 # 当前生效的重力区；只认最后进入的那个
 var _active_zone: Area2D = null
 
-
 func _ready() -> void:
 	anim = $PlayerAnimated
 	anim.play("idle")
-
+	collision = $CollisionShape2D
+	
 func _physics_process(delta: float) -> void:
 	_update_gravity(delta)
 
@@ -108,6 +111,7 @@ func _physics_process(delta: float) -> void:
 
 	# 角色贴图跟随显示方向旋转；180° 反转时会平滑转半圈
 	anim.rotation = (-current_gravity).angle() + PI / 2
+	collision.rotation = anim.rotation
 
 
 ## 推进重力转向。
