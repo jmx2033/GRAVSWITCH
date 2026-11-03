@@ -41,9 +41,10 @@ shape = SubResource("RectangleShape2D_sam6v")
 position = Vector2(320, 250)
 
 [node name="GravityZone" parent="." unique_id=285377863 instance=ExtResource("2_qxrlw")]
-position = Vector2(356, 194)
+position = Vector2(332, 24)
+direction = 1
+size_in_tiles = Vector2i(2, 2)
 
 [node name="GravityZone2" parent="." unique_id=37853669 instance=ExtResource("2_qxrlw")]
-position = Vector2(365, 17)
-direction = 1
-size_in_tiles = Vector2i(3, 4)
+position = Vector2(349, 175)
+size_in_tiles = Vector2i(3, 8)
