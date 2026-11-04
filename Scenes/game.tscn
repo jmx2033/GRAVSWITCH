@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://b11hj8ncr5db5" path="res://Scenes/player.tscn" id="1_ebmjs"]
 [ext_resource type="PackedScene" uid="uid://u7jbmkf7gqyg" path="res://Scenes/gravity_zone.tscn" id="2_qxrlw"]
+[ext_resource type="PackedScene" uid="uid://cnnosxglxyvx3" path="res://Scenes/spike.tscn" id="3_wrm1d"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2na5r"]
 size = Vector2(765, 29)
@@ -38,23 +39,11 @@ position = Vector2(644, 184)
 shape = SubResource("RectangleShape2D_sam6v")
 
 [node name="Player" parent="." unique_id=1085382721 instance=ExtResource("1_ebmjs")]
-position = Vector2(294, 106)
+position = Vector2(270, 210)
 
 [node name="GravityZone" parent="." unique_id=285377863 instance=ExtResource("2_qxrlw")]
-position = Vector2(84, 224)
+position = Vector2(60, 138)
 size_in_tiles = Vector2i(2, 2)
 
-[node name="GravityZone2" parent="." unique_id=37853669 instance=ExtResource("2_qxrlw")]
-position = Vector2(200, 148)
-direction = 1
-size_in_tiles = Vector2i(3, 8)
-
-[node name="GravityZone3" parent="." unique_id=1292054527 instance=ExtResource("2_qxrlw")]
-position = Vector2(296, 148)
-direction = 3
-size_in_tiles = Vector2i(4, 4)
-
-[node name="GravityZone4" parent="." unique_id=998343648 instance=ExtResource("2_qxrlw")]
-position = Vector2(483, 61)
-direction = 1
-size_in_tiles = Vector2i(3, 3)
+[node name="Spike" parent="." unique_id=1755118528 instance=ExtResource("3_wrm1d")]
+position = Vector2(406, 247)
