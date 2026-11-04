@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://c3weq7t8eyox8"]
+
+[ext_resource type="TileSet" uid="uid://dpphdnueb46dl" path="res://Scenes/tileset_cave.tres" id="1_m0b12"]
+[ext_resource type="PackedScene" uid="uid://b11hj8ncr5db5" path="res://Scenes/player.tscn" id="2_8ryqv"]
+
+[node name="Level0" type="Node2D" unique_id=2016033085]
+
+[node name="Terrain" type="TileMapLayer" parent="." unique_id=506487372]
+tile_set = ExtResource("1_m0b12")
+
+[node name="Deco" type="TileMapLayer" parent="." unique_id=1145484285]
+enabled = false
+tile_set = ExtResource("1_m0b12")
+
+[node name="Zones" type="Node2D" parent="." unique_id=1402379953]
+
+[node name="Spawn" type="Marker2D" parent="." unique_id=757425576]
+
+[node name="Player" parent="." unique_id=1085382721 instance=ExtResource("2_8ryqv")]
+position = Vector2(114, 58)
