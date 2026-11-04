@@ -123,7 +123,11 @@ func _physics_process(delta: float) -> void:
 
 	# 角色贴图跟随显示方向旋转；180° 反转时会平滑转半圈
 	anim.rotation = (-current_gravity).angle() + PI / 2
-	collision.rotation = anim.rotation
+
+	# 180° 反转期间碰撞箱不跟转：
+	# 旋转中的包围盒会短暂变化，让重力区误判玩家进出，把目标重力改回去。
+	if not _turn_is_flip:
+		collision.rotation = anim.rotation
 
 
 ## 推进重力转向。
