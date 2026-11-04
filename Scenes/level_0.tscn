@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://u7jbmkf7gqyg" path="res://Scenes/gravity_zone.tscn" id="2_31js7"]
 [ext_resource type="PackedScene" uid="uid://cnnosxglxyvx3" path="res://Scenes/spike.tscn" id="4_pspvu"]
 [ext_resource type="PackedScene" uid="uid://bqom0xe37pje3" path="res://Scenes/moving_platform.tscn" id="5_vuqrd"]
+[ext_resource type="PackedScene" path="res://Scenes/level_goal.tscn" id="6_goal"]
 
 [node name="Level0" type="Node2D" unique_id=2016033085]
 
@@ -34,3 +35,6 @@ position = Vector2(169, 242)
 
 [node name="MovingPlatform" parent="." unique_id=440819158 instance=ExtResource("5_vuqrd")]
 position = Vector2(142, 207)
+
+[node name="LevelGoal" parent="." instance=ExtResource("6_goal")]
+position = Vector2(576, 0)
