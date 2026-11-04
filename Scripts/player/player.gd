@@ -106,8 +106,14 @@ func _physics_process(delta: float) -> void:
 
 	# 切动画
 	if not is_on_floor():
-		if anim.animation != "idle":
-			anim.play("idle")
+		# 空中分两种：还往上冲（fall_speed < 0）播 jump，往下掉播 fall。
+		# fall_speed 是"沿重力方向"的速度，负值代表在跟重力反着走 = 上升。
+		if fall_speed < 0.0:
+			if anim.animation != "jump":
+				anim.play("jump")
+		else:
+			if anim.animation != "fall":
+				anim.play("fall")
 	elif axis != 0.0:
 		if anim.animation != "run":
 			anim.play("run")
@@ -257,7 +263,8 @@ func die() -> void:
 		return
 	is_alive = false
 	velocity = Vector2.ZERO
-	anim.pause()
+	# 死亡动画：不循环，播完停在最后一帧（人形消散后是泡沫）。
+	anim.play("die")
 	died.emit()
 
 
