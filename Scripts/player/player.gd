@@ -64,11 +64,18 @@ func _physics_process(delta: float) -> void:
 
 	# 施加合力重力；_gravity_scale 是当前强度（普通 1g、向下区 2g、失重 0 等）
 	velocity += g * Config.GRAVITY * _gravity_scale * delta
-
+	
 	# 左右移动（沿"垂直于重力"的方向，不是世界 x 轴）
-	var right_dir: Vector2 = g.rotated(-PI / 2)
-	var axis: float = Input.get_axis("move_left", "move_right")
+	# 重力正上/正下时固定为屏幕右：倒立站天花板后按 D 仍然往右走，
+	# 不跟着角色朝向反向，操作习惯不变。
+	var right_dir: Vector2
+	if g.is_equal_approx(Vector2.DOWN) or g.is_equal_approx(Vector2.UP):
+		right_dir = Vector2.RIGHT
+	else:
+		right_dir = g.rotated(-PI / 2)
 
+	var axis: float = Input.get_axis("move_left", "move_right")
+	
 	# 把速度拆成两部分：沿重力方向的下落速度、垂直于重力方向的横移速度
 	var side_speed: float = velocity.dot(right_dir)
 	var fall_speed: float = velocity.dot(g)
@@ -122,11 +129,14 @@ func _physics_process(delta: float) -> void:
 			anim.play("idle")
 
 	# 左右翻转：地面和空中都生效
+	# 倒立（重力朝上）时要把翻转反过来：
+	# 旋转 180° 后精灵自身的"右"在屏幕上变成了"左"。
+	var upside_down: bool = _physics_gravity.y < 0.0
 	if axis < 0.0:
-		anim.flip_h = true
+		anim.flip_h = not upside_down
 	elif axis > 0.0:
-		anim.flip_h = false
-
+		anim.flip_h = upside_down
+	
 	# 角色贴图跟随显示方向旋转；180° 反转时会平滑转半圈
 	anim.rotation = (-current_gravity).angle() + PI / 2
 
@@ -299,4 +309,4 @@ func _input(event: InputEvent) -> void:
 			die()
 		else:
 			print(">>> 调用 respawn()")
-			respawn(Vector2(320, 200))
+			respawn(Vector2(50, 300))
