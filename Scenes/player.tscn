@@ -365,4 +365,4 @@ shape = SubResource("RectangleShape2D_2na5r")
 [node name="PlayerAnimated" type="AnimatedSprite2D" parent="." unique_id=28649686]
 sprite_frames = SubResource("SpriteFrames_sam6v")
 animation = &"idle"
-offset = Vector2(1, 0)
+offset = Vector2(1, 1)
