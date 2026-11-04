@@ -36,5 +36,5 @@ position = Vector2(169, 242)
 [node name="MovingPlatform" parent="." unique_id=440819158 instance=ExtResource("5_vuqrd")]
 position = Vector2(142, 207)
 
-[node name="LevelGoal" parent="." instance=ExtResource("6_goal")]
-position = Vector2(576, 0)
+[node name="LevelGoal" parent="." unique_id=1246939478 instance=ExtResource("6_goal")]
+position = Vector2(575, 2)
