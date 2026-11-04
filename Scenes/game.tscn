@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://b11hj8ncr5db5" path="res://Scenes/player.tscn" id="1_ebmjs"]
 [ext_resource type="PackedScene" uid="uid://u7jbmkf7gqyg" path="res://Scenes/gravity_zone.tscn" id="2_qxrlw"]
+[ext_resource type="PackedScene" uid="uid://g56phohff8q2" path="res://Scenes/mainmenu.tscn" id="3_wrm1d"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2na5r"]
 size = Vector2(765, 29)
@@ -58,3 +59,5 @@ size_in_tiles = Vector2i(4, 4)
 position = Vector2(483, 61)
 direction = 1
 size_in_tiles = Vector2i(3, 3)
+
+[node name="mainmenu" parent="." unique_id=2074724687 instance=ExtResource("3_wrm1d")]

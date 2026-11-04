@@ -29,12 +29,38 @@ func _ready() -> void:
 
 
 ## R 键重载当前场景；放在 _unhandled_input 里，不抢 UI 的输入。
+## R 键重生逻辑：不重载场景，直接重置玩家状态
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("restart"):
 		get_viewport().set_input_as_handled()
-		get_tree().reload_current_scene()
+		
+		# 1. 停止死亡倒计时（防止死后按 R 导致双重触发）
+		if has_method("_on_player_died") or has_node("RespawnTimer"):
+			 # 这里假设你有一个计时器节点，或者在 game.gd 里管理了重生延迟
+			 # 如果之前的逻辑是用 _respawn_timer，请确保在这里 stop() 它
+			 # 简单起见，我们主要关注重置玩家
+			pass
 
+		# 2. 寻找场景中的玩家节点
+		# 注意：这里假设玩家节点的名字叫 "Player"。
+		# 如果你的场景结构是 Level -> Player，可能需要用 $Level/Player
+		var player = get_node_or_null("Player") 
+		
+		# 3. 如果没找到，尝试在当前加载的关卡容器里找
+		if not player:
+			# 假设你的关卡是作为子节点加载在 game.gd 下的
+			# 这里的 "LevelContainer" 或类似名字取决于你的 _load_level 怎么写的
+			# 通常直接用 find_child 比较稳妥
+			player = find_child("Player", true, false)
 
+		# 4. 执行重生
+		if player and player.has_method("respawn"):
+			# 调用我们在 player.gd 里写好的 respawn 函数
+			# _spawn_position 是你在第 47 行定义的变量，正好在这里用！
+			player.respawn(_spawn_position)
+			print("Game.gd: 玩家已重生到 ", _spawn_position)
+		else:
+			print("警告: 未找到玩家节点或玩家没有 respawn 方法")
 ## 加载关卡：重置全局重力，缓存出生点，并连接玩家的 died 信号。
 func _load_level(level_scene: PackedScene) -> void:
 	# 重载场景时 autoload 不会重置；先恢复基础向下重力，避免残留上一局的合力。
