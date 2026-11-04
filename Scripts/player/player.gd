@@ -290,13 +290,13 @@ func respawn(at: Vector2) -> void:
 
 
 
-##测试区域
-## 按 R
-#func _input(event: InputEvent) -> void:
-	#if event.is_action_pressed("restart"):
-		#if is_alive:
-			#print(">>> 调用 die()")
-			#die()
-		#else:
-			#print(">>> 调用 respawn()")
-			#respawn(Vector2(320, 200))
+#测试区域
+# 按 R
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("restart"):
+		if is_alive:
+			print(">>> 调用 die()")
+			die()
+		else:
+			print(">>> 调用 respawn()")
+			respawn(Vector2(320, 200))
