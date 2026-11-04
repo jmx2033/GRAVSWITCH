@@ -6,8 +6,14 @@ const FLIP_ANGLE_EPSILON := 0.001
 ## 玩家死亡时发出，由 game.gd 或关卡脚本接住切 DEAD 状态。
 signal died
 
+## 玩家通关时发出，由 game.gd 接住切 WIN 状态或切关。
+signal won
+
 ## 玩家是否活着；死后停掉输入和重力。
 var is_alive: bool = true
+
+## 玩家是否已通关；通关后停掉输入和重力，die() 不再生效。
+var is_won: bool = false
 
 # 显示用的重力方向：只驱动角色贴图旋转，不影响物理。
 var current_gravity: Vector2 = Vector2.DOWN
@@ -51,7 +57,7 @@ func _ready() -> void:
 	collision = $CollisionShape2D
 
 func _physics_process(delta: float) -> void:
-	if not is_alive:
+	if not is_alive or is_won:
 		return
 	_update_gravity(delta)
 
@@ -267,9 +273,18 @@ func _zone_gravity(direction: Vector2) -> Vector2:
 	return pull + Vector2.UP * Config.GRAVITY
 
 
+## 被通关区域通知时调用，进入通关状态；之后 die() 不再生效。
+func win() -> void:
+	if is_won or not is_alive:
+		return
+	is_won = true
+	velocity = Vector2.ZERO
+	won.emit()
+
+
 ## 被尖刺或出界通知时调用，进入死亡状态。
 func die() -> void:
-	if not is_alive:
+	if not is_alive or is_won:
 		return
 	is_alive = false
 	velocity = Vector2.ZERO
@@ -291,6 +306,7 @@ func respawn(at: Vector2) -> void:
 	coyote_timer = 0.0
 	jump_timer = 0.0
 	is_alive = true
+	is_won = false
 	_gravity_dirs.clear()
 	anim.rotation = 0.0
 	collision.rotation = 0.0
