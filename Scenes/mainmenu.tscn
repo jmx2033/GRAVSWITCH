@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bwgx3km5n5imc"]
 
 [ext_resource type="Script" uid="uid://1rcdnt6jpwoh" path="res://Scripts/main_menu.gd" id="1_tt5f1"]
+[ext_resource type="Texture2D" path="res://Art/ui/ui_button.png" id="2_btn"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_frost"]
 bg_color = Color(0.12, 0.1, 0.18, 0.85)
@@ -15,6 +16,30 @@ corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 shadow_color = Color(0, 0, 0, 0.45)
 shadow_size = 8
+
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn_normal"]
+content_margin_left = 12.0
+content_margin_top = 4.0
+content_margin_right = 12.0
+content_margin_bottom = 4.0
+texture = ExtResource("2_btn")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn_hover"]
+content_margin_left = 12.0
+content_margin_top = 4.0
+content_margin_right = 12.0
+content_margin_bottom = 4.0
+texture = ExtResource("2_btn")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+modulate_color = Color(1.2, 1.2, 1.2, 1)
 
 [node name="mainmenu" type="Control" unique_id=2074724687]
 layout_mode = 3
@@ -35,11 +60,15 @@ anchor_bottom = 0.5
 offset_left = -56.0
 offset_top = -16.0
 offset_right = 64.0
-offset_bottom = 22.0
+offset_bottom = 16.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_colors/font_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_font_sizes/font_size = 20
 text = "START"
+theme_override_styles/normal = SubResource("StyleBoxTexture_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxTexture_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_btn_normal")
 
 [node name="ButtonSettings" type="Button" parent="." unique_id=1326681747]
 layout_mode = 1
@@ -51,11 +80,15 @@ anchor_bottom = 0.5
 offset_left = -56.0
 offset_top = 39.0
 offset_right = 64.0
-offset_bottom = 77.0
+offset_bottom = 71.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_colors/font_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_font_sizes/font_size = 20
 text = "SETTINGS"
+theme_override_styles/normal = SubResource("StyleBoxTexture_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxTexture_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_btn_normal")
 
 [node name="ButtonQuit" type="Button" parent="." unique_id=1326681748]
 layout_mode = 1
@@ -67,11 +100,15 @@ anchor_bottom = 0.5
 offset_left = -56.0
 offset_top = 97.0
 offset_right = 64.0
-offset_bottom = 135.0
+offset_bottom = 129.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_colors/font_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_font_sizes/font_size = 20
 text = "QUIT"
+theme_override_styles/normal = SubResource("StyleBoxTexture_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxTexture_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_btn_normal")
 
 [node name="SettingsPanel" type="Control" parent="." unique_id=2074724688]
 visible = false
