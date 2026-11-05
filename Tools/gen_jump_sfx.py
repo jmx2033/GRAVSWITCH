@@ -10,6 +10,7 @@
 - 砍掉中低频撞击体感：基频不往下坠、压低低频分量，轻而不是砸
 - 起音有一记清脆的"叩"噪点做敲击起始，但幅度轻
 """
+# 文件名必须带 sfx_ 前缀（CI 的音频命名规则）：sfx_jump_1.wav 这种。
 import wave
 import numpy as np
 import os
@@ -64,9 +65,9 @@ def write_wav(path: str, mono: np.ndarray) -> None:
 
 def main() -> None:
     variants = [
-        ("jump_1.wav", make_jump(1500.0, seed=11)),
-        ("jump_2.wav", make_jump(1250.0, seed=37)),
-        ("jump_3.wav", make_jump(1400.0, seed=73)),
+        ("sfx_jump_1.wav", make_jump(1500.0, seed=11)),
+        ("sfx_jump_2.wav", make_jump(1250.0, seed=37)),
+        ("sfx_jump_3.wav", make_jump(1400.0, seed=73)),
     ]
     for name, data in variants:
         path = os.path.normpath(os.path.join(OUT_DIR, name))
