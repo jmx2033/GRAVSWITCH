@@ -1,15 +1,19 @@
 extends Node
 
-## 主场景控制器：加载关卡，统一处理死亡重生和 R 重载。
+## 主场景控制器：按顺序加载关卡，统一处理死亡重生和 R 重载。
 ##
 ## 关卡只负责地形与出生点；存活流程集中在这里，换关或加状态机时不用改玩家脚本。
 
-## 要加载的关卡场景；换关时替换这个引用。
-@export var start_level: PackedScene
+## 按顺序排列的关卡；通关后自动进入下一关，最后一关通关后停留在当前关。
+@export var levels: Array[PackedScene] = []
 
 ## 负责 Config.RESPAWN_DELAY 秒后的重生；超时后把玩家送回出生点。
 @onready var _respawn_timer: Timer = $RespawnTimer
 
+# 当前关卡实例，切关时先卸载它。
+var _current_level: Node = null
+# 当前关卡在 levels 中的下标；-1 表示当前关卡不在序列里。
+var _level_index: int = -1
 # 当前关卡的玩家，通过 player 组查找；关卡重新加载后会重新获取。
 var _player: Node = null
 # 当前关卡的出生点，来自关卡里的 Spawn 节点。
@@ -22,45 +26,43 @@ func _ready() -> void:
 	_respawn_timer.wait_time = Config.RESPAWN_DELAY
 	_respawn_timer.timeout.connect(_on_respawn_timer_timeout)
 
-	if start_level == null:
-		push_error("game.gd：start_level 未设置")
+	if levels.is_empty():
+		push_error("game.gd：levels 未配置")
 		return
-	_load_level(start_level)
+	_load_level(levels[0])
 
 
-## R 键重载当前场景；放在 _unhandled_input 里，不抢 UI 的输入。
-## R 键重生逻辑：不重载场景，直接重置玩家状态
+## R 键重开当前关卡；放在 _unhandled_input 里，不抢 UI 的输入。
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("restart"):
-		get_viewport().set_input_as_handled()
-		
-		# 1. 停止死亡倒计时（防止死后按 R 导致双重触发）
-		if has_method("_on_player_died") or has_node("RespawnTimer"):
-			 # 这里假设你有一个计时器节点，或者在 game.gd 里管理了重生延迟
-			 # 如果之前的逻辑是用 _respawn_timer，请确保在这里 stop() 它
-			 # 简单起见，我们主要关注重置玩家
-			pass
+	if not event.is_action_pressed("restart"):
+		return
+	get_viewport().set_input_as_handled()
+	if _level_index < 0:
+		return
+	change_level.call_deferred(levels[_level_index])
 
-		# 2. 寻找场景中的玩家节点
-		var player = get_node_or_null("Player") 
-		
-		# 3. 如果没找到，尝试在当前加载的关卡容器里找
-		if not player:
-			player = find_child("Player", true, false)
 
-		# 4. 执行重生
-		if player and player.has_method("respawn"):
-			player.respawn(_spawn_position)
-			print("Game.gd: 玩家已重生到 ", _spawn_position)
-		else:
-			print("警告: 未找到玩家节点或玩家没有 respawn 方法")
-## 加载关卡：重置全局重力，缓存出生点，并连接玩家的 died 信号。
+## 切换到指定关卡场景；传 null 时什么也不做。
+func change_level(level_scene: PackedScene) -> void:
+	if level_scene == null:
+		return
+	if is_instance_valid(_current_level):
+		remove_child(_current_level)
+		_current_level.queue_free()
+	_respawn_timer.stop()
+	_load_level(level_scene)
+
+
+## 加载关卡：重置全局重力，缓存出生点，并连接玩家的 died / won 信号。
 func _load_level(level_scene: PackedScene) -> void:
 	# 重载场景时 autoload 不会重置；先恢复基础向下重力，避免残留上一局的合力。
 	Config.gravity_acceleration = Vector2.DOWN * Config.GRAVITY
+	_respawn_timer.stop()
 
 	var level: Node = level_scene.instantiate()
 	add_child(level)
+	_current_level = level
+	_level_index = levels.find(level_scene)
 
 	var spawn: Node2D = level.get_node_or_null("Spawn") as Node2D
 	if spawn != null:
@@ -77,6 +79,10 @@ func _load_level(level_scene: PackedScene) -> void:
 		push_error("game.gd：玩家节点缺少 died 信号")
 		return
 	_player.connect("died", _on_player_died)
+	if not _player.has_signal("won"):
+		push_error("game.gd：玩家节点缺少 won 信号")
+		return
+	_player.connect("won", _on_player_won)
 
 
 ## 玩家死亡后启动重生计时；die() 已幂等，这里不用防重复。
@@ -89,3 +95,14 @@ func _on_respawn_timer_timeout() -> void:
 	if not is_instance_valid(_player):
 		return
 	_player.call("respawn", _spawn_position)
+
+
+## 玩家通关后停掉重生计时；有下一关就切过去，否则停留在当前关。
+func _on_player_won() -> void:
+	_respawn_timer.stop()
+	if _level_index < 0:
+		return
+	var next_index: int = _level_index + 1
+	if next_index >= levels.size():
+		return
+	change_level.call_deferred(levels[next_index])

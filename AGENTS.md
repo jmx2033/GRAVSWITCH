@@ -142,7 +142,8 @@ level_1 (Node2D)
 | 纹理 | `Art/tiles/tile_cave.png`（横排、32×32、间距 0） |
 | `texture_region_size` | 32 × 32，分离值全 0 |
 | 碰撞 | 1–4 号砖给**整格方形**碰撞多边形，放进 Physics Layer 1 |
-| 单向平台（5 号） | 半格高碰撞多边形 + 该物理层勾 **One Way** |
+| 移动平台 | **不是瓦片**，用 `Scenes/moving_platform.tscn`（`AnimatableBody2D` + `Tween` 左右往返），
+|  | 直接摆进关卡的 `Zones` 或根节点下；`sync_to_physics` 保持默认 `true` |
 
 **谁配碰撞**：`tileset_cave.tres` 和碰撞多边形由**程序（或会用的那个人）配一次**，半小时内做完。之后策划摆格子不需要再碰碰撞。
 
