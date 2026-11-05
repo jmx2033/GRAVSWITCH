@@ -337,18 +337,3 @@ func respawn(at: Vector2) -> void:
 	anim.rotation = 0.0
 	collision.rotation = 0.0
 	anim.play("idle")
-
-
-
-
-
-#测试区域
-# 按 R
-func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("restart"):
-		if is_alive:
-			print(">>> 调用 die()")
-			die()
-		else:
-			print(">>> 调用 respawn()")
-			respawn(Vector2(50, 300))

@@ -1,19 +1,19 @@
 extends Node
 
-## 主场景控制器：加载关卡，统一处理死亡重生和 R 重载。
+## 主场景控制器：按顺序加载关卡，统一处理死亡重生和 R 重载。
 ##
 ## 关卡只负责地形与出生点；存活流程集中在这里，换关或加状态机时不用改玩家脚本。
 
-## 要加载的起始关卡场景。
-@export var start_level: PackedScene
-## 通关后自动切换到的下一关；没有下一关时留空，通关后停留在当前关。
-@export var next_level: PackedScene
+## 按顺序排列的关卡；通关后自动进入下一关，最后一关通关后停留在当前关。
+@export var levels: Array[PackedScene] = []
 
 ## 负责 Config.RESPAWN_DELAY 秒后的重生；超时后把玩家送回出生点。
 @onready var _respawn_timer: Timer = $RespawnTimer
 
 # 当前关卡实例，切关时先卸载它。
 var _current_level: Node = null
+# 当前关卡在 levels 中的下标；-1 表示当前关卡不在序列里。
+var _level_index: int = -1
 # 当前关卡的玩家，通过 player 组查找；关卡重新加载后会重新获取。
 var _player: Node = null
 # 当前关卡的出生点，来自关卡里的 Spawn 节点。
@@ -26,17 +26,20 @@ func _ready() -> void:
 	_respawn_timer.wait_time = Config.RESPAWN_DELAY
 	_respawn_timer.timeout.connect(_on_respawn_timer_timeout)
 
-	if start_level == null:
-		push_error("game.gd：start_level 未设置")
+	if levels.is_empty():
+		push_error("game.gd：levels 未配置")
 		return
-	_load_level(start_level)
+	_load_level(levels[0])
 
 
-## R 键重载当前场景；放在 _unhandled_input 里，不抢 UI 的输入。
+## R 键重开当前关卡；放在 _unhandled_input 里，不抢 UI 的输入。
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("restart"):
-		get_viewport().set_input_as_handled()
-		get_tree().reload_current_scene()
+	if not event.is_action_pressed("restart"):
+		return
+	get_viewport().set_input_as_handled()
+	if _level_index < 0:
+		return
+	change_level.call_deferred(levels[_level_index])
 
 
 ## 切换到指定关卡场景；传 null 时什么也不做。
@@ -59,6 +62,7 @@ func _load_level(level_scene: PackedScene) -> void:
 	var level: Node = level_scene.instantiate()
 	add_child(level)
 	_current_level = level
+	_level_index = levels.find(level_scene)
 
 	var spawn: Node2D = level.get_node_or_null("Spawn") as Node2D
 	if spawn != null:
@@ -93,8 +97,12 @@ func _on_respawn_timer_timeout() -> void:
 	_player.call("respawn", _spawn_position)
 
 
-## 玩家通关后停掉重生计时；配置了下一关就切过去，否则停留在当前关。
+## 玩家通关后停掉重生计时；有下一关就切过去，否则停留在当前关。
 func _on_player_won() -> void:
 	_respawn_timer.stop()
-	if next_level != null:
-		change_level.call_deferred(next_level)
+	if _level_index < 0:
+		return
+	var next_index: int = _level_index + 1
+	if next_index >= levels.size():
+		return
+	change_level.call_deferred(levels[next_index])

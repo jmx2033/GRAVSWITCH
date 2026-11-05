@@ -1,14 +1,15 @@
 [gd_scene format=3 uid="uid://cohl7m1fxjefw"]
 
 [ext_resource type="Script" uid="uid://bpbbbi3ytoj0c" path="res://Scripts/core/game.gd" id="1_game"]
-[ext_resource type="PackedScene" uid="uid://c3weq7t8eyox8" path="res://Scenes/level_0.tscn" id="2_level"]
+[ext_resource type="PackedScene" uid="uid://c3weq7t8eyox8" path="res://Scenes/level_0.tscn" id="2_level0"]
+[ext_resource type="PackedScene" uid="uid://dr8k1m4oax2q" path="res://Scenes/level_1.tscn" id="2_level1"]
+[ext_resource type="PackedScene" uid="uid://bbuo1jxt14wjq" path="res://Scenes/level_2.tscn" id="2_jjvhh"]
+[ext_resource type="PackedScene" uid="uid://b717cwxbobabo" path="res://Scenes/level_3.tscn" id="2_kry3j"]
 [ext_resource type="Script" uid="uid://cto0ucty03wxl" path="res://Scripts/level/death_bounds.gd" id="3_bounds"]
-[ext_resource type="PackedScene" uid="uid://dr8k1m4n9x2q" path="res://Scenes/level_1.tscn" id="4_level1"]
 
 [node name="Game2" type="Node" unique_id=821458268]
 script = ExtResource("1_game")
-start_level = ExtResource("2_level")
-next_level = ExtResource("4_level1")
+levels = Array[PackedScene]([ExtResource("2_level0"), ExtResource("2_level1"), ExtResource("2_jjvhh"), ExtResource("2_kry3j")])
 
 [node name="DeathBounds" type="Node" parent="." unique_id=1926696948]
 script = ExtResource("3_bounds")
