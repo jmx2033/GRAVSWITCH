@@ -3,6 +3,9 @@
 [ext_resource type="Texture2D" uid="uid://bt3urq2lftiw4" path="res://Art/tiles/spr_spike.png" id="1_spike"]
 [ext_resource type="Script" uid="uid://bc50ecb84qfw0" path="res://Scripts/level/spike.gd" id="2_spike"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_spike"]
+size = Vector2(32, 32)
+
 [node name="Spike" type="Area2D" unique_id=1755118528]
 collision_layer = 8
 collision_mask = 2
@@ -11,5 +14,5 @@ script = ExtResource("2_spike")
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=603888886]
 texture = ExtResource("1_spike")
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=233536975]
-polygon = PackedVector2Array(-16, 16, 16, 16, 1, -16, -1, -16)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=233536975]
+shape = SubResource("RectangleShape2D_spike")
