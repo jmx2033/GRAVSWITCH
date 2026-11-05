@@ -74,26 +74,49 @@ func _physics_process(delta: float) -> void:
 	# 左右移动（沿"垂直于重力"的方向，不是世界 x 轴）
 	# 重力正上/正下时固定为屏幕右：倒立站天花板后按 D 仍然往右走，
 	# 不跟着角色朝向反向，操作习惯不变。
-	var right_dir: Vector2
-	if g.is_equal_approx(Vector2.DOWN) or g.is_equal_approx(Vector2.UP):
-		right_dir = Vector2.RIGHT
-	else:
-		right_dir = g.rotated(-PI / 2)
-
+	#
+	# 转向过渡期的 g 是斜的，此时不能做"沿 g / 垂直 g"的分解：
+	# 那样会把原来的速度投影到斜轴上，水平和竖直分量都缩水（表现为"一进区就不动了"）。
+	# 所以过渡期只加重力、保持 velocity 原样，等 g 回到主轴再分解。
 	var axis: float = Input.get_axis("move_left", "move_right")
-	
-	# 把速度拆成两部分：沿重力方向的下落速度、垂直于重力方向的横移速度
-	var side_speed: float = velocity.dot(right_dir)
 	var fall_speed: float = velocity.dot(g)
+	# 侧向速度提到外层：起跳那一段要重新拼 velocity 时也得用它。
+	var side_speed: float = 0.0
+	var right_dir: Vector2 = Vector2.RIGHT
 
-	if axis != 0.0:
-		side_speed = side_speed + axis * Config.ACCEL * delta
-		side_speed = clamp(side_speed, -Config.MAX_SPEED, Config.MAX_SPEED)
+	var on_axis: bool = (
+		g.is_equal_approx(Vector2.DOWN) or g.is_equal_approx(Vector2.UP)
+		or g.is_equal_approx(Vector2.LEFT) or g.is_equal_approx(Vector2.RIGHT)
+	)
+
+	if on_axis:
+		if g.is_equal_approx(Vector2.DOWN) or g.is_equal_approx(Vector2.UP):
+			right_dir = Vector2.RIGHT
+		else:
+			right_dir = g.rotated(-PI / 2)
+
+		# 把速度拆成两部分：沿重力方向的下落速度、垂直于重力方向的横移速度
+		side_speed = velocity.dot(right_dir)
+
+		if axis != 0.0:
+			side_speed = side_speed + axis * Config.ACCEL * delta
+			side_speed = clamp(side_speed, -Config.MAX_SPEED, Config.MAX_SPEED)
+		else:
+			side_speed = move_toward(side_speed, 0.0, Config.DECEL * delta)
+
+		# 再拼回去
+		velocity = right_dir * side_speed + g * fall_speed
 	else:
-		side_speed = move_toward(side_speed, 0.0, Config.DECEL * delta)
-
-	# 再拼回去
-	velocity = right_dir * side_speed + g * fall_speed
+		# 过渡期：g 是斜的，不能按"沿 g / 垂直 g"分解（会把速度投影缩水）。
+		# 但按键不能失灵——所以在世界 X 轴上直接加减速度，
+		# 不做分解、也不重拼，速度大小不会被这次转向吃掉。
+		var vx: float = velocity.x
+		if axis != 0.0:
+			vx = vx + axis * Config.ACCEL * delta
+			vx = clampf(vx, -Config.MAX_SPEED, Config.MAX_SPEED)
+		else:
+			vx = move_toward(vx, 0.0, Config.DECEL * delta)
+		velocity.x = vx
 
 	# 更新土狼时间
 	if is_on_floor():
@@ -108,7 +131,8 @@ func _physics_process(delta: float) -> void:
 		jump_timer = jump_timer - delta
 
 	# 起跳（180° 反转的失重期不许跳，否则会顺着翻转后的重力飞出去）
-	if jump_timer > 0.0 and coyote_timer > 0.0 and not _turn_is_flip:
+	# 过渡期 g 是斜的，此时拼 velocity 会把侧向速度拆歪，所以只在主轴上拼。
+	if jump_timer > 0.0 and coyote_timer > 0.0 and not _turn_is_flip and on_axis:
 		fall_speed = -Config.JUMP_SPEED
 		velocity = right_dir * side_speed + g * fall_speed
 		jump_timer = 0.0

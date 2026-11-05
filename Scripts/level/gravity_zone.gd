@@ -1,3 +1,4 @@
+@tool
 extends Area2D
 class_name GravityZone
 
@@ -32,9 +33,17 @@ const EDGE_HIGHLIGHT_COLOR := Color("D9C7FF")
 const EDGE_HIGHLIGHT_WIDTH := 4.0
 
 ## 重力拉力方向：0 上、1 右、2 下、3 左。
-@export_enum("重力向上", "重力向右", "重力向下", "重力向左") var direction: int = 0
+@export_enum("重力向上", "重力向右", "重力向下", "重力向左") var direction: int = 0:
+	set(value):
+		direction = clampi(value, 0, DIRS.size() - 1)
+		if Engine.is_editor_hint():
+			queue_redraw()
 ## 区域尺寸（格）；节点原点是左上角，向右下扩展。
-@export var size_in_tiles: Vector2i = Vector2i(6, 8)
+@export var size_in_tiles: Vector2i = Vector2i(6, 8):
+	set(value):
+		size_in_tiles = Vector2i(maxi(value.x, 1), maxi(value.y, 1))
+		if Engine.is_editor_hint():
+			_rebuild()
 
 ## 区域的像素尺寸，由 size_in_tiles × Config.TILE_SIZE 算出。
 var _zone_size: Vector2 = Vector2.ZERO
@@ -46,8 +55,11 @@ var _stones: Array[Vector2] = []
 
 
 ## 初始化：重建碰撞盒和石粒，并监听玩家进出。
+## @tool 下（编辑器里）只负责画出区域，不连信号、不生成石粒。
 func _ready() -> void:
 	_rebuild()
+	if Engine.is_editor_hint():
+		return
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
 
@@ -62,7 +74,9 @@ func _rebuild() -> void:
 	_collision_shape.shape = shape
 	_collision_shape.position = _zone_size * 0.5
 
-	_spawn_stones(tiles)
+	# 编辑器里不撒石粒（每次重绘都重新随机会闪），只画区域轮廓。
+	if not Engine.is_editor_hint():
+		_spawn_stones(tiles)
 	queue_redraw()
 
 
@@ -77,7 +91,10 @@ func _spawn_stones(tiles: Vector2i) -> void:
 
 
 ## 每帧让石粒沿重力方向漂移，越界后从另一侧绕回。
+## 编辑器里不动（石粒是运行时表现），但要响应属性改动重画。
 func _process(delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
 	if _stones.is_empty():
 		return
 
@@ -105,11 +122,33 @@ func _draw() -> void:
 	var field := FIELD_COLOR
 	field.a = FIELD_ALPHA
 	draw_rect(Rect2(Vector2.ZERO, _zone_size), field)
-	draw_rect(Rect2(Vector2.ZERO, _zone_size), FIELD_COLOR, false, 2.0)
 
+	# 编辑器里边框画粗一点、再加个方向箭头，方便摆位时一眼认出这块是什么。
+	if Engine.is_editor_hint():
+		draw_rect(Rect2(Vector2.ZERO, _zone_size), EDGE_HIGHLIGHT_COLOR, false, 2.0)
+		_draw_corners()
+		_draw_pull_edge()
+		_draw_editor_arrow()
+		return
+
+	draw_rect(Rect2(Vector2.ZERO, _zone_size), FIELD_COLOR, false, 2.0)
 	_draw_corners()
 	_draw_pull_edge()
 	_draw_stones()
+
+
+## 编辑器专用：在场中央画一个方向箭头，标明这个区会把重力推向哪。
+func _draw_editor_arrow() -> void:
+	var c := _zone_size * 0.5
+	var pull := _pull()
+	# 箭头主体：从中心反向延伸到尖端
+	var tail := c - pull * 20.0
+	var head := c + pull * 20.0
+	draw_line(tail, head, EDGE_HIGHLIGHT_COLOR, 3.0)
+	# 箭头两翼
+	var perp := pull.rotated(PI * 0.5)
+	draw_line(head, head - pull * 10.0 + perp * 8.0, EDGE_HIGHLIGHT_COLOR, 3.0)
+	draw_line(head, head - pull * 10.0 - perp * 8.0, EDGE_HIGHLIGHT_COLOR, 3.0)
 
 
 ## 在场体四个角各画一个 4×4 实心方块，强调区域边界。
