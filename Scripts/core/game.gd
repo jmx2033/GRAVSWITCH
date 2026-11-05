@@ -42,21 +42,14 @@ func _unhandled_input(event: InputEvent) -> void:
 			pass
 
 		# 2. 寻找场景中的玩家节点
-		# 注意：这里假设玩家节点的名字叫 "Player"。
-		# 如果你的场景结构是 Level -> Player，可能需要用 $Level/Player
 		var player = get_node_or_null("Player") 
 		
 		# 3. 如果没找到，尝试在当前加载的关卡容器里找
 		if not player:
-			# 假设你的关卡是作为子节点加载在 game.gd 下的
-			# 这里的 "LevelContainer" 或类似名字取决于你的 _load_level 怎么写的
-			# 通常直接用 find_child 比较稳妥
 			player = find_child("Player", true, false)
 
 		# 4. 执行重生
 		if player and player.has_method("respawn"):
-			# 调用我们在 player.gd 里写好的 respawn 函数
-			# _spawn_position 是你在第 47 行定义的变量，正好在这里用！
 			player.respawn(_spawn_position)
 			print("Game.gd: 玩家已重生到 ", _spawn_position)
 		else:
