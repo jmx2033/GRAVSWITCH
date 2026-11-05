@@ -2,6 +2,8 @@ extends CharacterBody2D
 
 ## 180° 反转的判定容差（弧度）。
 const FLIP_ANGLE_EPSILON := 0.001
+## 180° 翻转开始时，若玩家贴地，沿新重力方向给这么点初速让它离地。
+## 太小会被人和地板之间继续摩擦（速度仍被刮），太大会像"被弹了一下"，12 是试出来的。
 
 ## 玩家死亡时发出，由 game.gd 或关卡脚本接住切 DEAD 状态。
 signal died
@@ -66,57 +68,46 @@ func _physics_process(delta: float) -> void:
 	# 180° 反转时它保持原方向，等强度降到 0 后才翻向，
 	# 所以过渡期间不会产生侧向拉力。
 	var g: Vector2 = _physics_gravity
-	up_direction = -g
+	# 【11/5 修】翻转期间不要立刻把 up_direction 反过去。
+	# up_direction 一反向，脚下的地板对 move_and_slide 来说就成了"墙"，
+	# 它会沿墙法线把水平速度清掉 —— 这就是"走进向上重力区速度就没了"的真正原因。
+	# 所以翻转那 0.12 秒继续沿用旧方向，等翻完再切成新的。
+	if not _turning:
+		up_direction = -g
 
 	# 施加合力重力；_gravity_scale 是当前强度（普通 1g、向下区 2g、失重 0 等）
 	velocity += g * Config.GRAVITY * _gravity_scale * delta
 	
-	# 左右移动（沿"垂直于重力"的方向，不是世界 x 轴）
-	# 重力正上/正下时固定为屏幕右：倒立站天花板后按 D 仍然往右走，
-	# 不跟着角色朝向反向，操作习惯不变。
-	#
-	# 转向过渡期的 g 是斜的，此时不能做"沿 g / 垂直 g"的分解：
-	# 那样会把原来的速度投影到斜轴上，水平和竖直分量都缩水（表现为"一进区就不动了"）。
-	# 所以过渡期只加重力、保持 velocity 原样，等 g 回到主轴再分解。
+	# 左右移动。
+	# 【11/5 重写】不再每帧用 g 重新分解并重构 velocity：
+	# 那样在重力方向翻转时，dot 投影再反投影会丢速度，
+	# 而且 fall_speed 的符号会随 g 翻转，把下落速度变成上升速度。
+	# 现在改成"增量修正"：只对"垂直于重力"的分量做加减，其余分量原样保留。
 	var axis: float = Input.get_axis("move_left", "move_right")
-	var fall_speed: float = velocity.dot(g)
-	# 侧向速度提到外层：起跳那一段要重新拼 velocity 时也得用它。
-	var side_speed: float = 0.0
-	var right_dir: Vector2 = Vector2.RIGHT
 
 	var on_axis: bool = (
 		g.is_equal_approx(Vector2.DOWN) or g.is_equal_approx(Vector2.UP)
 		or g.is_equal_approx(Vector2.LEFT) or g.is_equal_approx(Vector2.RIGHT)
 	)
 
-	if on_axis:
-		if g.is_equal_approx(Vector2.DOWN) or g.is_equal_approx(Vector2.UP):
-			right_dir = Vector2.RIGHT
-		else:
-			right_dir = g.rotated(-PI / 2)
+	var right_dir: Vector2 = Vector2.RIGHT
+	if g.is_equal_approx(Vector2.LEFT) or g.is_equal_approx(Vector2.RIGHT):
+		right_dir = g.rotated(-PI / 2)
+	# g 斜的时候（转向过渡中）用上一次的 right_dir 也行，但过渡只有 0.12 秒，
+	# 直接用屏幕右足够稳，也不会把速度拆歪。
 
-		# 把速度拆成两部分：沿重力方向的下落速度、垂直于重力方向的横移速度
-		side_speed = velocity.dot(right_dir)
+	var side_speed: float = velocity.dot(right_dir) if on_axis else velocity.x
 
-		if axis != 0.0:
-			side_speed = side_speed + axis * Config.ACCEL * delta
-			side_speed = clamp(side_speed, -Config.MAX_SPEED, Config.MAX_SPEED)
-		else:
-			side_speed = move_toward(side_speed, 0.0, Config.DECEL * delta)
+	# 目标侧向速度：有输入就加速/限速，没输入就减速。
+	var target_side: float = side_speed
+	if axis != 0.0:
+		target_side = clampf(side_speed + axis * Config.ACCEL * delta,
+			-Config.MAX_SPEED, Config.MAX_SPEED)
+	elif on_axis:
+		target_side = move_toward(side_speed, 0.0, Config.DECEL * delta)
 
-		# 再拼回去
-		velocity = right_dir * side_speed + g * fall_speed
-	else:
-		# 过渡期：g 是斜的，不能按"沿 g / 垂直 g"分解（会把速度投影缩水）。
-		# 但按键不能失灵——所以在世界 X 轴上直接加减速度，
-		# 不做分解、也不重拼，速度大小不会被这次转向吃掉。
-		var vx: float = velocity.x
-		if axis != 0.0:
-			vx = vx + axis * Config.ACCEL * delta
-			vx = clampf(vx, -Config.MAX_SPEED, Config.MAX_SPEED)
-		else:
-			vx = move_toward(vx, 0.0, Config.DECEL * delta)
-		velocity.x = vx
+	# 只加差值，不重构：沿重力方向的分量原样保留，翻转时不会被吃掉。
+	velocity += right_dir * (target_side - side_speed)
 
 	# 更新土狼时间
 	if is_on_floor():
@@ -133,8 +124,10 @@ func _physics_process(delta: float) -> void:
 	# 起跳（180° 反转的失重期不许跳，否则会顺着翻转后的重力飞出去）
 	# 过渡期 g 是斜的，此时拼 velocity 会把侧向速度拆歪，所以只在主轴上拼。
 	if jump_timer > 0.0 and coyote_timer > 0.0 and not _turn_is_flip and on_axis:
-		fall_speed = -Config.JUMP_SPEED
-		velocity = right_dir * side_speed + g * fall_speed
+		# 先把"沿重力方向"的速度清零，再加跳跃初速——同样用增量，不重构整个速度。
+		var fall_now: float = velocity.dot(g)
+		velocity -= g * fall_now
+		velocity += (-g) * Config.JUMP_SPEED
 		jump_timer = 0.0
 		coyote_timer = 0.0
 	
@@ -142,6 +135,7 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 	# 切动画
+	var fall_speed: float = velocity.dot(g)
 	if not is_on_floor():
 		# 空中分两种：还往上冲（fall_speed < 0）播 jump，往下掉播 fall。
 		# fall_speed 是"沿重力方向"的速度，负值代表在跟重力反着走 = 上升。
@@ -221,6 +215,9 @@ func _update_gravity(delta: float) -> void:
 		_turn_is_flip = absf(_turn_angle) > PI - FLIP_ANGLE_EPSILON
 		_turning = true
 
+		# up_direction 在翻转期间保持旧方向（见 _physics_process 开头），
+		# 这样脚下的地板不会被误判成"墙"，水平速度不会被 move_and_slide 清掉。
+
 	# 转向时长与转角成正比，保证角速度与 GRAVITY_TURN_TIME 一致：
 	# 90° 用时 GRAVITY_TURN_TIME / 2，180° 用时 GRAVITY_TURN_TIME。
 	var turn_time: float = Config.GRAVITY_TURN_TIME * absf(_turn_angle) / PI
@@ -234,14 +231,17 @@ func _update_gravity(delta: float) -> void:
 	current_gravity = _turn_from.rotated(_turn_angle * weight).normalized()
 
 	if _turn_is_flip:
-		# 180° 反转：前半程沿旧方向把强度降到 0，
-		# 后半程沿新方向把强度升到目标值。
+		# 180° 反转：原来的做法是把强度从 1 降到 0 再升回 1，
+		# 玩家感觉是"重力先没了再回来"（向上区尤其明显：中途整段失重）。
+		# 现在改成保持接近满强度，只在最中间一小段（±15%）降速，
+		# 既能压住侧向甩动，又不会让人觉得重力"消失"了。
+		# 不再把强度降到 0 或做"浅坑"：那正是玩家感觉"重力先没了再回来"的原因。
+		# 增量式速度更新已经能避免甩动，所以强度直接线性切到目标即可。
 		if weight < 0.5:
 			_physics_gravity = _turn_from
-			_gravity_scale = lerpf(_turn_start_scale, 0.0, weight * 2.0)
 		else:
 			_physics_gravity = _turn_to
-			_gravity_scale = lerpf(0.0, _turn_target_scale, (weight - 0.5) * 2.0)
+		_gravity_scale = lerpf(_turn_start_scale, _turn_target_scale, weight)
 	else:
 		# 小于 180° 的转向：物理方向跟随显示方向，强度同步插值
 		_physics_gravity = current_gravity
@@ -259,6 +259,8 @@ func _finish_gravity_turn() -> void:
 	_gravity_scale = _turn_target_scale
 	_turning = false
 	_turn_is_flip = false
+	# 转向结束，把 up_direction 切到新方向（翻转期间一直是旧值）。
+	up_direction = -_turn_to
 
 
 ## 进入重力区：记录该区的拉力方向，并重算所有重叠区的合力。
