@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://b11hj8ncr5db5" path="res://Scenes/player.tscn" id="3_53xsp"]
 [ext_resource type="PackedScene" path="res://Scenes/level_goal.tscn" id="4_5e78q"]
 [ext_resource type="PackedScene" uid="uid://cnnosxglxyvx3" path="res://Scenes/spike.tscn" id="5_l4wr6"]
-[ext_resource type="PackedScene" uid="uid://bqom0xe37pje3" path="res://Scenes/moving_platform.tscn" id="6_qf6rc"]
+[ext_resource type="PackedScene" uid="uid://bqom0xe37pje3" path="res://Scenes/moving_platform.tscn" id="6_plat3"]
 
 [node name="Level1" type="Node2D" unique_id=2016033099]
 
@@ -73,5 +73,5 @@ position = Vector2(464, 304)
 [node name="Spike11" parent="Spikes" unique_id=1886499767 instance=ExtResource("5_l4wr6")]
 position = Vector2(496, 304)
 
-[node name="MovingPlatform" parent="." unique_id=440819158 instance=ExtResource("6_qf6rc")]
+[node name="MovingPlatform" parent="." unique_id=440819158 instance=ExtResource("6_plat3")]
 position = Vector2(224, 192)
