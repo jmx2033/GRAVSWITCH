@@ -71,8 +71,9 @@ func _rebuild() -> void:
 
 	var shape := RectangleShape2D.new()
 	shape.size = _zone_size
-	_collision_shape.shape = shape
-	_collision_shape.position = _zone_size * 0.5
+	if _collision_shape:
+		_collision_shape.shape = shape
+		_collision_shape.position = _zone_size * 0.5
 
 	# 编辑器里不撒石粒（每次重绘都重新随机会闪），只画区域轮廓。
 	if not Engine.is_editor_hint():

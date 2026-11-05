@@ -1,8 +1,13 @@
 [gd_scene format=3 uid="uid://co0dxsh54ae13"]
 
 [ext_resource type="PackedScene" uid="uid://b11hj8ncr5db5" path="res://Scenes/player.tscn" id="1_ebmjs"]
+[ext_resource type="Script" uid="uid://bpbbbi3ytoj0c" path="res://Scripts/core/game.gd" id="1_v158k"]
+[ext_resource type="PackedScene" uid="uid://c3weq7t8eyox8" path="res://Scenes/level_0.tscn" id="2_h4fw4"]
 [ext_resource type="PackedScene" uid="uid://u7jbmkf7gqyg" path="res://Scenes/gravity_zone.tscn" id="2_qxrlw"]
+[ext_resource type="PackedScene" uid="uid://dr8k1m4oax2q" path="res://Scenes/level_1.tscn" id="3_ldgsr"]
 [ext_resource type="PackedScene" uid="uid://g56phohff8q2" path="res://Scenes/mainmenu.tscn" id="3_wrm1d"]
+[ext_resource type="PackedScene" uid="uid://bbuo1jxt14wjq" path="res://Scenes/level_2.tscn" id="4_o5yvi"]
+[ext_resource type="PackedScene" uid="uid://b717cwxbobabo" path="res://Scenes/level_3.tscn" id="5_rku1e"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2na5r"]
 size = Vector2(765, 29)
@@ -11,6 +16,8 @@ size = Vector2(765, 29)
 size = Vector2(20, 382)
 
 [node name="Game" type="Node2D" unique_id=1598757090]
+script = ExtResource("1_v158k")
+levels = Array[PackedScene]([ExtResource("2_h4fw4"), ExtResource("3_ldgsr"), ExtResource("4_o5yvi"), ExtResource("5_rku1e")])
 
 [node name="Ground" type="StaticBody2D" parent="." unique_id=1673898157]
 position = Vector2(320, 250)
@@ -61,3 +68,6 @@ direction = 1
 size_in_tiles = Vector2i(3, 3)
 
 [node name="mainmenu" parent="." unique_id=2074724687 instance=ExtResource("3_wrm1d")]
+
+[node name="RespawnTimer" type="Timer" parent="." unique_id=329849263]
+one_shot = true
