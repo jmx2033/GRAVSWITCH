@@ -65,14 +65,22 @@ func _ready() -> void:
 
 
 ## 按 size_in_tiles 算出像素尺寸，重新生成居中的碰撞矩形并重置石粒。
+##
+## @tool 下 setter 可能在 @onready 之前就触发，此时 _collision_shape 还是 null，
+## 直接赋值会报 "Invalid assignment ... on a base object of type 'Nil'"。
+## 所以这里自己取一次节点，取不到就跳过改碰撞（_ready 里会再补一次）。
 func _rebuild() -> void:
 	var tiles := Vector2i(maxi(size_in_tiles.x, 1), maxi(size_in_tiles.y, 1))
 	_zone_size = Vector2(tiles.x * Config.TILE_SIZE, tiles.y * Config.TILE_SIZE)
 
-	var shape := RectangleShape2D.new()
-	shape.size = _zone_size
-	_collision_shape.shape = shape
-	_collision_shape.position = _zone_size * 0.5
+	var shape_node: CollisionShape2D = _collision_shape
+	if shape_node == null and is_inside_tree():
+		shape_node = get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if shape_node != null:
+		var shape := RectangleShape2D.new()
+		shape.size = _zone_size
+		shape_node.shape = shape
+		shape_node.position = _zone_size * 0.5
 
 	# 编辑器里不撒石粒（每次重绘都重新随机会闪），只画区域轮廓。
 	if not Engine.is_editor_hint():
