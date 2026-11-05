@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="GRAVSWITCH"
-run/main_scene="uid://cohl7m1fxjefw"
+run/main_scene="uid://bwgx3km5n5imc"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 

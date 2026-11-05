@@ -107,9 +107,11 @@ func _physics_process(delta: float) -> void:
 
 	var right_dir: Vector2 = Vector2.RIGHT
 	if g.is_equal_approx(Vector2.LEFT) or g.is_equal_approx(Vector2.RIGHT):
-		right_dir = g.rotated(-PI / 2)
-	# g 斜的时候（转向过渡中）用上一次的 right_dir 也行，但过渡只有 0.12 秒，
-	# 直接用屏幕右足够稳，也不会把速度拆歪。
+		# 【11/5 修】重力朝左/朝右时，角色是"躺在侧墙上"的。
+		# 原来写的是 g.rotated(-PI/2)：朝右时得到 (0,-1)，也就是屏幕上方，
+		# 玩家一按 D 就被沿 -y 加速，看起来就是"进了水平重力区人往上飞"。
+		# 现在固定让 D 走屏幕下方（沿墙往下走）、A 走上方，两个朝向手感一致。
+		right_dir = Vector2.DOWN
 
 	var side_speed: float = velocity.dot(right_dir) if on_axis else velocity.x
 
@@ -318,26 +320,35 @@ func exit_gravity_zone(zone: Area2D) -> void:
 	_apply_gravity_zones()
 
 
-## 重算重力：基础向下重力 + 所有重叠区的贡献。
+## 重算重力：把所有"正在生效的区"折算成一个合力加速度。
+##
+## 【11/5 重写】原来写的是"基础向下 1g + 每个区补差"：向上区补 2g、
+## 左右区补 1g 水平 + 1g 向上。这套算法把"基础重力已经存在"当成前提，
+## 一旦两个区同时生效，y 分量就会累加 —— 表现就是站在水平重力区里人被往上顶。
+##
+## 改成自洽的写法：每个区只给出"它指向的那个方向"，不再补差。
+## - 没有区生效 → 世界默认向下 1g
+## - 朝上 / 朝左 / 朝右 → 该方向 1g
+## - 朝下 → 该方向 2g（"加重"：跳得更矮、落得更快）
+## - 多个区同时生效 → 各自的加速度相加，完全相抵时就是失重（加速度 0）
 func _apply_gravity_zones() -> void:
-	var total := Vector2.DOWN * Config.GRAVITY
+	if _gravity_dirs.is_empty():
+		Config.gravity_acceleration = Vector2.DOWN * Config.GRAVITY
+		return
+
+	var total := Vector2.ZERO
 	for direction in _gravity_dirs.values():
-		var pull: Vector2 = direction
-		total += _zone_gravity(pull)
+		total += _zone_gravity(direction)
 	Config.gravity_acceleration = total
 
 
-## 单个重力区提供的加速度：
-## 向上区 2g（多出的 1g 抵消基础重力，净向上 1g）；
-## 向下区 1g；
-## 左/右区 1g 水平 + 1g 向上（抵消基础重力，净水平 1g）。
+## 单个重力区提供的加速度（自洽，不依赖"基础重力已存在"）。
+## 朝下 2g 是"加重"的设定；其余三个方向各 1g。
 func _zone_gravity(direction: Vector2) -> Vector2:
-	var pull: Vector2 = direction * Config.GRAVITY
-	if direction.is_equal_approx(Vector2.UP):
-		return pull * 2.0
+	var pull: Vector2 = direction.normalized() * Config.GRAVITY
 	if direction.is_equal_approx(Vector2.DOWN):
-		return pull
-	return pull + Vector2.UP * Config.GRAVITY
+		return pull * 2.0
+	return pull
 
 
 ## 被通关区域通知时调用，进入通关状态；之后 die() 不再生效。

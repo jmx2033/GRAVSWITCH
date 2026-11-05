@@ -5,21 +5,21 @@ extends Node
 
 ## 跳跃音效；真正起跳时随机选一个播放。
 const JUMP_SFX: Array[AudioStream] = [
-	preload("res://Audio/sfx/jump_1.wav"),
-	preload("res://Audio/sfx/jump_2.wav"),
-	preload("res://Audio/sfx/jump_3.wav"),
+	preload("res://Audio/sfx/sfx_jump_1.wav"),
+	preload("res://Audio/sfx/sfx_jump_2.wav"),
+	preload("res://Audio/sfx/sfx_jump_3.wav"),
 ]
 ## 行走音效；贴地行走时轮流随机播放。
 const WALK_SFX: Array[AudioStream] = [
-	preload("res://Audio/sfx/walk_1.wav"),
-	preload("res://Audio/sfx/walk_2.wav"),
-	preload("res://Audio/sfx/walk_3.wav"),
-	preload("res://Audio/sfx/walk_4.wav"),
+	preload("res://Audio/sfx/sfx_walk_1.wav"),
+	preload("res://Audio/sfx/sfx_walk_2.wav"),
+	preload("res://Audio/sfx/sfx_walk_3.wav"),
+	preload("res://Audio/sfx/sfx_walk_4.wav"),
 ]
 ## 行走音效的播放间隔；音效本身 0.5 秒，留 0.1 秒重叠让脚步更连贯。
 const WALK_SFX_INTERVAL := 0.4
 ## 坠地音效；落地时根据冲击速度调整音量。
-const LAND_SFX: AudioStream = preload("res://Audio/sfx/land.wav")
+const LAND_SFX: AudioStream = preload("res://Audio/sfx/sfx_land.wav")
 ## 2.0 倍音量对应的自由落体高度（像素）：288px 的落地速度约为 1018。
 const LAND_SFX_LOUD_HEIGHT := 288.0
 ## 低于这个冲击速度不播放，避免贴地抖动误触。
