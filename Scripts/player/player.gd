@@ -11,6 +11,15 @@ signal died
 ## 玩家通关时发出，由 game.gd 接住切 WIN 状态或切关。
 signal won
 
+## 真正起跳时发出，由音效脚本播放跳跃声。
+signal jumped
+
+## 落地时发出，impact_speed 是沿重力方向的冲击速度。
+signal landed(impact_speed: float)
+
+## 行走状态变化时发出，由音效脚本控制脚步声。
+signal walking_changed(walking: bool)
+
 ## 玩家是否活着；死后停掉输入和重力。
 var is_alive: bool = true
 
@@ -42,6 +51,12 @@ var anim: AnimatedSprite2D
 
 # 碰撞盒节点，在 _ready() 里赋值
 var collision: CollisionShape2D
+
+# 上一物理帧是否贴地，用于检测落地瞬间。
+var _was_on_floor: bool = false
+
+# 当前是否处于行走状态；变化时发 walking_changed。
+var _walking: bool = false
 
 # 土狼时间倒计时
 var coyote_timer: float = 0.0
@@ -130,9 +145,27 @@ func _physics_process(delta: float) -> void:
 		velocity += (-g) * Config.JUMP_SPEED
 		jump_timer = 0.0
 		coyote_timer = 0.0
+		jumped.emit()
 	
+	# 记录撞地前的沿重力速度；move_and_slide 落地后会把速度清零。
+	var impact_speed: float = velocity.dot(g)
+
 	# 交给引擎移动
 	move_and_slide()
+
+	# 落地：从空中转到贴地的那一帧，把冲击速度交给音效脚本。
+	var on_floor_now: bool = is_on_floor()
+	if on_floor_now and not _was_on_floor:
+		landed.emit(impact_speed)
+	_was_on_floor = on_floor_now
+
+	# 行走状态：贴地且真的在移动；变化时通知音效脚本。
+	var walking: bool = (
+		is_on_floor()
+		and axis != 0.0
+		and absf(velocity.dot(right_dir)) > 1.0
+	)
+	_set_walking(walking)
 
 	# 切动画
 	var fall_speed: float = velocity.dot(g)
@@ -263,6 +296,14 @@ func _finish_gravity_turn() -> void:
 	up_direction = -_turn_to
 
 
+## 更新行走状态；变化时发信号，由音效脚本负责起停。
+func _set_walking(walking: bool) -> void:
+	if walking == _walking:
+		return
+	_walking = walking
+	walking_changed.emit(walking)
+
+
 ## 进入重力区：记录该区的拉力方向，并重算所有重叠区的合力。
 func enter_gravity_zone(zone: Area2D, gravity_direction: Vector2) -> void:
 	if gravity_direction == Vector2.ZERO:
@@ -305,6 +346,7 @@ func win() -> void:
 		return
 	is_won = true
 	velocity = Vector2.ZERO
+	_set_walking(false)
 	won.emit()
 
 
@@ -314,6 +356,7 @@ func die() -> void:
 		return
 	is_alive = false
 	velocity = Vector2.ZERO
+	_set_walking(false)
 	# 死亡动画：不循环，播完停在最后一帧（人形消散后是泡沫）。
 	anim.play("die")
 	died.emit()
@@ -334,6 +377,8 @@ func respawn(at: Vector2) -> void:
 	is_alive = true
 	is_won = false
 	_gravity_dirs.clear()
+	_set_walking(false)
+	_was_on_floor = false
 	anim.rotation = 0.0
 	collision.rotation = 0.0
 	anim.play("idle")

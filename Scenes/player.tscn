@@ -2,6 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://b8fyc8r1faa3p" path="res://Art/player/spr_player.png" id="1_4flbx"]
 [ext_resource type="Script" uid="uid://ri1sfnbbhe5h" path="res://Scripts/player/player.gd" id="1_cvnsp"]
+[ext_resource type="Script" path="res://Scripts/player/player_sfx.gd" id="2_playersfx"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2na5r"]
 size = Vector2(20, 28)
@@ -366,3 +367,14 @@ shape = SubResource("RectangleShape2D_2na5r")
 sprite_frames = SubResource("SpriteFrames_sam6v")
 animation = &"idle"
 offset = Vector2(1, 1)
+
+[node name="PlayerSfx" type="Node" parent="."]
+script = ExtResource("2_playersfx")
+
+[node name="JumpSfx" type="AudioStreamPlayer" parent="PlayerSfx"]
+
+[node name="LandSfx" type="AudioStreamPlayer" parent="PlayerSfx"]
+
+[node name="WalkSfx1" type="AudioStreamPlayer" parent="PlayerSfx"]
+
+[node name="WalkSfx2" type="AudioStreamPlayer" parent="PlayerSfx"]
