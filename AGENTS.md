@@ -97,6 +97,29 @@
 - 新建 `.gd` 一律 Tab
 - 从聊天窗口复制代码后，先看一眼缩进是不是变成了空格
 
+### `.tscn` / `.tres` 的属性之间不能有空行（同样极难查）
+
+**一个节点的属性必须连续写；中间出现空行，就等于告诉 Godot「这个节点结束了」，空行后面的属性全部被静默忽略，不报错。**
+
+```
+[node name="ButtonPlay" type="Button" parent="."]
+text = "START"
+theme_override_styles/normal = SubResource("...")     ← 紧接，有效
+
+[node name="ButtonPlay" type="Button" parent="."]
+text = "START"
+                                                      ← 这个空行会让下一行失效
+theme_override_styles/normal = SubResource("...")     ← 被忽略，按钮回退成默认样式
+```
+
+**踩过的坑（11/5）**：脚本给三个按钮插样式行时多插了一个空行，结果按钮全部显示成 Godot 默认的白底白框白字，**控制台一个报错都没有**，排查花了半小时。
+
+- 用脚本改 `.tscn` 时，插入的片段**不要带前后空行**
+- 手改完存盘前**扫一眼有没有孤立空行**
+- 症状「节点属性写了却不生效」时，第一个怀疑对象就是空行
+
+**同理适用于 `.tres`。**
+
 ## 架构硬规则
 
 - 所有可调数值放进 **一个 autoload 单例 `Config`**，不许散落在各个脚本里。调手感时只改这一处
