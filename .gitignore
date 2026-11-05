@@ -20,6 +20,11 @@ desktop.ini
 *.swp
 *.bak
 
+# Windows 上在 Git Bash 里跑 `cmd > nul` 会误建一个叫 nul 的文件（不是重定向到空设备）。
+# 它没有任何内容却会进 git status，必须忽略。
+nul
+NUL
+
 # VS Code / Rider / JetBrains 缓存
 .vscode/
 .idea/
