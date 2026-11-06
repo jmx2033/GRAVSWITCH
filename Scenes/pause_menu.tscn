@@ -1,0 +1,174 @@
+[gd_scene format=3 uid="uid://bkl7puj8au24g"]
+
+[ext_resource type="Script" uid="uid://cmf5g8rwey2uk" path="res://Scripts/ui/pause_menu.gd" id="1_pm"]
+[ext_resource type="Texture2D" uid="uid://dv478o526tpud" path="res://Art/ui/ui_button.png" id="2_btn"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glass"]
+bg_color = Color(0.12, 0.1, 0.18, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.78, 1, 0.6)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.55)
+shadow_size = 12
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn_normal"]
+content_margin_left = 12.0
+content_margin_top = 4.0
+content_margin_right = 12.0
+content_margin_bottom = 4.0
+texture = ExtResource("2_btn")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn_hover"]
+content_margin_left = 12.0
+content_margin_top = 4.0
+content_margin_right = 12.0
+content_margin_bottom = 4.0
+texture = ExtResource("2_btn")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+modulate_color = Color(1.25, 1.25, 1.25, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn_focus"]
+content_margin_left = 12.0
+content_margin_top = 4.0
+content_margin_right = 12.0
+content_margin_bottom = 4.0
+texture = ExtResource("2_btn")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+modulate_color = Color(1.15, 1.15, 1.15, 1)
+draw_center = false
+
+[node name="PauseMenu" type="Control" unique_id=516674994]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_pm")
+metadata/_edit_horizontal_guides_ = [75.0]
+metadata/_edit_vertical_guides_ = [320.0]
+
+[node name="Content" type="Control" parent="." unique_id=1366016002]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Dim" type="ColorRect" parent="Content" unique_id=1563413264]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.01, 0.008, 0.03, 0.70)
+
+[node name="Glass" type="Panel" parent="Content" unique_id=1808202639]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -208.0
+offset_top = -177.0
+offset_right = -208.0
+offset_bottom = -177.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_glass")
+
+[node name="Title" type="Label" parent="Content/Glass" unique_id=1625554831]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 50.0
+offset_right = 352.0
+offset_bottom = 86.0
+theme_override_colors/font_color = Color(0.85, 0.78, 1, 1)
+theme_override_font_sizes/font_size = 26
+text = "PAUSED"
+horizontal_alignment = 1
+
+[node name="ButtonContinue" type="Button" parent="Content/Glass" unique_id=343224497]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 144.0
+offset_top = 118.0
+offset_right = 272.0
+offset_bottom = 154.0
+theme_override_colors/font_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_focus_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_pressed_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_hover_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_disabled_color = Color(0.35, 0.35, 0.35, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxTexture_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxTexture_btn_hover")
+theme_override_styles/focus = SubResource("StyleBoxTexture_btn_focus")
+text = "CONTINUE"
+
+[node name="ButtonSettings" type="Button" parent="Content/Glass" unique_id=2147073425]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 147.0
+offset_top = 174.0
+offset_right = 267.0
+offset_bottom = 210.0
+theme_override_colors/font_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_focus_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_pressed_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_hover_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_disabled_color = Color(0.35, 0.35, 0.35, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxTexture_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxTexture_btn_hover")
+theme_override_styles/focus = SubResource("StyleBoxTexture_btn_focus")
+text = "SETTINGS"
+
+[node name="ButtonMenu" type="Button" parent="Content/Glass" unique_id=181762402]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 138.0
+offset_top = 235.0
+offset_right = 281.0
+offset_bottom = 271.0
+theme_override_colors/font_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_focus_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_pressed_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_hover_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_disabled_color = Color(0.35, 0.35, 0.35, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxTexture_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxTexture_btn_hover")
+theme_override_styles/focus = SubResource("StyleBoxTexture_btn_focus")
+text = "MAIN MENU"

@@ -1,11 +1,17 @@
 extends Node
 
-## 主场景控制器：按顺序加载关卡，统一处理死亡重生和 R 重载。
+## 主场景控制器：按顺序加载关卡，统一处理死亡重生、R 重载和暂停。
 ##
 ## 关卡只负责地形与出生点；存活流程集中在这里，换关或加状态机时不用改玩家脚本。
 
 ## 按顺序排列的关卡；通关后自动进入下一关，最后一关通关后停留在当前关。
 @export var levels: Array[PackedScene] = []
+
+## 暂停菜单场景。
+const PAUSE_MENU_SCENE := preload("res://Scenes/pause_menu.tscn")
+
+## 暂停菜单的绘制层级；要盖过关卡与玩家，给一个足够高的值。
+const PAUSE_MENU_Z_INDEX := 100
 
 ## 负责 Config.RESPAWN_DELAY 秒后的重生；超时后把玩家送回出生点。
 @onready var _respawn_timer: Timer = $RespawnTimer
@@ -18,13 +24,27 @@ var _level_index: int = -1
 var _player: Node = null
 # 当前关卡的出生点，来自关卡里的 Spawn 节点。
 var _spawn_position: Vector2 = Vector2.ZERO
+# 暂停菜单实例；它自己是 ALWAYS 模式，暂停期间仍能交互。
+var _pause_menu: Control = null
 
 
 ## 初始化重生计时器并加载起始关卡。
 func _ready() -> void:
+	# 本节点保持默认 INHERIT：暂停时关卡、玩家、重生计时器都跟着树一起冻结。
+	# 暂停键由 pause_menu（ALWAYS）自己监听，见 pause_menu.gd。
 	# 场景里的 wait_time 只是默认值，实际时长以 Config 为准，方便统一调整。
 	_respawn_timer.wait_time = Config.RESPAWN_DELAY
 	_respawn_timer.timeout.connect(_on_respawn_timer_timeout)
+
+	_pause_menu = PAUSE_MENU_SCENE.instantiate()
+	add_child(_pause_menu)
+	_pause_menu.resumed.connect(_on_pause_resumed)
+	_pause_menu.quit_to_menu.connect(_on_pause_quit)
+	# 注意：不要把它 visible 设成 false —— Godot 里不可见的 Control 不处理输入，
+	# 暂停键就再也收不到了。它的显示由内部 Content 容器控制。
+	# 绘制层级：z_index 拉高，并在每次加载关卡后把它挪到子节点末尾，
+	# 否则后加的关卡会盖在菜单上面（关卡和菜单的 z_index 都是 0，按子节点顺序绘制）。
+	_pause_menu.z_index = PAUSE_MENU_Z_INDEX
 
 	if levels.is_empty():
 		push_error("game.gd：levels 未配置")
@@ -32,7 +52,8 @@ func _ready() -> void:
 	_load_level(levels[0])
 
 
-## R 键重开当前关卡；放在 _unhandled_input 里，不抢 UI 的输入。
+## 处理 R 重开；放在 _unhandled_input 里，不抢 UI 的输入。
+## 暂停期间本节点被冻结，所以要重开先按 Esc 恢复。
 func _unhandled_input(event: InputEvent) -> void:
 	if not event.is_action_pressed("restart"):
 		return
@@ -40,6 +61,17 @@ func _unhandled_input(event: InputEvent) -> void:
 	if _level_index < 0:
 		return
 	change_level.call_deferred(levels[_level_index])
+
+
+## 暂停菜单点「继续」：pause_menu 已自行解除暂停，这里只做确认。
+func _on_pause_resumed() -> void:
+	# pause_menu 内部已经 get_tree().paused = false，这里留作扩展点。
+	pass
+
+
+## 暂停菜单点「回主菜单」：切回主菜单场景（pause_menu 已自行解除暂停）。
+func _on_pause_quit() -> void:
+	get_tree().change_scene_to_file("res://Scenes/mainmenu.tscn")
 
 
 ## 切换到指定关卡场景；传 null 时什么也不做。
@@ -63,6 +95,9 @@ func _load_level(level_scene: PackedScene) -> void:
 	add_child(level)
 	_current_level = level
 	_level_index = levels.find(level_scene)
+	# 关卡是后加的子节点，会盖在暂停菜单上面；把它挪到末尾保持菜单在最上层。
+	if _pause_menu != null and is_instance_valid(_pause_menu):
+		move_child(_pause_menu, get_child_count() - 1)
 
 	var spawn: Node2D = level.get_node_or_null("Spawn") as Node2D
 	if spawn != null:
