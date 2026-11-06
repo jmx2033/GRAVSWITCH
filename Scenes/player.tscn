@@ -375,6 +375,14 @@ script = ExtResource("2_playersfx")
 
 [node name="LandSfx" type="AudioStreamPlayer" parent="PlayerSfx"]
 
+[node name="FlipSfx" type="AudioStreamPlayer" parent="PlayerSfx"]
+
+[node name="DieSfx" type="AudioStreamPlayer" parent="PlayerSfx"]
+
+[node name="WinSfx" type="AudioStreamPlayer" parent="PlayerSfx"]
+
 [node name="WalkSfx1" type="AudioStreamPlayer" parent="PlayerSfx"]
 
 [node name="WalkSfx2" type="AudioStreamPlayer" parent="PlayerSfx"]
+
+[node name="WalkSfx3" type="AudioStreamPlayer" parent="PlayerSfx"]

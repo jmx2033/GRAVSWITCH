@@ -20,6 +20,12 @@ signal landed(impact_speed: float)
 ## 行走状态变化时发出，由音效脚本控制脚步声。
 signal walking_changed(walking: bool)
 
+## 180° 重力翻转开始时发出，由音效脚本播放下落二音（与跳跃的上升音相反）。
+signal flipped
+
+## 死亡后重生完成时发出，由音效脚本复位"死亡/通关"标志。
+signal respawned
+
 ## 玩家是否活着；死后停掉输入和重力。
 var is_alive: bool = true
 
@@ -249,6 +255,9 @@ func _update_gravity(delta: float) -> void:
 		# 夹角接近 180° 时按翻转处理
 		_turn_is_flip = absf(_turn_angle) > PI - FLIP_ANGLE_EPSILON
 		_turning = true
+		# 真正开始一次 180° 翻转时发信号，由音效脚本播放下落二音
+		if _turn_is_flip:
+			flipped.emit()
 
 		# up_direction 在翻转期间保持旧方向（见 _physics_process 开头），
 		# 这样脚下的地板不会被误判成"墙"，水平速度不会被 move_and_slide 清掉。
@@ -393,3 +402,5 @@ func respawn(at: Vector2) -> void:
 	anim.rotation = 0.0
 	collision.rotation = 0.0
 	anim.play("idle")
+	# 重生完成：通知音效脚本解除"死亡/通关"的抑制，落地音恢复正常
+	respawned.emit()
