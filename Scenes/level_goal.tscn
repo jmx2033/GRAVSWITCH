@@ -1,15 +1,15 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bcc0efq3yy18v"]
 
-[ext_resource type="Script" path="res://Scripts/level/level_goal.gd" id="1_goal"]
+[ext_resource type="Script" uid="uid://dcjuyh2tvi465" path="res://Scripts/level/level_goal.gd" id="1_goal"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_goal"]
 size = Vector2(32, 32)
 
-[node name="LevelGoal" type="Area2D"]
+[node name="LevelGoal" type="Area2D" unique_id=1241713597]
 collision_layer = 0
 collision_mask = 2
 script = ExtResource("1_goal")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1016185498]
 position = Vector2(16, 16)
 shape = SubResource("RectangleShape2D_goal")
