@@ -41,6 +41,18 @@ const TRAIL_THICK_RATIO := 0.62
 const STONE_COLOR := Color("#fff2e0")
 const STONE_ALPHA := 0.55
 
+## 朝下加重力区的视觉区分（11/7 加）。
+##
+## 朝下的区是 2g「加重」（见 player.gd 的 _zone_gravity），但玩家原本看不出来。
+## 这里给它一档更强的表现：辉光更亮、呼吸更急、场体亮端更亮——
+## 用「更强的紫」表示「更强的拉力」。
+##
+## 约束：只能用紫色内部的变化。AGENTS.md 规定石粒不许加速、橙色只给危险，
+## 所以不能靠石粒动得更快或换颜色来表达。
+const DOWN_GLOW_BOOST := 1.35
+const DOWN_PULSE_BOOST := 1.45
+const DOWN_FIELD_BOOST := 1.18
+
 ## 重力指向侧高亮边：颜色与厚度（像素）。等于 0 表示不画这条加粗边。
 const EDGE_HIGHLIGHT_COLOR := Color("D9C7FF")
 const EDGE_HIGHLIGHT_WIDTH := 0.0
@@ -95,7 +107,7 @@ func _draw() -> void:
 		return
 
 	# 运行时只留一圈极淡的描边，四角与力源端加粗边都不画了：
-	# 方向感由场体渐变 + 出口辉光承担，再加粗边会显得突乧（负责人反馈）。
+	# 方向感由场体渐变 + 出口辉光承担，再加粗边会显得突兀（负责人反馈）。
 	var frame_color := EDGE_HIGHLIGHT_COLOR
 	frame_color.a = FRAME_ALPHA
 	draw_rect(Rect2(Vector2.ZERO, _zone_size), frame_color, false, 1.0)
@@ -109,10 +121,12 @@ func _draw_field_gradient() -> void:
 	var span := _zone_size.x if horizontal else _zone_size.y
 	var segs := clampi(int(span / GRADIENT_SEG_TARGET_PX), 8, GRADIENT_SEG_MAX)
 	var pull_toward_low := _pull_dir.x < 0.0 or _pull_dir.y < 0.0
+	# 朝下区（2g 加重）：场体整体更亮一档，和 1g 的区区分开
+	var field_alpha := FIELD_ALPHA * (DOWN_FIELD_BOOST if _is_down_zone() else 1.0)
 	var far := FIELD_FAR_COLOR
-	far.a = FIELD_ALPHA
+	far.a = clampf(field_alpha, 0.0, 1.0)
 	var near := FIELD_NEAR_COLOR
-	near.a = FIELD_ALPHA
+	near.a = clampf(field_alpha, 0.0, 1.0)
 
 	for i in segs:
 		var t0 := float(i) / float(segs)
@@ -153,7 +167,11 @@ func _draw_exit_glow() -> void:
 	if thickness <= 0.0:
 		return
 
-	var breath := sin(_time * GLOW_PULSE_SPEED) * 0.5 + 0.5
+	# 朝下区（2g 加重）：辉光更亮、呼吸更急，与 1g 的区区分开
+	var glow_boost := DOWN_GLOW_BOOST if _is_down_zone() else 1.0
+	var pulse_boost := DOWN_PULSE_BOOST if _is_down_zone() else 1.0
+
+	var breath := sin(_time * GLOW_PULSE_SPEED * pulse_boost) * 0.5 + 0.5
 	var alpha_scale := 1.0 - GLOW_PULSE_AMOUNT * 0.5 + GLOW_PULSE_AMOUNT * breath
 
 	var along := _zone_size.x if _pull_dir.y != 0.0 else _zone_size.y
@@ -168,15 +186,20 @@ func _draw_exit_glow() -> void:
 		# 光纹随相位平移，所以看着是"在流"而不是"在闪"。
 		var wave0 := sin(s0 * TAU * GLOW_FLOW_WAVES + phase) * 0.5 + 0.5
 		var wave1 := sin(s1 * TAU * GLOW_FLOW_WAVES + phase) * 0.5 + 0.5
-		var a0 := GLOW_ALPHA * alpha_scale * (1.0 - GLOW_FLOW_DEPTH + GLOW_FLOW_DEPTH * wave0)
-		var a1 := GLOW_ALPHA * alpha_scale * (1.0 - GLOW_FLOW_DEPTH + GLOW_FLOW_DEPTH * wave1)
+		var a0 := GLOW_ALPHA * glow_boost * alpha_scale * (1.0 - GLOW_FLOW_DEPTH + GLOW_FLOW_DEPTH * wave0)
+		var a1 := GLOW_ALPHA * glow_boost * alpha_scale * (1.0 - GLOW_FLOW_DEPTH + GLOW_FLOW_DEPTH * wave1)
 		if a0 <= 0.004 and a1 <= 0.004:
 			continue
 		var c0 := GLOW_COLOR
-		c0.a = maxf(a0, 0.0)
+		c0.a = clampf(maxf(a0, 0.0), 0.0, 1.0)
 		var c1 := GLOW_COLOR
-		c1.a = maxf(a1, 0.0)
+		c1.a = clampf(maxf(a1, 0.0), 0.0, 1.0)
 		draw_polygon(_glow_quad(thickness, seg_len * float(seg), seg_len), _glow_colors(c0, c1))
+
+
+## 当前是否是「朝下」的加重力区（2g）。判断依据和 player.gd 的 _zone_gravity 一致。
+func _is_down_zone() -> bool:
+	return _pull_dir.y > 0.0
 
 
 ## 辉光顶点色：沿边界方向用两头各自的 alpha（段内插值连续），
