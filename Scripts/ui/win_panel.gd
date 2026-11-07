@@ -21,12 +21,23 @@ signal menu_pressed
 ## 美术交付的通关展示图；文件不存在时留空。
 const WIN_ART_PATH := "res://Art/ui/win_art.png"
 
+## UI 音效挂载器（按钮悬停/按下）。
+const UI_SFX_SCRIPT := preload("res://Scripts/ui/ui_sfx.gd")
+
+# UI 音效挂载器。
+var _ui_sfx: Node = null
+
 
 func _ready() -> void:
 	_btn_retry.pressed.connect(_on_retry_pressed)
 	_btn_menu.pressed.connect(_on_menu_pressed)
 	_btn_quit.pressed.connect(_on_quit_pressed)
 	_load_art()
+
+	# 按钮悬停/按下音效（挂载器自己是 ALWAYS，通关页暂停时也能响）
+	_ui_sfx = UI_SFX_SCRIPT.new()
+	add_child(_ui_sfx)
+	_ui_sfx.attach_to(self)
 
 
 ## 打开结算页并把焦点交给「再玩一次」。

@@ -285,6 +285,24 @@ def make_win_jade(dur: float = 0.80) -> np.ndarray:
     return out
 
 
+def make_ui_hover(dur: float = 0.07) -> np.ndarray:
+    """按钮悬停：一声极轻的高频玉片"叮"，只提示"焦点移到这里"。
+
+    比跳跃音更高、更轻、更短——悬停触发很频繁，做响会烦。
+    """
+    # 1600Hz 高于跳跃音（1000Hz），音量压到 0.32
+    return jade_note(1600.0, dur, amp=0.32, fade_ms=8.0)
+
+
+def make_ui_press(dur: float = 0.12) -> np.ndarray:
+    """按钮按下：比悬停低一点的确认音，有一点"按下去"的落感。
+
+    频率低于悬停音（980 vs 1600），形成"高→低"的按下手势；
+    音量略大但仍比游戏内音效轻。
+    """
+    return jade_note(980.0, dur, amp=0.45, fade_ms=10.0)
+
+
 def write_wav(path: str, mono: np.ndarray) -> None:
     data16 = (np.clip(mono, -1, 1) * 32767).astype(np.int16)
     # 保持与原文件一致的双声道（左右相同），位深 16bit
@@ -308,6 +326,9 @@ def main() -> None:
         ("sfx_flip.wav", make_flip_jade(850.0, 600.0, 0.30)),
         ("sfx_die.wav", make_die_jade(700.0, 0.70)),
         ("sfx_win.wav", make_win_jade(0.80)),
+        # UI：按钮悬停与按下（主菜单用，11/7 加）
+        ("sfx_ui_hover.wav", make_ui_hover(0.07)),
+        ("sfx_ui_press.wav", make_ui_press(0.12)),
     ]
     for name, data in variants:
         path = os.path.normpath(os.path.join(OUT_DIR, name))

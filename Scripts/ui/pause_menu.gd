@@ -14,6 +14,9 @@ signal quit_to_menu
 ## 共享设置面板场景，_ready 里实例化一份。
 const SETTINGS_PANEL_SCENE := preload("res://Scenes/settings_panel.tscn")
 
+## UI 音效挂载器（按钮悬停/按下）。
+const UI_SFX_SCRIPT := preload("res://Scripts/ui/ui_sfx.gd")
+
 @onready var _content: Control = %Content
 @onready var _btn_continue: Button = %ButtonContinue
 @onready var _btn_menu: Button = %ButtonMenu
@@ -23,6 +26,8 @@ const SETTINGS_PANEL_SCENE := preload("res://Scenes/settings_panel.tscn")
 var _settings: Control = null
 # 是否处于暂停状态。
 var _paused: bool = false
+# UI 音效挂载器。
+var _ui_sfx: Node = null
 
 
 func _ready() -> void:
@@ -34,6 +39,11 @@ func _ready() -> void:
 	add_child(_settings)
 	_settings.closed.connect(_on_settings_closed)
 	_settings.visible = false
+
+	# 按钮悬停/按下音效（挂载器自己是 ALWAYS，暂停期间也能响）
+	_ui_sfx = UI_SFX_SCRIPT.new()
+	add_child(_ui_sfx)
+	_ui_sfx.attach_to(self)
 
 	# 根节点始终保持可见，否则收不到输入；内容由 _content 控制。
 	visible = true

@@ -12,6 +12,9 @@ const CHALLENGE_SELECT_SCENE := preload("res://Scenes/challenge_select.tscn")
 ## 共享设置面板场景，_ready 里实例化一份。
 const SETTINGS_PANEL_SCENE := preload("res://Scenes/settings_panel.tscn")
 
+## UI 音效挂载器（按钮悬停/按下）；同一份逻辑也给暂停菜单等其它面板复用。
+const UI_SFX_SCRIPT := preload("res://Scripts/ui/ui_sfx.gd")
+
 @onready var _btn_play: Button = $ButtonPlay
 @onready var _btn_challenge: Button = $ButtonChallenge
 @onready var _btn_settings: Button = $ButtonSettings
@@ -21,6 +24,8 @@ const SETTINGS_PANEL_SCENE := preload("res://Scenes/settings_panel.tscn")
 var _panel: Control = null
 # 运行时实例化的挑战关选关面板；默认隐藏。
 var _challenge_panel: Control = null
+# UI 音效挂载器。
+var _ui_sfx: Node = null
 
 
 func _ready() -> void:
@@ -42,6 +47,11 @@ func _ready() -> void:
 	# 挑战关入口只在"通关过一次"之后出现；未解锁时它完全不占位。
 	var unlocked := Progress.is_challenge_unlocked()
 	_btn_challenge.visible = unlocked
+
+	# 按钮悬停/按下音效。等隐藏状态定下来再挂，避免给不可见的按钮也接一遍。
+	_ui_sfx = UI_SFX_SCRIPT.new()
+	add_child(_ui_sfx)
+	_ui_sfx.attach_to(self)
 
 	_btn_play.grab_focus()
 
