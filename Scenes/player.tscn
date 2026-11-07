@@ -3,6 +3,8 @@
 [ext_resource type="Texture2D" uid="uid://b8fyc8r1faa3p" path="res://Art/player/spr_player.png" id="1_4flbx"]
 [ext_resource type="Script" uid="uid://ri1sfnbbhe5h" path="res://Scripts/player/player.gd" id="1_cvnsp"]
 [ext_resource type="Script" path="res://Scripts/player/player_sfx.gd" id="2_playersfx"]
+[ext_resource type="Script" path="res://Scripts/player/player_trail.gd" id="3_trail"]
+[ext_resource type="Script" path="res://Scripts/player/land_dust.gd" id="4_dust"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2na5r"]
 size = Vector2(20, 28)
@@ -363,10 +365,16 @@ script = ExtResource("1_cvnsp")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=627174386]
 shape = SubResource("RectangleShape2D_2na5r")
 
+[node name="PlayerTrail" type="Node2D" parent="."]
+script = ExtResource("3_trail")
+
 [node name="PlayerAnimated" type="AnimatedSprite2D" parent="." unique_id=28649686]
 sprite_frames = SubResource("SpriteFrames_sam6v")
 animation = &"idle"
 offset = Vector2(1, 1)
+
+[node name="LandDust" type="Node2D" parent="."]
+script = ExtResource("4_dust")
 
 [node name="PlayerSfx" type="Node" parent="."]
 script = ExtResource("2_playersfx")
