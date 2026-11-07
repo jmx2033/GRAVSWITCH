@@ -17,7 +17,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-Config="*uid://btb2fs6cmqiiw"
+Config="*res://Scenes/config.tscn"
 Progress="*res://Scripts/core/progress.gd"
 
 [display]
