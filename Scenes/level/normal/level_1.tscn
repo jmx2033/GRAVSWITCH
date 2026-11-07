@@ -2,9 +2,9 @@
 
 [ext_resource type="TileSet" uid="uid://dpphdnueb46dl" path="res://Scenes/tileset_cave.tres" id="1_m0b12"]
 [ext_resource type="PackedScene" uid="uid://b11hj8ncr5db5" path="res://Scenes/player.tscn" id="2_8ryqv"]
-[ext_resource type="PackedScene" uid="uid://u7jbmkf7gqyg" path="res://Scenes/gravity_zone.tscn" id="2_31js7"]
-[ext_resource type="PackedScene" uid="uid://cnnosxglxyvx3" path="res://Scenes/spike.tscn" id="5_6444e"]
-[ext_resource type="PackedScene" uid="uid://bcc0efq3yy18v" path="res://Scenes/level_goal.tscn" id="6_goal"]
+[ext_resource type="PackedScene" uid="uid://u7jbmkf7gqyg" path="res://Scenes/tile/gravity_zone.tscn" id="2_31js7"]
+[ext_resource type="PackedScene" uid="uid://cnnosxglxyvx3" path="res://Scenes/tile/spike.tscn" id="5_6444e"]
+[ext_resource type="PackedScene" uid="uid://bcc0efq3yy18v" path="res://Scenes/tile/level_goal.tscn" id="6_goal"]
 
 [node name="Level1" type="Node2D" unique_id=2016033099]
 

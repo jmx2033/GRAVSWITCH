@@ -131,7 +131,10 @@ func _on_win_retry() -> void:
 func _on_win_menu() -> void:
 	get_tree().paused = false
 	_win_panel.get_node("%Content").visible = false
-	get_tree().change_scene_to_file("res://Scenes/mainmenu.tscn")
+	Transition.transition(
+		func() -> void: get_tree().change_scene_to_file("res://Scenes/mainmenu.tscn"),
+		true
+	)
 
 
 ## 绑定 Zones 下所有重力区的进出信号。
@@ -201,13 +204,15 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 ## 重开本关：送回出生点并复位所有临时状态。
+##
+## 和四关的 R 一样走 Transition 过渡：黑幕盖满那一刻才把玩家挪回出生点，
+## 否则复位那一帧会直接露在画面上（瞬移感）。
+## _respawn_player() 里已经清了区锁状态，这里不用重复清。
 func _restart_level() -> void:
+	# 计时器要立刻停：死亡后按 R 时，重生计时还可能在跑，
+	# 让它和过渡各自复活一次会把玩家挪两次。
 	_stop_respawn_timer()
-	_zone_overlap = 0
-	_set_shift_locked(false)
-	if not is_instance_valid(_player):
-		return
-	_player.call("respawn", _spawn.global_position)
+	Transition.transition(_respawn_player)
 
 
 ## 建重生计时器并接上玩家的 died 信号。
@@ -227,21 +232,27 @@ func _setup_respawn() -> void:
 	_player.connect("died", _on_player_died)
 
 
-## 玩家死亡：开始倒计时。die() 本身幂等，这里不用防重复触发。
+## 玩家死亡：发起过渡，重生发生在黑幕全黑的那一刻。
+## die() 本身幂等，这里不用防重复触发。
 func _on_player_died() -> void:
-	if _respawn_timer != null:
-		_respawn_timer.start()
+	Transition.transition(_respawn_player)
 
 
-## 倒计时结束：把玩家送回出生点。
+## 把玩家送回出生点。由 Transition 在黑幕全黑时调用。
 ## 用 respawn() 而不是重载场景——重载会销毁结算页实例、把信号连接全断掉。
-func _on_respawn_timer_timeout() -> void:
+func _respawn_player() -> void:
 	if not is_instance_valid(_player):
 		return
 	_player.call("respawn", _spawn.global_position)
 	# 复活后清掉区锁计数，避免带着旧状态进去（身体已经不在原来那个区里了）
 	_zone_overlap = 0
 	_set_shift_locked(false)
+
+
+## 倒计时结束的回调。
+## 【11/7】重生时机已交由过渡接管，这个 Timer 不再启动；保留是为了不删场景里的节点。
+func _on_respawn_timer_timeout() -> void:
+	_respawn_player()
 
 
 ## 通关：停掉重生计时，否则通关后若刚好在倒计时里会把人拽回出生点。
