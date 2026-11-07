@@ -72,7 +72,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
 	if _level_index < 0:
 		return
-	change_level.call_deferred(levels[_level_index])
+	var scene: PackedScene = levels[_level_index]
+	Transition.transition(func() -> void: change_level(scene))
 
 
 ## 暂停菜单点「继续」：pause_menu 已自行解除暂停，这里只做确认。
@@ -82,8 +83,12 @@ func _on_pause_resumed() -> void:
 
 
 ## 暂停菜单点「回主菜单」：切回主菜单场景（pause_menu 已自行解除暂停）。
+## 黑幕盖满之后才真的切，避免退回菜单时看到上一帧的关卡画面。
 func _on_pause_quit() -> void:
-	get_tree().change_scene_to_file("res://Scenes/mainmenu.tscn")
+	Transition.transition(
+		func() -> void: get_tree().change_scene_to_file("res://Scenes/mainmenu.tscn"),
+		true
+	)
 
 
 ## 切换到指定关卡场景；传 null 时什么也不做。
@@ -143,16 +148,22 @@ func _load_level(level_scene: PackedScene) -> void:
 		_player.call("enable_gravity_shift")
 
 
-## 玩家死亡后启动重生计时；die() 已幂等，这里不用防重复。
+## 玩家死亡后发起过渡；重生实际发生在黑幕全黑的那一刻（die() 已幂等，不用防重复）。
 func _on_player_died() -> void:
-	_respawn_timer.start()
+	Transition.transition(_respawn_player)
 
 
-## 计时结束，把玩家送回缓存的出生点。
-func _on_respawn_timer_timeout() -> void:
+## 把玩家送回缓存的出生点。由 Transition 在黑幕全黑时调用。
+func _respawn_player() -> void:
 	if not is_instance_valid(_player):
 		return
 	_player.call("respawn", _spawn_position)
+
+
+## 计时结束，把玩家送回缓存的出生点。
+## 【11/7】重生时机已交由过渡接管，这个 Timer 不再启动；保留是为了不删场景里的节点。
+func _on_respawn_timer_timeout() -> void:
+	_respawn_player()
 
 
 ## 通关音效响多久之后再弹结算页，让「通关」那一声先落下去。
@@ -172,7 +183,7 @@ func _on_player_won() -> void:
 		Progress.mark_game_cleared()
 		_show_win_panel_delayed()
 		return
-	change_level.call_deferred(levels[next_index])
+	Transition.transition(func() -> void: change_level(levels[next_index]))
 
 
 ## 等 WIN_PANEL_DELAY 秒再显示结算页。
@@ -200,11 +211,14 @@ func _on_win_retry() -> void:
 	_win_panel.get_node("%Content").visible = false
 	if levels.is_empty():
 		return
-	change_level.call_deferred(levels[0])
+	Transition.transition(func() -> void: change_level(levels[0]))
 
 
 ## 通关页点「回主菜单」：解除暂停并切回主菜单。
 func _on_win_menu() -> void:
 	get_tree().paused = false
 	_win_panel.get_node("%Content").visible = false
-	get_tree().change_scene_to_file("res://Scenes/mainmenu.tscn")
+	Transition.transition(
+		func() -> void: get_tree().change_scene_to_file("res://Scenes/mainmenu.tscn"),
+		true
+	)

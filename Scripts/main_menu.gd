@@ -18,10 +18,10 @@ const UI_SFX_SCRIPT := preload("res://Scripts/ui/ui_sfx.gd")
 ## 主菜单重力场效果（背景石粒 + 方向键切换重力）。
 const MENU_GRAVITY_FX := preload("res://Scripts/ui/menu_gravity_fx.gd")
 
-@onready var _btn_play: Button = $ButtonPlay
-@onready var _btn_challenge: Button = $ButtonChallenge
-@onready var _btn_settings: Button = $ButtonSettings
-@onready var _btn_quit: Button = $ButtonQuit
+@onready var _btn_play: Button = $VBoxContainer/ButtonPlay
+@onready var _btn_challenge: Button = $VBoxContainer/ButtonChallenge
+@onready var _btn_settings: Button = $VBoxContainer/ButtonSettings
+@onready var _btn_quit: Button = $VBoxContainer/ButtonQuit
 
 # 运行时实例化的设置面板；默认隐藏。
 var _panel: Control = null
@@ -75,7 +75,11 @@ func _on_play_pressed() -> void:
 	if game_scene == null:
 		push_error("main_menu.gd：game_scene 未设置")
 		return
-	get_tree().change_scene_to_packed(game_scene)
+	# 黑幕盖满之后才真的进关，玩家不会看到菜单被瞬间替换。
+	Transition.transition(
+		func() -> void: get_tree().change_scene_to_packed(game_scene),
+		true
+	)
 
 
 ## 打开挑战关选关面板。
