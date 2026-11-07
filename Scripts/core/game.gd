@@ -134,6 +134,14 @@ func _load_level(level_scene: PackedScene) -> void:
 		return
 	_player.connect("won", _on_player_won)
 
+	# 最后一关（正式关的第 5 关）才授权「空中改重力」。
+	# 前四关不授权，玩家只能靠重力区改变方向——那些关的谜题全建立在这个前提上。
+	# 授权集中写在这里而不是每关一个参数，是因为「哪一关开能力」是游戏流程的决定，
+	# 不该散落到四个关卡场景里。
+	var is_last_level: bool = _level_index >= 0 and _level_index == levels.size() - 1
+	if is_last_level and _player.has_method("enable_gravity_shift"):
+		_player.call("enable_gravity_shift")
+
 
 ## 玩家死亡后启动重生计时；die() 已幂等，这里不用防重复。
 func _on_player_died() -> void:
