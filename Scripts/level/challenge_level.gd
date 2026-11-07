@@ -13,9 +13,17 @@ const OVERLAY_Z_INDEX := 100
 
 @onready var _spawn: Marker2D = $Spawn
 @onready var _player: Node = $Player
+## 重力区容器；场景里没摆区就是 null，此时整套"区内锁"自动跳过。
+@onready var _zones: Node2D = get_node_or_null("Zones") as Node2D
 
 # 运行时实例化的结算页；默认隐藏。
 var _win_panel: Control = null
+
+## 玩家当前重叠的重力区数量。>0 时收回玩家的"主动改重力"能力。
+var _zone_overlap: int = 0
+
+## 玩家脚本是否认这个开关。不认就只警告一次，不去每帧写不存在的属性。
+var _can_lock_shift: bool = false
 
 
 func _ready() -> void:
@@ -39,6 +47,9 @@ func _ready() -> void:
 	# 四关不调用这个方法，所以那边的手感与之前完全一致。
 	if _player.has_method("enable_gravity_shift"):
 		_player.call("enable_gravity_shift")
+
+	# 重力区优先级：玩家在区里时临时收回上面这个能力（见 _lock_shift 的说明）。
+	_bind_gravity_zones()
 
 
 ## 让结算页铺满整个视口。
@@ -92,3 +103,54 @@ func _on_win_menu() -> void:
 	get_tree().paused = false
 	_win_panel.get_node("%Content").visible = false
 	get_tree().change_scene_to_file("res://Scenes/mainmenu.tscn")
+
+
+## 绑定 Zones 下所有重力区的进出信号。
+##
+## 本项目的 Zones 节点下只放重力区，所以按 Area2D 判断即可，
+## 不依赖 gravity_zone.gd 的 class_name（改脚本名也不会让这里解析失败）。
+func _bind_gravity_zones() -> void:
+	if _zones == null:
+		return
+	# 玩家脚本里是 _gravity_shift_enabled: bool，默认 false，所以用 get() 判存在：
+	# 属性不存在时 get() 返回 null，存在时一定是 true/false。
+	_can_lock_shift = _player.get("_gravity_shift_enabled") != null
+	if not _can_lock_shift:
+		push_warning("challenge_level.gd：玩家脚本没有 _gravity_shift_enabled，重力区压不住主动改重力")
+		return
+	for zone in _zones.get_children():
+		if zone is Area2D:
+			zone.body_entered.connect(_on_zone_body_entered)
+			zone.body_exited.connect(_on_zone_body_exited)
+
+
+## 玩家进入某个重力区：计数加一，并收回主动改重力能力。
+func _on_zone_body_entered(body: Node2D) -> void:
+	if body != _player:
+		return
+	_zone_overlap += 1
+	_set_shift_locked(true)
+
+
+## 玩家离开某个重力区：计数减一，全部离开后才恢复能力。
+## 用计数而不是布尔，是为了覆盖两个区首尾相接、走出去的瞬间已经站在另一个区里的情况。
+func _on_zone_body_exited(body: Node2D) -> void:
+	if body != _player:
+		return
+	_zone_overlap = maxi(_zone_overlap - 1, 0)
+	if _zone_overlap == 0:
+		_set_shift_locked(false)
+
+
+## 写玩家脚本里的开关。locked 为 true 就是"区内禁止主动改重力"。
+##
+## 为什么用 set() 而不给 player.gd 加方法：四关共用 player.gd，
+## 这次只允许改挑战关，所以宁愿在挑战关这边写一下私有字段，
+## 也不去动会被四关一起影响的共享脚本。
+## 关掉之后 player.gd 的 _try_gravity_shift() 第一行就返回 false，
+## 按「方向 + 空格」会照常走跳跃流程——不会被吃掉，也不会把方向
+## 排队到出区之后再翻过去。
+func _set_shift_locked(locked: bool) -> void:
+	if not _can_lock_shift or not is_instance_valid(_player):
+		return
+	_player.set("_gravity_shift_enabled", not locked)
