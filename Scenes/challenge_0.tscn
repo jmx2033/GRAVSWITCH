@@ -4,9 +4,17 @@
 [ext_resource type="PackedScene" uid="uid://b11hj8ncr5db5" path="res://Scenes/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://bcc0efq3yy18v" path="res://Scenes/level_goal.tscn" id="4_goal"]
 [ext_resource type="Script" uid="uid://dyvi8elcavl7i" path="res://Scripts/level/challenge_level.gd" id="5_ctrl"]
+[ext_resource type="Texture2D" uid="uid://rmo458s4itmk" path="res://Art/bg/bg_cave.png" id="6_bg"]
 
 [node name="Challenge0" type="Node2D" unique_id=1738420820]
 script = ExtResource("5_ctrl")
+
+[node name="Background" type="Sprite2D" parent="."]
+z_index = -100
+texture_filter = 1
+position = Vector2(320, 180)
+scale = Vector2(1.125, 1.125)
+texture = ExtResource("6_bg")
 
 [node name="Terrain" type="TileMapLayer" parent="." unique_id=87453172]
 tile_map_data = PackedByteArray("AAAAAAoAAAAEAAAAAAABAAoAAAAEAAAAAAACAAoAAAAEAAAAAAADAAoAAAAEAAAAAAAEAAoAAAAEAAAAAAAFAAoAAAAEAAAAAAAGAAoAAAAEAAAAAAAHAAoAAAAEAAAAAAAIAAoAAAAEAAAAAAAJAAoAAAAEAAAAAAAKAAoAAAAEAAAAAAALAAoAAAAEAAAAAAAMAAoAAAAEAAAAAAANAAoAAAAEAAAAAAAOAAoAAAAEAAAAAAAPAAoAAAAEAAAAAAAQAAoAAAAEAAAAAAARAAoAAAAEAAAAAAASAAoAAAAEAAAAAAATAAoAAAAEAAAAAAAAAAEAAAAEAAAAAAAAAAIAAAAEAAAAAAAAAAMAAAAEAAAAAAAAAAQAAAAEAAAAAAAAAAUAAAAEAAAAAAAAAAYAAAAEAAAAAAAAAAcAAAAEAAAAAAAAAAgAAAAEAAAAAAAAAAkAAAAEAAAAAAATAAEAAAAEAAAAAAATAAIAAAAEAAAAAAATAAMAAAAEAAAAAAATAAQAAAAEAAAAAAATAAUAAAAEAAAAAAATAAYAAAAEAAAAAAATAAcAAAAEAAAAAAATAAgAAAAEAAAAAAATAAkAAAAEAAAAAAA=")
