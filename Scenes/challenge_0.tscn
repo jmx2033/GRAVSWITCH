@@ -1,0 +1,24 @@
+[gd_scene format=4 uid="uid://df2dbifp0v42y"]
+
+[ext_resource type="TileSet" uid="uid://dpphdnueb46dl" path="res://Scenes/tileset_cave.tres" id="1_tiles"]
+[ext_resource type="PackedScene" uid="uid://b11hj8ncr5db5" path="res://Scenes/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" uid="uid://bcc0efq3yy18v" path="res://Scenes/level_goal.tscn" id="4_goal"]
+[ext_resource type="Script" uid="uid://dyvi8elcavl7i" path="res://Scripts/level/challenge_level.gd" id="5_ctrl"]
+
+[node name="Challenge0" type="Node2D" unique_id=1738420820]
+script = ExtResource("5_ctrl")
+
+[node name="Terrain" type="TileMapLayer" parent="." unique_id=87453172]
+tile_map_data = PackedByteArray("AAAAAAoAAAAEAAAAAAABAAoAAAAEAAAAAAACAAoAAAAEAAAAAAADAAoAAAAEAAAAAAAEAAoAAAAEAAAAAAAFAAoAAAAEAAAAAAAGAAoAAAAEAAAAAAAHAAoAAAAEAAAAAAAIAAoAAAAEAAAAAAAJAAoAAAAEAAAAAAAKAAoAAAAEAAAAAAALAAoAAAAEAAAAAAAMAAoAAAAEAAAAAAANAAoAAAAEAAAAAAAOAAoAAAAEAAAAAAAPAAoAAAAEAAAAAAAQAAoAAAAEAAAAAAARAAoAAAAEAAAAAAASAAoAAAAEAAAAAAATAAoAAAAEAAAAAAAAAAEAAAAEAAAAAAAAAAIAAAAEAAAAAAAAAAMAAAAEAAAAAAAAAAQAAAAEAAAAAAAAAAUAAAAEAAAAAAAAAAYAAAAEAAAAAAAAAAcAAAAEAAAAAAAAAAgAAAAEAAAAAAAAAAkAAAAEAAAAAAATAAEAAAAEAAAAAAATAAIAAAAEAAAAAAATAAMAAAAEAAAAAAATAAQAAAAEAAAAAAATAAUAAAAEAAAAAAATAAYAAAAEAAAAAAATAAcAAAAEAAAAAAATAAgAAAAEAAAAAAATAAkAAAAEAAAAAAA=")
+tile_set = ExtResource("1_tiles")
+
+[node name="Zones" type="Node2D" parent="." unique_id=559220360]
+
+[node name="Spawn" type="Marker2D" parent="." unique_id=3448634]
+position = Vector2(50, 300)
+
+[node name="Player" parent="." unique_id=1776167578 instance=ExtResource("2_player")]
+position = Vector2(50, 300)
+
+[node name="LevelGoal" parent="." unique_id=1802959924 instance=ExtResource("4_goal")]
+position = Vector2(224, 285)
