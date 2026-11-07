@@ -1,44 +1,44 @@
 [gd_scene format=4 uid="uid://df2dbifp0v42y"]
 
-[ext_resource type="TileSet" uid="uid://dpphdnueb46dl" path="res://Scenes/tileset_cave.tres" id="1_tiles"]
-[ext_resource type="PackedScene" uid="uid://b11hj8ncr5db5" path="res://Scenes/player.tscn" id="2_player"]
-[ext_resource type="PackedScene" uid="uid://u7jbmkf7gqyg" path="res://Scenes/gravity_zone.tscn" id="3_0e5gw"]
-[ext_resource type="PackedScene" uid="uid://bcc0efq3yy18v" path="res://Scenes/level_goal.tscn" id="4_goal"]
-[ext_resource type="Script" uid="uid://dyvi8elcavl7i" path="res://Scripts/level/challenge_level.gd" id="5_ctrl"]
-[ext_resource type="Texture2D" uid="uid://rmo458s4itmk" path="res://Art/bg/bg_cave.png" id="6_bg"]
-[ext_resource type="PackedScene" uid="uid://cnnosxglxyvx3" path="res://Scenes/spike.tscn" id="7_3jban"]
-[ext_resource type="Script" uid="uid://cto0ucty03wxl" path="res://Scripts/level/death_bounds.gd" id="8_bounds"]
+[ext_resource type="Script" uid="uid://dyvi8elcavl7i" path="res://Scripts/level/challenge_level.gd" id="1_vpt74"]
+[ext_resource type="Script" uid="uid://cto0ucty03wxl" path="res://Scripts/level/death_bounds.gd" id="2_0vieh"]
+[ext_resource type="Texture2D" uid="uid://rmo458s4itmk" path="res://Art/bg/bg_cave.png" id="3_j2q56"]
+[ext_resource type="TileSet" uid="uid://dpphdnueb46dl" path="res://Scenes/tileset_cave.tres" id="4_5l6lo"]
+[ext_resource type="PackedScene" uid="uid://u7jbmkf7gqyg" path="res://Scenes/tile/gravity_zone.tscn" id="5_pa28v"]
+[ext_resource type="PackedScene" uid="uid://b11hj8ncr5db5" path="res://Scenes/player.tscn" id="6_h7brn"]
+[ext_resource type="PackedScene" uid="uid://bcc0efq3yy18v" path="res://Scenes/tile/level_goal.tscn" id="7_mdg0x"]
+[ext_resource type="PackedScene" uid="uid://cnnosxglxyvx3" path="res://Scenes/tile/spike.tscn" id="8_065xr"]
 
 [node name="Challenge0" type="Node2D" unique_id=1738420820]
-script = ExtResource("5_ctrl")
+script = ExtResource("1_vpt74")
 
 [node name="DeathBounds" type="Node" parent="." unique_id=221472444]
-script = ExtResource("8_bounds")
+script = ExtResource("2_0vieh")
 
 [node name="Background" type="Sprite2D" parent="." unique_id=2037500036]
 z_index = -100
 texture_filter = 1
 position = Vector2(320, 180)
 scale = Vector2(1.125, 1.125)
-texture = ExtResource("6_bg")
+texture = ExtResource("3_j2q56")
 
 [node name="Terrain" type="TileMapLayer" parent="." unique_id=87453172]
 tile_map_data = PackedByteArray("AAAAAAoAAAAEAAAAAAABAAoAAAAAAAAAAAACAAoAAAAAAAAAAAADAAoAAAAAAAAAAAAEAAoAAAAAAAAAAAAFAAoAAAAAAAAAAAAGAAoAAAAAAAAAAAAHAAoAAAAAAAAAAAAIAAoAAAAAAAAAAAAJAAoAAAAAAAAAAAAKAAoAAAAAAAAAAAALAAoAAAAAAAAAAAAMAAoAAAAAAAAAAAANAAoAAAAAAAAAAAAOAAoAAAAAAAAAAAAPAAoAAAAAAAAAAAAQAAoAAAAAAAAAAAARAAoAAAAAAAAAAAASAAoAAAAAAAAAAAATAAoAAAAEAAAAAAAAAAEAAAAEAAAAAAAAAAIAAAAEAAAAAAAAAAMAAAAEAAAAAAAAAAQAAAAEAAAAAAAAAAUAAAAEAAAAAAAAAAYAAAAEAAAAAAAAAAcAAAAEAAAAAAAAAAgAAAAEAAAAAAAAAAkAAAAEAAAAAAATAAEAAAAEAAAAAAATAAIAAAAEAAAAAAATAAMAAAAEAAAAAAATAAQAAAAEAAAAAAATAAUAAAAEAAAAAAATAAYAAAAEAAAAAAATAAcAAAAEAAAAAAATAAgAAAAEAAAAAAATAAkAAAAEAAAAAAAAAAAAAAADAAAAAAABAAAAAAADAAAAAAACAAAAAAADAAAAAAADAAAAAAADAAAAAAAEAAAAAAADAAAAAAAFAAAAAAADAAAAAAAGAAAAAAADAAAAAAAHAAAAAAADAAAAAAAIAAAAAAADAAAAAAAJAAAAAAADAAAAAAAKAAAAAAADAAAAAAALAAAAAAADAAAAAAAMAAAAAAADAAAAAAANAAAAAAADAAAAAAAOAAAAAAADAAAAAAAPAAAAAAADAAAAAAAQAAAAAAADAAAAAAARAAAAAAADAAAAAAASAAAAAAADAAAAAAATAAAAAAADAAAAAAADAAcAAAADAAAAAAADAAgAAAADAAAAAAADAAkAAAADAAAAAAAEAAkAAAADAAAAAAAEAAgAAAADAAAAAAAEAAcAAAADAAAAAAAKAAQAAAADAAAAAAALAAQAAAADAAAAAAAMAAQAAAADAAAAAAAMAAUAAAADAAAAAAAMAAYAAAADAAAAAAAGAAEAAAADAAAAAAAGAAIAAAADAAAAAAAGAAMAAAADAAAAAAARAAkAAAADAAAAAAARAAgAAAADAAAAAAARAAcAAAADAAAAAAARAAYAAAADAAAAAAARAAUAAAADAAAAAAA=")
-tile_set = ExtResource("1_tiles")
+tile_set = ExtResource("4_5l6lo")
 
 [node name="Zones" type="Node2D" parent="." unique_id=559220360]
 
-[node name="GravityZone2" parent="Zones" unique_id=285377863 instance=ExtResource("3_0e5gw")]
+[node name="GravityZone2" parent="Zones" unique_id=285377863 instance=ExtResource("5_pa28v")]
 position = Vector2(515, 30)
 direction = 2
 size_in_tiles = Vector2i(3, 9)
 
-[node name="GravityZone" parent="Zones" unique_id=955969124 instance=ExtResource("3_0e5gw")]
+[node name="GravityZone" parent="Zones" unique_id=955969124 instance=ExtResource("5_pa28v")]
 position = Vector2(65, 32)
 direction = 2
 size_in_tiles = Vector2i(1, 9)
 
-[node name="GravityZone3" parent="Zones" unique_id=1861918243 instance=ExtResource("3_0e5gw")]
+[node name="GravityZone3" parent="Zones" unique_id=1861918243 instance=ExtResource("5_pa28v")]
 position = Vector2(96, 127)
 direction = 1
 size_in_tiles = Vector2i(9, 3)
@@ -46,29 +46,29 @@ size_in_tiles = Vector2i(9, 3)
 [node name="Spawn" type="Marker2D" parent="." unique_id=3448634]
 position = Vector2(50, 300)
 
-[node name="Player" parent="." unique_id=1776167578 instance=ExtResource("2_player")]
+[node name="Player" parent="." unique_id=1776167578 instance=ExtResource("6_h7brn")]
 position = Vector2(50, 300)
 
-[node name="LevelGoal" parent="." unique_id=1802959924 instance=ExtResource("4_goal")]
+[node name="LevelGoal" parent="." unique_id=1802959924 instance=ExtResource("7_mdg0x")]
 position = Vector2(577, 284)
 
 [node name="Node2D" type="Node2D" parent="." unique_id=680226877]
 
-[node name="Spike" parent="Node2D" unique_id=1755118528 instance=ExtResource("7_3jban")]
+[node name="Spike" parent="Node2D" unique_id=1755118528 instance=ExtResource("8_065xr")]
 position = Vector2(310, 303)
 scale = Vector2(9.42056, 1.1911836)
 
-[node name="Spike2" parent="Node2D" unique_id=1714993250 instance=ExtResource("7_3jban")]
+[node name="Spike2" parent="Node2D" unique_id=1714993250 instance=ExtResource("8_065xr")]
 position = Vector2(343.00003, 40.000004)
 rotation = 3.1478019
 scale = Vector2(1.2494473, 0.35099334)
 
-[node name="Spike3" parent="Node2D" unique_id=1817935301 instance=ExtResource("7_3jban")]
+[node name="Spike3" parent="Node2D" unique_id=1817935301 instance=ExtResource("8_065xr")]
 position = Vector2(423.00003, 101.00001)
 rotation = -1.58628
 scale = Vector2(1.7912338, 0.47820556)
 
-[node name="Spike4" parent="Node2D" unique_id=245976412 instance=ExtResource("7_3jban")]
+[node name="Spike4" parent="Node2D" unique_id=245976412 instance=ExtResource("8_065xr")]
 position = Vector2(532, 36.999992)
 rotation = 3.136719
 scale = Vector2(4.8399563, 0.3188386)

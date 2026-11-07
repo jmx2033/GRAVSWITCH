@@ -2,8 +2,8 @@
 
 [ext_resource type="TileSet" uid="uid://dpphdnueb46dl" path="res://Scenes/tileset_cave.tres" id="1_tiles"]
 [ext_resource type="PackedScene" uid="uid://b11hj8ncr5db5" path="res://Scenes/player.tscn" id="2_player"]
-[ext_resource type="PackedScene" uid="uid://u7jbmkf7gqyg" path="res://Scenes/gravity_zone.tscn" id="3_zone"]
-[ext_resource type="PackedScene" uid="uid://bcc0efq3yy18v" path="res://Scenes/level_goal.tscn" id="4_goal"]
+[ext_resource type="PackedScene" uid="uid://u7jbmkf7gqyg" path="res://Scenes/tile/gravity_zone.tscn" id="3_zone"]
+[ext_resource type="PackedScene" uid="uid://bcc0efq3yy18v" path="res://Scenes/tile/level_goal.tscn" id="4_goal"]
 [ext_resource type="Script" uid="uid://dyvi8elcavl7i" path="res://Scripts/level/challenge_level.gd" id="5_ctrl"]
 [ext_resource type="Texture2D" uid="uid://rmo458s4itmk" path="res://Art/bg/bg_cave.png" id="6_bg"]
 [ext_resource type="Script" uid="uid://cto0ucty03wxl" path="res://Scripts/level/death_bounds.gd" id="8_bounds"]
