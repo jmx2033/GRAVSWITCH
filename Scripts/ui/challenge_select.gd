@@ -7,13 +7,15 @@ extends Control
 signal closed
 
 ## 挑战关的场景列表；按顺序对应面板里的按钮。
-## 目前只有一张占位关，后面加关时在这里追加即可。
+## 加新挑战关时在这里追加，同时改下面的 CHALLENGE_NAMES。
 const CHALLENGE_SCENES: Array[PackedScene] = [
 	preload("res://Scenes/challenge_0.tscn"),
+	preload("res://Scenes/challenge_1.tscn"),
+	preload("res://Scenes/challenge_2.tscn"),
 ]
 
 ## 挑战关名称，和 CHALLENGE_SCENES 一一对应。
-const CHALLENGE_NAMES := ["CHALLENGE 1"]
+const CHALLENGE_NAMES := ["CHALLENGE 1", "CHALLENGE 2 逆流", "CHALLENGE 3 失重走廊"]
 
 @onready var _list: VBoxContainer = %ButtonList
 @onready var _btn_back: Button = %ButtonBack
