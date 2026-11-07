@@ -1,6 +1,51 @@
 [gd_scene format=3 uid="uid://durcx6hmcy24w"]
 
 [ext_resource type="Script" uid="uid://dq3plm2pm86jq" path="res://Scripts/ui/settings_panel.gd" id="1_sp"]
+[ext_resource type="Texture2D" path="res://Art/ui/settings_panel_bg.png" id="2_bg"]
+[ext_resource type="Texture2D" path="res://Art/ui/ui_button.png" id="3_btn"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_frost_bg"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+texture = ExtResource("2_bg")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn_normal"]
+content_margin_left = 12.0
+content_margin_top = 4.0
+content_margin_right = 12.0
+content_margin_bottom = 4.0
+texture = ExtResource("3_btn")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn_hover"]
+content_margin_left = 12.0
+content_margin_top = 4.0
+content_margin_right = 12.0
+content_margin_bottom = 4.0
+texture = ExtResource("3_btn")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+modulate_color = Color(1.25, 1.25, 1.25, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn_focus"]
+content_margin_left = 12.0
+content_margin_top = 4.0
+content_margin_right = 12.0
+content_margin_bottom = 4.0
+texture = ExtResource("3_btn")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+modulate_color = Color(1.15, 1.15, 1.15, 1)
+draw_center = false
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_frost"]
 bg_color = Color(0.12, 0.1, 0.18, 0.85)
@@ -50,13 +95,13 @@ offset_right = 150.0
 offset_bottom = 150.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_frost")
+theme_override_styles/panel = SubResource("StyleBoxTexture_frost_bg")
 
 [node name="Title" type="Label" parent="Frost" unique_id=1817457904]
 layout_mode = 0
-offset_top = 8.0
+offset_top = 18.0
 offset_right = 300.0
-offset_bottom = 32.0
+offset_bottom = 42.0
 theme_override_colors/font_color = Color(0.85, 0.78, 1, 1)
 theme_override_font_sizes/font_size = 16
 text = "SETTINGS"
@@ -66,9 +111,9 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 24.0
-offset_top = 36.0
+offset_top = 48.0
 offset_right = 276.0
-offset_bottom = 58.0
+offset_bottom = 70.0
 theme_override_font_sizes/font_size = 14
 text = "Volume: 100%"
 
@@ -76,7 +121,7 @@ text = "Volume: 100%"
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 24.0
-offset_top = 58.0
+offset_top = 70.0
 offset_right = 276.0
 offset_bottom = 82.0
 max_value = 1.0
@@ -113,5 +158,13 @@ offset_left = 106.0
 offset_top = 237.0
 offset_right = 203.0
 offset_bottom = 273.0
+theme_override_colors/font_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_focus_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_pressed_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_hover_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxTexture_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxTexture_btn_hover")
+theme_override_styles/focus = SubResource("StyleBoxTexture_btn_focus")
 text = "BACK"
