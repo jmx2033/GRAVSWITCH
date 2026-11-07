@@ -7,8 +7,8 @@ extends Node2D
 ## 场体填充透明度。
 const FIELD_ALPHA := 0.45
 ## 远端（重力反侧）与力源端（重力指向侧）颜色。
-## 远端要足够暗：辉光铺满半个场会把远端抬亮，远端颜色再暗一档才拉得开方向差。
-const FIELD_FAR_COLOR := Color("#080510")
+## 远端直接用背景色 P01 #100D14（叶一谦 11/7 反馈"深色一端太深，跟背景一个颜色就行"）。
+const FIELD_FAR_COLOR := Color("#100D14")
 const FIELD_NEAR_COLOR := Color("#B295F0")
 ## 渐变曲线：必须是 1.0（线性），非线性会在暗端出折线台阶。
 const GRADIENT_CURVE := 1.0
@@ -21,8 +21,12 @@ const GRADIENT_SEG_MAX := 200
 const GLOW_COLOR := Color("D9CBFF")
 const GLOW_ALPHA := 0.30
 const GLOW_WIDTH_RATIO := 0.5
-const GLOW_PULSE_SPEED := 0.7
-const GLOW_PULSE_AMOUNT := 0.35
+## 呼吸灯（叶一谦 11/7 要求浅色端能看出呼吸）：
+## 速度按"人眼舒服的呼吸周期 4 秒左右"反推，2π/1.5 ≈ 4.2s；
+## 幅度 1.0 时 alpha_scale 在 0.5~1.5 之间摆（相对 3 倍差），平均亮度仍由 GLOW_ALPHA 决定，
+## 所以"呼吸明显"和"整体不刺眼"两件事不冲突。
+const GLOW_PULSE_SPEED := 1.5
+const GLOW_PULSE_AMOUNT := 1.0
 const GLOW_FLOW_SPEED := 0.9
 const GLOW_FLOW_WAVES := 1.5
 const GLOW_FLOW_DEPTH := 0.55
