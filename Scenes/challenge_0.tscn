@@ -9,7 +9,7 @@
 [node name="Challenge0" type="Node2D" unique_id=1738420820]
 script = ExtResource("5_ctrl")
 
-[node name="Background" type="Sprite2D" parent="."]
+[node name="Background" type="Sprite2D" parent="." unique_id=2037500036]
 z_index = -100
 texture_filter = 1
 position = Vector2(320, 180)
