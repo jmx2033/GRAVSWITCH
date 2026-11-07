@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://durcx6hmcy24w"]
 
 [ext_resource type="Script" uid="uid://dq3plm2pm86jq" path="res://Scripts/ui/settings_panel.gd" id="1_sp"]
-[ext_resource type="Texture2D" path="res://Art/ui/settings_panel_bg.png" id="2_bg"]
-[ext_resource type="Texture2D" path="res://Art/ui/ui_button.png" id="3_btn"]
+[ext_resource type="Texture2D" uid="uid://m4vv6voktodq" path="res://Art/ui/settings_panel_bg.png" id="2_bg"]
+[ext_resource type="Texture2D" uid="uid://dv478o526tpud" path="res://Art/ui/ui_button.png" id="3_btn"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_frost_bg"]
 content_margin_left = 0.0
@@ -47,20 +47,6 @@ texture_margin_bottom = 6.0
 modulate_color = Color(1.15, 1.15, 1.15, 1)
 draw_center = false
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_frost"]
-bg_color = Color(0.12, 0.1, 0.18, 0.85)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.85, 0.78, 1, 0.55)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-shadow_color = Color(0, 0, 0, 0.45)
-shadow_size = 8
-
 [node name="SettingsPanel" type="Control" unique_id=710877453]
 process_mode = 3
 visible = false
@@ -99,9 +85,10 @@ theme_override_styles/panel = SubResource("StyleBoxTexture_frost_bg")
 
 [node name="Title" type="Label" parent="Frost" unique_id=1817457904]
 layout_mode = 0
-offset_top = 18.0
-offset_right = 300.0
-offset_bottom = 42.0
+offset_left = -3.0
+offset_top = 25.0
+offset_right = 297.0
+offset_bottom = 49.0
 theme_override_colors/font_color = Color(0.85, 0.78, 1, 1)
 theme_override_font_sizes/font_size = 16
 text = "SETTINGS"
@@ -110,9 +97,9 @@ horizontal_alignment = 1
 [node name="VolumeLabel" type="Label" parent="Frost" unique_id=1248034047]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 24.0
+offset_left = 63.0
 offset_top = 48.0
-offset_right = 276.0
+offset_right = 315.0
 offset_bottom = 70.0
 theme_override_font_sizes/font_size = 14
 text = "Volume: 100%"
@@ -120,29 +107,29 @@ text = "Volume: 100%"
 [node name="VolumeSlider" type="HSlider" parent="Frost" unique_id=744007780]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 24.0
+offset_left = 63.0
 offset_top = 70.0
-offset_right = 276.0
-offset_bottom = 82.0
+offset_right = 235.0
+offset_bottom = 86.0
 max_value = 1.0
 step = 0.05
 value = 1.0
 
 [node name="KeysTitle" type="Label" parent="Frost" unique_id=996241516]
 layout_mode = 0
-offset_left = 24.0
-offset_top = 88.0
-offset_right = 276.0
-offset_bottom = 108.0
+offset_left = 63.0
+offset_top = 86.0
+offset_right = 315.0
+offset_bottom = 106.0
 theme_override_colors/font_color = Color(0.85, 0.78, 1, 1)
 theme_override_font_sizes/font_size = 14
 text = "CONTROLS"
 
 [node name="KeysTable" type="Label" parent="Frost" unique_id=735927332]
 layout_mode = 0
-offset_left = 24.0
+offset_left = 63.0
 offset_top = 119.0
-offset_right = 276.0
+offset_right = 315.0
 offset_bottom = 221.0
 theme_override_font_sizes/font_size = 13
 text = "Move Left    A / Left
