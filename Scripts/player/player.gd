@@ -71,6 +71,10 @@ var coyote_timer: float = 0.0
 # 跳预输入倒计时
 var jump_timer: float = 0.0
 
+## 本次起跳是否还在"可截断"窗口里：起跳后置 true，松手/落地清掉。
+## 只在里面为 true 时才做可变跳跃高度的截断，避免把走过去掉落也砍一刀。
+var _jump_cut_armed: bool = false
+
 # 玩家当前重叠的重力区 -> 拉力方向；叠加时按各区的加速度贡献计算
 var _gravity_dirs: Dictionary = {}
 
@@ -134,10 +138,18 @@ func _physics_process(delta: float) -> void:
 
 	var side_speed: float = velocity.dot(right_dir) if on_axis else velocity.x
 
+	# 地面用 ACCEL（慢起步），空中用 AIR_ACCEL（跟手）
+	var accel: float = Config.ACCEL if is_on_floor() else Config.AIR_ACCEL
+	# 反向输入 = 掉头：换用更大的 TURN_ACCEL 把速度拽回来。
+	# 不加这一条的话，掉头和起步共用 accel，把 ACCEL 调小做「慢起步」时
+	# 掉头会被一起拖慢（ACCEL=1100 时掉头要 0.45 秒），主观上就是脚底打滑。
+	# side_speed 始终是沿 right_dir 的分量，所以重力朝左/朝右时这个判断同样成立。
+	if is_on_floor() and axis != 0.0 and side_speed * axis < 0.0:
+		accel = Config.TURN_ACCEL
 	# 目标侧向速度：有输入就加速/限速，没输入就减速。
 	var target_side: float = side_speed
 	if axis != 0.0:
-		target_side = clampf(side_speed + axis * Config.ACCEL * delta,
+		target_side = clampf(side_speed + axis * accel * delta,
 			-Config.MAX_SPEED, Config.MAX_SPEED)
 	elif on_axis:
 		target_side = move_toward(side_speed, 0.0, Config.DECEL * delta)
@@ -179,7 +191,23 @@ func _physics_process(delta: float) -> void:
 		velocity += (-g) * Config.JUMP_SPEED
 		jump_timer = 0.0
 		coyote_timer = 0.0
+		# 开启"可截断"窗口：这一跳还没松手，松手就按 JUMP_CUT 砍高度。
+		_jump_cut_armed = true
 		jumped.emit()
+
+	# 可变跳跃高度：起跳后提前松手，就把剩余的上升速度砍掉一部分。
+	#
+	# 必须用沿重力轴的分量（velocity.dot(g)）判断"是否在上升"，
+	# 不能照抄常见的 velocity.y < 0——这游戏空中能改重力，
+	# 重力朝上/朝左时 velocity.y 的符号和"上升"毫无关系。
+	# on_axis 为假说明 g 正在转向过渡期（斜向），此时按 g 砍会把侧向速度拆歪，
+	# 干脆跳过这一帧（过渡期只有 GRAVITY_TURN_TIME，最长 0.12 秒）。
+	if _jump_cut_armed and on_axis:
+		if not Input.is_action_pressed("jump"):
+			_jump_cut_armed = false
+			var rise: float = velocity.dot(g)
+			if rise < 0.0:
+				velocity -= g * rise * (1.0 - Config.JUMP_CUT)
 	
 	# 记录撞地前的沿重力速度；move_and_slide 落地后会把速度清零。
 	var impact_speed: float = velocity.dot(g)
@@ -191,6 +219,8 @@ func _physics_process(delta: float) -> void:
 	var on_floor_now: bool = is_on_floor()
 	if on_floor_now and not _was_on_floor:
 		landed.emit(impact_speed)
+		# 落地后不再有"上升速度"可砍，关掉可变跳跃窗口。
+		_jump_cut_armed = false
 	_was_on_floor = on_floor_now
 
 	# 行走状态：贴地且真的在移动；变化时通知音效脚本。
@@ -470,6 +500,7 @@ func die() -> void:
 	is_alive = false
 	velocity = Vector2.ZERO
 	_set_walking(false)
+	
 	# 死亡动画：不循环，播完停在最后一帧（人形消散后是泡沫）。
 	anim.play("die")
 	died.emit()
@@ -477,6 +508,8 @@ func die() -> void:
 
 ## 重开时调用，把玩家恢复到指定位置并重置所有状态。
 func respawn(at: Vector2) -> void:
+	# 过渡由关卡侧在黑幕里发起（见 game.gd / challenge_level.gd），
+	# 这里只做状态复位。若在这里盖黑，就是「先瞬移、后遮住」，跳变会露在画面上。
 	global_position = at
 	velocity = Vector2.ZERO
 	current_gravity = Vector2.DOWN
@@ -487,6 +520,7 @@ func respawn(at: Vector2) -> void:
 	_turn_is_flip = false
 	coyote_timer = 0.0
 	jump_timer = 0.0
+	_jump_cut_armed = false
 	is_alive = true
 	is_won = false
 	_gravity_dirs.clear()

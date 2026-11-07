@@ -1,10 +1,10 @@
 [gd_scene format=4 uid="uid://b717cwxbobabo"]
 
 [ext_resource type="TileSet" uid="uid://dpphdnueb46dl" path="res://Scenes/tileset_cave.tres" id="1_vwg62"]
-[ext_resource type="PackedScene" uid="uid://u7jbmkf7gqyg" path="res://Scenes/gravity_zone.tscn" id="2_qf6rc"]
+[ext_resource type="PackedScene" uid="uid://u7jbmkf7gqyg" path="res://Scenes/tile/gravity_zone.tscn" id="2_qf6rc"]
 [ext_resource type="PackedScene" uid="uid://b11hj8ncr5db5" path="res://Scenes/player.tscn" id="3_53xsp"]
-[ext_resource type="PackedScene" uid="uid://bcc0efq3yy18v" path="res://Scenes/level_goal.tscn" id="4_5e78q"]
-[ext_resource type="PackedScene" uid="uid://cnnosxglxyvx3" path="res://Scenes/spike.tscn" id="5_l4wr6"]
+[ext_resource type="PackedScene" uid="uid://bcc0efq3yy18v" path="res://Scenes/tile/level_goal.tscn" id="4_5e78q"]
+[ext_resource type="PackedScene" uid="uid://cnnosxglxyvx3" path="res://Scenes/tile/spike.tscn" id="5_l4wr6"]
 [ext_resource type="PackedScene" uid="uid://bqom0xe37pje3" path="res://Scenes/moving_platform.tscn" id="6_plat3"]
 
 [node name="Level1" type="Node2D" unique_id=2016033099]

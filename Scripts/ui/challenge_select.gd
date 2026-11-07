@@ -90,7 +90,10 @@ func _on_challenge_button_pressed(index: int) -> void:
 	if scene == null:
 		push_error("challenge_select.gd：第 %d 个挑战关未设置" % index)
 		return
-	get_tree().change_scene_to_packed(scene)
+	Transition.transition(
+		func() -> void: get_tree().change_scene_to_packed(scene),
+		true
+	)
 
 
 ## 点返回：通知主菜单收起面板。
