@@ -74,6 +74,18 @@ var jump_timer: float = 0.0
 # 玩家当前重叠的重力区 -> 拉力方向；叠加时按各区的加速度贡献计算
 var _gravity_dirs: Dictionary = {}
 
+## 关卡是否授权玩家主动改变重力方向（挑战关专用）。
+## 默认关闭，所以四关的行为与之前完全一致；挑战关在 _ready 里调用
+## enable_gravity_shift() 显式打开。
+var _gravity_shift_enabled: bool = false
+
+## 玩家主动设定的重力方向；Vector2.ZERO 表示"没改过，走世界默认向下"。
+## 有重力区重叠时它被忽略（重力区优先级最高），出区后继续生效。
+var _shifted_gravity: Vector2 = Vector2.ZERO
+
+## 本次滞空是否已经用掉改重力的机会。落地清零，实现"落地前不能再改"。
+var _gravity_shift_used: bool = false
+
 
 func _ready() -> void:
 	anim = $PlayerAnimated
@@ -136,11 +148,19 @@ func _physics_process(delta: float) -> void:
 	# 更新土狼时间
 	if is_on_floor():
 		coyote_timer = Config.COYOTE_TIME
+		# 落地：重置"改重力"的机会，实现"落地前不能再改"
+		_gravity_shift_used = false
 	else:
 		coyote_timer = coyote_timer - delta
 
-	# 更新跳预输入
-	if Input.is_action_just_pressed("jump"):
+	# 挑战关能力：空中按「方向 + 空格」改变重力方向。
+	# 它必须排在跳预输入之前，并且在触发时把这一下空格吃掉，
+	# 否则会既改重力又起跳。贴地时不会触发（那是正常跳跃）。
+	var shifted: bool = _try_gravity_shift()
+	if shifted:
+		# 这一下空格已经用于改重力，不进入跳预输入
+		jump_timer = 0.0
+	elif Input.is_action_just_pressed("jump"):
 		jump_timer = Config.JUMP_BUFFER_TIME
 	else:
 		jump_timer = jump_timer - delta
@@ -316,6 +336,56 @@ func _set_walking(walking: bool) -> void:
 	walking_changed.emit(walking)
 
 
+## 由关卡控制器调用，授权本关使用"主动改重力"能力。四关不会调用，所以保持关闭。
+func enable_gravity_shift() -> void:
+	_gravity_shift_enabled = true
+
+
+## 尝试用掉一次"空中改重力"：条件不满足就返回 false，调用方照常处理跳跃。
+##
+## 触发条件（缺一不可）：
+## 1. 本关已授权该能力
+## 2. 真正在空中：coyote_timer <= 0。贴地时按空格永远是跳跃
+## 3. 本次滞空还没用过：实现"落地前不能再改"
+## 4. 这一帧刚按下 jump，且同时按住了某个方向键
+##
+## 方向取法：**垂直优先于水平**。因为水平键是跑动时一直按着的，
+## 若水平优先，"按住 → 跑跳时按空格"就会误触发改重力；垂直键必然是玩家额外按下的、意图明确。
+##
+## 满足时立刻重算重力并返回 true，调用方要把这一下空格吃掉、不再当作跳跃。
+func _try_gravity_shift() -> bool:
+	if not _gravity_shift_enabled:
+		return false
+	if coyote_timer > 0.0:
+		return false
+	if _gravity_shift_used:
+		return false
+	if not Input.is_action_just_pressed("jump"):
+		return false
+
+	var target := _shift_direction_from_input()
+	if target == Vector2.ZERO:
+		return false
+
+	_gravity_shift_used = true
+	_shifted_gravity = target
+	# 立即重算：没在重力区里就生效；在区里则被区覆盖（出区后继续生效）
+	_apply_gravity_zones()
+	return true
+
+
+## 读取方向键，换算成"重力要指向哪一边"；没按方向就返回 ZERO。
+## 垂直优先（见 _try_gravity_shift 的说明）。
+func _shift_direction_from_input() -> Vector2:
+	var axis_y: float = Input.get_axis("move_up", "move_down")
+	if not is_zero_approx(axis_y):
+		return Vector2.DOWN if axis_y > 0.0 else Vector2.UP
+	var axis_x: float = Input.get_axis("move_left", "move_right")
+	if not is_zero_approx(axis_x):
+		return Vector2.RIGHT if axis_x > 0.0 else Vector2.LEFT
+	return Vector2.ZERO
+
+
 ## 进入重力区：记录该区的拉力方向，并重算所有重叠区的合力。
 func enter_gravity_zone(zone: Area2D, gravity_direction: Vector2) -> void:
 	if gravity_direction == Vector2.ZERO:
@@ -341,9 +411,16 @@ func exit_gravity_zone(zone: Area2D) -> void:
 ## - 朝上 / 朝左 / 朝右 → 该方向 1g
 ## - 朝下 → 该方向 2g（"加重"：跳得更矮、落得更快）
 ## - 多个区同时生效 → 各自的加速度相加，完全相抵时就是失重（加速度 0）
+## 汇总当前所有重力来源，算出 Config.gravity_acceleration。
+##
+## 优先级：**重力区最高**。有区重叠时玩家的主动重力被忽略（出区后继续生效），
+## 没有区时：用过主动重力就保持它，否则回到世界默认的向下 1g。
 func _apply_gravity_zones() -> void:
 	if _gravity_dirs.is_empty():
-		Config.gravity_acceleration = Vector2.DOWN * Config.GRAVITY
+		var base: Vector2 = (
+			_shifted_gravity if _shifted_gravity != Vector2.ZERO else Vector2.DOWN
+		)
+		Config.gravity_acceleration = base * Config.GRAVITY
 		return
 
 	var total := Vector2.ZERO
@@ -398,6 +475,9 @@ func respawn(at: Vector2) -> void:
 	is_alive = true
 	is_won = false
 	_gravity_dirs.clear()
+	# 重置主动重力：重生后回到世界默认，并重新获得改重力的机会
+	_shifted_gravity = Vector2.ZERO
+	_gravity_shift_used = false
 	_set_walking(false)
 	_was_on_floor = false
 	anim.rotation = 0.0

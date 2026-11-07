@@ -35,6 +35,11 @@ func _ready() -> void:
 		return
 	_player.connect("won", _on_player_won)
 
+	# 挑战关专属：授权玩家在空中按「方向 + 空格」主动改变重力方向。
+	# 四关不调用这个方法，所以那边的手感与之前完全一致。
+	if _player.has_method("enable_gravity_shift"):
+		_player.call("enable_gravity_shift")
+
 
 ## 让结算页铺满整个视口。
 ##
