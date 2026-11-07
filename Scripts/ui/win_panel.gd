@@ -46,26 +46,28 @@ func open() -> void:
 	_btn_retry.grab_focus()
 
 
-## 载入美术的通关展示图；没有就隐藏那个槽位，并把按钮整体上移，避免中间空一块。
+## 载入美术的通关展示图；没有就隐藏那个槽位。
+##
+## 11/7 美术交付了一张 320×300 的**面板底图**（`win_panel_bg.png`），
+## 已经铺在 Frost 上。所以这里**不再压缩面板高度**——压成 200 会把底图挤变形。
+## 按钮改为在标题下方居中排布，底部留白由底图自己的装饰填充。
 func _load_art() -> void:
 	var has_art := ResourceLoader.exists(WIN_ART_PATH)
 	if has_art:
 		_art.texture = load(WIN_ART_PATH)
 		_art.visible = true
-		# 有图：按钮留在原位置，图占标题下方的空间
-		_btn_retry.position.y = 156.0
-		_btn_menu.position.y = 200.0
-		_btn_quit.position.y = 244.0
+		# 有展示图：图放标题下方，按钮依次往下
+		_art.position.y = 98.0
+		_btn_retry.position.y = 186.0
+		_btn_menu.position.y = 230.0
+		_btn_quit.position.y = 274.0
 	else:
 		_art.texture = null
 		_art.visible = false
-		# 无图：三个按钮上移到紧跟标题，面板高度也收紧
-		_btn_retry.position.y = 68.0
-		_btn_menu.position.y = 112.0
-		_btn_quit.position.y = 156.0
-		var frost := _btn_retry.get_parent() as Control
-		if frost != null:
-			frost.size.y = 200.0
+		# 无展示图：按钮在标题下方居中排布（间隔 44 = 36 高 + 8 间隙）
+		_btn_retry.position.y = 112.0
+		_btn_menu.position.y = 156.0
+		_btn_quit.position.y = 200.0
 
 
 ## 再玩一次。

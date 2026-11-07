@@ -15,6 +15,7 @@ extends Node
 const LEVELS := [
 	"res://Scenes/challenge_1.tscn",
 	"res://Scenes/level_4.tscn",
+	"res://Scenes/level_5.tscn",
 	"res://Scenes/challenge_2.tscn",
 ]
 

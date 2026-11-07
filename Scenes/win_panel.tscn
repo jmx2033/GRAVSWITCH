@@ -2,6 +2,14 @@
 
 [ext_resource type="Script" path="res://Scripts/ui/win_panel.gd" id="1_wp"]
 [ext_resource type="Texture2D" path="res://Art/ui/ui_button.png" id="2_btn"]
+[ext_resource type="Texture2D" path="res://Art/ui/win_panel_bg.png" id="3_bg"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_frost_bg"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+texture = ExtResource("3_bg")
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn_normal"]
 content_margin_left = 12.0
@@ -97,13 +105,13 @@ offset_right = 160.0
 offset_bottom = 150.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_frost")
+theme_override_styles/panel = SubResource("StyleBoxTexture_frost_bg")
 
 [node name="Title" type="Label" parent="Content/Frost"]
 layout_mode = 0
-offset_top = 16.0
+offset_top = 56.0
 offset_right = 320.0
-offset_bottom = 52.0
+offset_bottom = 92.0
 theme_override_colors/font_color = Color(0.85, 0.78, 1, 1)
 theme_override_font_sizes/font_size = 26
 text = "ALL CLEAR"
