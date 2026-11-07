@@ -21,7 +21,8 @@ signal landed(impact_speed: float)
 signal walking_changed(walking: bool)
 
 ## 180° 重力翻转开始时发出，由音效脚本播放下落二音（与跳跃的上升音相反）。
-signal flipped
+## 参数是翻转的目标方向，音效据此决定声像往左还是往右扫。
+signal flipped(new_direction: Vector2)
 
 ## 死亡后重生完成时发出，由音效脚本复位"死亡/通关"标志。
 signal respawned
@@ -257,7 +258,7 @@ func _update_gravity(delta: float) -> void:
 		_turning = true
 		# 真正开始一次 180° 翻转时发信号，由音效脚本播放下落二音
 		if _turn_is_flip:
-			flipped.emit()
+			flipped.emit(_turn_to)
 
 		# up_direction 在翻转期间保持旧方向（见 _physics_process 开头），
 		# 这样脚下的地板不会被误判成"墙"，水平速度不会被 move_and_slide 清掉。
