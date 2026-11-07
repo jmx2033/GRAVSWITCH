@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Scripts/ui/win_panel.gd" id="1_wp"]
 [ext_resource type="Texture2D" path="res://Art/ui/ui_button.png" id="2_btn"]
-[ext_resource type="Texture2D" path="res://Art/ui/win_panel_bg.png" id="3_bg"]
+[ext_resource type="Texture2D" uid="uid://crxmjxopjlfaj" path="res://Art/ui/ui_win_panel.png" id="3_bg"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_frost_bg"]
 content_margin_left = 0.0
