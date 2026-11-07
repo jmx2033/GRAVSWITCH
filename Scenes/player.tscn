@@ -378,8 +378,10 @@ script = ExtResource("2_playersfx")
 [node name="FlipSfx" type="AudioStreamPlayer" parent="PlayerSfx"]
 
 [node name="DieSfx" type="AudioStreamPlayer" parent="PlayerSfx"]
+process_mode = 3
 
 [node name="WinSfx" type="AudioStreamPlayer" parent="PlayerSfx"]
+process_mode = 3
 
 [node name="WalkSfx1" type="AudioStreamPlayer" parent="PlayerSfx"]
 

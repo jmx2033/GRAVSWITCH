@@ -1,0 +1,182 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/ui/win_panel.gd" id="1_wp"]
+[ext_resource type="Texture2D" path="res://Art/ui/ui_button.png" id="2_btn"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn_normal"]
+content_margin_left = 12.0
+content_margin_top = 4.0
+content_margin_right = 12.0
+content_margin_bottom = 4.0
+texture = ExtResource("2_btn")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn_hover"]
+content_margin_left = 12.0
+content_margin_top = 4.0
+content_margin_right = 12.0
+content_margin_bottom = 4.0
+texture = ExtResource("2_btn")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+modulate_color = Color(1.25, 1.25, 1.25, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn_focus"]
+content_margin_left = 12.0
+content_margin_top = 4.0
+content_margin_right = 12.0
+content_margin_bottom = 4.0
+texture = ExtResource("2_btn")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+modulate_color = Color(1.15, 1.15, 1.15, 1)
+draw_center = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_frost"]
+bg_color = Color(0.12, 0.1, 0.18, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.78, 1, 0.6)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.55)
+shadow_size = 12
+
+[node name="WinPanel" type="Control"]
+process_mode = 3
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_wp")
+
+[node name="Content" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Dim" type="ColorRect" parent="Content"]
+mouse_filter = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.01, 0.008, 0.03, 0.86)
+
+[node name="Frost" type="Panel" parent="Content"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = -150.0
+offset_right = 160.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_frost")
+
+[node name="Title" type="Label" parent="Content/Frost"]
+layout_mode = 0
+offset_top = 16.0
+offset_right = 320.0
+offset_bottom = 52.0
+theme_override_colors/font_color = Color(0.85, 0.78, 1, 1)
+theme_override_font_sizes/font_size = 26
+text = "ALL CLEAR"
+horizontal_alignment = 1
+
+[node name="ArtSlot" type="TextureRect" parent="Content/Frost"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 90.0
+offset_top = 60.0
+offset_right = 230.0
+offset_bottom = 140.0
+texture_filter = 1
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ButtonRetry" type="Button" parent="Content/Frost"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 90.0
+offset_top = 156.0
+offset_right = 230.0
+offset_bottom = 192.0
+theme_override_colors/font_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_focus_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_pressed_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_hover_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_disabled_color = Color(0.35, 0.35, 0.35, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxTexture_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxTexture_btn_hover")
+theme_override_styles/focus = SubResource("StyleBoxTexture_btn_focus")
+text = "PLAY AGAIN"
+
+[node name="ButtonMenu" type="Button" parent="Content/Frost"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 90.0
+offset_top = 200.0
+offset_right = 230.0
+offset_bottom = 236.0
+theme_override_colors/font_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_focus_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_pressed_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_hover_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_disabled_color = Color(0.35, 0.35, 0.35, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxTexture_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxTexture_btn_hover")
+theme_override_styles/focus = SubResource("StyleBoxTexture_btn_focus")
+text = "MAIN MENU"
+
+[node name="ButtonQuit" type="Button" parent="Content/Frost"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 90.0
+offset_top = 244.0
+offset_right = 230.0
+offset_bottom = 280.0
+theme_override_colors/font_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_focus_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_pressed_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_hover_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.102, 0.102, 0.102, 1)
+theme_override_colors/font_disabled_color = Color(0.35, 0.35, 0.35, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxTexture_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxTexture_btn_hover")
+theme_override_styles/focus = SubResource("StyleBoxTexture_btn_focus")
+text = "QUIT"
