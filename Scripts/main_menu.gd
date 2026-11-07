@@ -15,6 +15,9 @@ const SETTINGS_PANEL_SCENE := preload("res://Scenes/settings_panel.tscn")
 ## UI 音效挂载器（按钮悬停/按下）；同一份逻辑也给暂停菜单等其它面板复用。
 const UI_SFX_SCRIPT := preload("res://Scripts/ui/ui_sfx.gd")
 
+## 主菜单重力场效果（背景石粒 + 方向键切换重力）。
+const MENU_GRAVITY_FX := preload("res://Scripts/ui/menu_gravity_fx.gd")
+
 @onready var _btn_play: Button = $ButtonPlay
 @onready var _btn_challenge: Button = $ButtonChallenge
 @onready var _btn_settings: Button = $ButtonSettings
@@ -26,6 +29,8 @@ var _panel: Control = null
 var _challenge_panel: Control = null
 # UI 音效挂载器。
 var _ui_sfx: Node = null
+# 重力场效果（背景石粒）。
+var _gravity_fx: Node2D = null
 
 
 func _ready() -> void:
@@ -52,6 +57,15 @@ func _ready() -> void:
 	_ui_sfx = UI_SFX_SCRIPT.new()
 	add_child(_ui_sfx)
 	_ui_sfx.attach_to(self)
+
+	# 重力场效果：背景石粒 + 方向键让整体"倒"向一侧。
+	# 必须在其它 UI 都就位后再挂，这样它才能收集到所有需要跟着倒的元素。
+	_gravity_fx = MENU_GRAVITY_FX.new()
+	add_child(_gravity_fx)
+	# 石粒要画在所有 UI 之下，但节点是在 UI 之后 add 的，所以显式压低层级。
+	_gravity_fx.z_index = -50
+	# 等一帧再收集：此时所有 UI 子节点（含刚加的设置面板）都已就位
+	_gravity_fx.call_deferred("_collect_ui")
 
 	_btn_play.grab_focus()
 
