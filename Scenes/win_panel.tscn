@@ -1,9 +1,16 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bg35mngjxlr6l"]
 
-[ext_resource type="Script" path="res://Scripts/ui/win_panel.gd" id="1_wp"]
-[ext_resource type="Texture2D" path="res://Art/ui/ui_button.png" id="2_btn"]
+[ext_resource type="Script" uid="uid://cyw21k5tli0u2" path="res://Scripts/ui/win_panel.gd" id="1_wp"]
+[ext_resource type="Texture2D" uid="uid://dv478o526tpud" path="res://Art/ui/ui_button.png" id="2_btn"]
 [ext_resource type="Texture2D" uid="uid://crxmjxopjlfaj" path="res://Art/ui/ui_win_panel.png" id="3_bg"]
 [ext_resource type="Theme" path="res://Scenes/ui_theme.tres" id="9_theme"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_frost_bg"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+texture = ExtResource("3_bg")
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn_normal"]
 content_margin_left = 12.0
@@ -41,29 +48,7 @@ texture_margin_bottom = 6.0
 modulate_color = Color(1.15, 1.15, 1.15, 1)
 draw_center = false
 
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_frost_bg"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-texture = ExtResource("3_bg")
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_frost"]
-bg_color = Color(0.12, 0.1, 0.18, 0.92)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.85, 0.78, 1, 0.6)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_color = Color(0, 0, 0, 0.55)
-shadow_size = 12
-
-[node name="WinPanel" type="Control"]
-theme = ExtResource("9_theme")
+[node name="WinPanel" type="Control" unique_id=1460682692]
 process_mode = 3
 visible = false
 layout_mode = 3
@@ -72,9 +57,10 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("9_theme")
 script = ExtResource("1_wp")
 
-[node name="Content" type="Control" parent="."]
+[node name="Content" type="Control" parent="." unique_id=307238515]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -84,17 +70,17 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="Dim" type="ColorRect" parent="Content"]
-mouse_filter = 2
+[node name="Dim" type="ColorRect" parent="Content" unique_id=938379549]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 color = Color(0.01, 0.008, 0.03, 0.86)
 
-[node name="Frost" type="Panel" parent="Content"]
+[node name="Frost" type="Panel" parent="Content" unique_id=605155794]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -109,35 +95,36 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxTexture_frost_bg")
 
-[node name="Title" type="Label" parent="Content/Frost"]
+[node name="Title" type="Label" parent="Content/Frost" unique_id=1953491536]
 layout_mode = 0
-offset_top = 56.0
-offset_right = 320.0
-offset_bottom = 92.0
-theme_override_colors/font_color = Color(0.85, 0.78, 1, 1)
-theme_override_font_sizes/font_size = 26
+offset_left = 5.0
+offset_top = 75.0
+offset_right = 325.0
+offset_bottom = 111.0
+theme_override_colors/font_color = Color(0.668117, 0.4251878, 1, 1)
+theme_override_font_sizes/font_size = 24
 text = "ALL CLEAR"
 horizontal_alignment = 1
 
-[node name="ArtSlot" type="TextureRect" parent="Content/Frost"]
+[node name="ArtSlot" type="TextureRect" parent="Content/Frost" unique_id=2033826506]
 unique_name_in_owner = true
 visible = false
+texture_filter = 1
 layout_mode = 0
 offset_left = 90.0
 offset_top = 60.0
 offset_right = 230.0
 offset_bottom = 140.0
-texture_filter = 1
 expand_mode = 1
 stretch_mode = 5
 
-[node name="ButtonRetry" type="Button" parent="Content/Frost"]
+[node name="ButtonRetry" type="Button" parent="Content/Frost" unique_id=151231678]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 90.0
-offset_top = 156.0
-offset_right = 230.0
-offset_bottom = 192.0
+offset_left = 50.0
+offset_top = 124.0
+offset_right = 274.0
+offset_bottom = 160.0
 theme_override_colors/font_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_focus_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_pressed_color = Color(0.102, 0.102, 0.102, 1)
@@ -151,13 +138,13 @@ theme_override_styles/hover = SubResource("StyleBoxTexture_btn_hover")
 theme_override_styles/focus = SubResource("StyleBoxTexture_btn_focus")
 text = "PLAY AGAIN"
 
-[node name="ButtonMenu" type="Button" parent="Content/Frost"]
+[node name="ButtonMenu" type="Button" parent="Content/Frost" unique_id=2090988339]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 90.0
-offset_top = 200.0
-offset_right = 230.0
-offset_bottom = 236.0
+offset_left = 59.0
+offset_top = 167.0
+offset_right = 263.0
+offset_bottom = 203.0
 theme_override_colors/font_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_focus_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_pressed_color = Color(0.102, 0.102, 0.102, 1)
@@ -171,13 +158,13 @@ theme_override_styles/hover = SubResource("StyleBoxTexture_btn_hover")
 theme_override_styles/focus = SubResource("StyleBoxTexture_btn_focus")
 text = "MAIN MENU"
 
-[node name="ButtonQuit" type="Button" parent="Content/Frost"]
+[node name="ButtonQuit" type="Button" parent="Content/Frost" unique_id=1088204960]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 90.0
-offset_top = 244.0
-offset_right = 230.0
-offset_bottom = 280.0
+offset_left = 83.0
+offset_top = 210.0
+offset_right = 223.0
+offset_bottom = 246.0
 theme_override_colors/font_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_focus_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_pressed_color = Color(0.102, 0.102, 0.102, 1)

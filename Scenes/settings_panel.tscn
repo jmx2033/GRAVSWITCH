@@ -128,16 +128,16 @@ text = "CONTROLS"
 
 [node name="KeysTable" type="Label" parent="Frost" unique_id=735927332]
 layout_mode = 0
-offset_left = 26.0
+offset_left = 36.0
 offset_top = 125.0
-offset_right = 316.0
+offset_right = 326.0
 offset_bottom = 209.0
 theme_override_font_sizes/font_size = 11
-text = "Move Left    A / Left
-Move Right   D / Right
-Jump         Space
-Restart      R
-Pause        Esc / P"
+text = "Move Left   A / Left
+Move Right  D / Right
+Jump        Space
+Restart     R
+Pause       Esc / P"
 
 [node name="ButtonBack" type="Button" parent="Frost" unique_id=2118807089]
 unique_name_in_owner = true

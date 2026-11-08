@@ -16,7 +16,7 @@ tile_set = ExtResource("1_m0b12")
 collision_enabled = false
 
 [node name="Deco2" type="TileMapLayer" parent="." unique_id=940555464]
-tile_map_data = PackedByteArray("AAACAAkAAAAFAAIAAAAEAAcAAAAGAAIAAAAFAAcAAAAFAAIAAAARAAEAAAAIAAEAAGASAAEAAAAIAAIAAGANAAkAAAAGAAIAAAAPAAkAAAAFAAIAAAA=")
+tile_map_data = PackedByteArray("AAACAAkAAAAFAAIAAAAEAAcAAAAGAAIAAAAFAAcAAAAFAAIAAAANAAkAAAAGAAIAAAAPAAkAAAAFAAIAAAA=")
 tile_set = ExtResource("1_m0b12")
 collision_enabled = false
 
