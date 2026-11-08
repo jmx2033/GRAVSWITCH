@@ -59,6 +59,9 @@ var anim: AnimatedSprite2D
 # 碰撞盒节点，在 _ready() 里赋值
 var collision: CollisionShape2D
 
+# 相机节点，在 _ready() 里赋值；宽度超过一屏的关卡靠它的 limit 平移取景
+var camera: Camera2D
+
 # 上一物理帧是否贴地，用于检测落地瞬间。
 var _was_on_floor: bool = false
 
@@ -95,6 +98,8 @@ func _ready() -> void:
 	anim = $PlayerAnimated
 	anim.play("idle")
 	collision = $CollisionShape2D
+	camera = $Camera
+	_setup_camera()
 
 func _physics_process(delta: float) -> void:
 	if not is_alive or is_won:
@@ -265,6 +270,10 @@ func _physics_process(delta: float) -> void:
 	# 旋转中的包围盒会短暂变化，让重力区误判玩家进出，把目标重力改回去。
 	if not _turn_is_flip:
 		collision.rotation = anim.rotation
+
+	# 相机跟随放在最后：move_and_slide() 已经算完本帧位置，
+	# 这里吸附整数像素再赋值，相机才不会拿到半帧前的坐标。
+	_snap_camera()
 
 
 ## 推进重力转向。
@@ -483,6 +492,52 @@ func _zone_gravity(direction: Vector2) -> Vector2:
 	return pull
 
 
+## 把相机可视范围限制在本关矩形内，并对齐一次整数像素。
+##
+## 一屏关（640×352）与关卡矩形完全重合时，四个 limit 把相机中心钉死在
+## (320,176)，画面一动不动——所以四关和一屏挑战关加相机后是**逐像素相同**的。
+## 宽屏关只要把 limit 撑大，玩家越过半屏后相机才开始跟，到地图边界停住：
+## 「碰到边界不移动」不需要写任何 if，全由 limit 是否生效决定。
+func _setup_camera() -> void:
+	if camera == null:
+		return
+	var level_px: Vector2 = _level_pixel_size()
+	camera.limit_left = 0
+	camera.limit_top = 0
+	camera.limit_right = int(level_px.x)
+	camera.limit_bottom = int(level_px.y)
+	# 相机是 top_level，进树时它自己在 (0,0)，不先对齐一次会闪一帧左上角。
+	_snap_camera()
+
+
+## 读本关尺寸（像素）。
+##
+## 关卡根节点上若有 level_size（单位：格，和 TileMap 一致）就用它；
+## 没有就退回 Config.LEVEL_SIZE（640×352），四关与所有一屏挑战关走的就是这条路。
+## 用 get() 而不是直接属性访问：没有该属性的关卡根节点会返回 null，
+## 不会像访问不存在的属性那样报错。
+func _level_pixel_size() -> Vector2:
+	var parent_node: Node = get_parent()
+	if parent_node != null:
+		var tiles: Variant = parent_node.get("level_size")
+		if tiles is Vector2i:
+			var grid: Vector2i = tiles
+			if grid.x > 0 and grid.y > 0:
+				return Vector2(grid) * float(Config.TILE_SIZE)
+	return Config.LEVEL_SIZE
+
+
+## 相机位置吸附到整数像素。
+##
+## 玩家坐标是速度积分出来的浮点，相机跟着它走会每帧落在 x.37 这种小数上；
+## 配合项目里 integer 缩放，瓦片接缝会逐帧爬行，看着像砖块在"呼吸"。
+## 一屏关相机被 limit 钉死，这一步没有效果；只有宽屏关才看得出意义。
+func _snap_camera() -> void:
+	if camera == null:
+		return
+	camera.global_position = global_position.round()
+
+
 ## 被通关区域通知时调用，进入通关状态；之后 die() 不再生效。
 func win() -> void:
 	if is_won or not is_alive:
@@ -532,5 +587,8 @@ func respawn(at: Vector2) -> void:
 	anim.rotation = 0.0
 	collision.rotation = 0.0
 	anim.play("idle")
+	# 瞬时传送后立刻对齐相机，否则会有一帧还停在死亡地点。
+	# 现在过渡黑幕盖着看不出来，但以后出现没有过渡的重生入口就会露馅。
+	_snap_camera()
 	# 重生完成：通知音效脚本解除"死亡/通关"的抑制，落地音恢复正常
 	respawned.emit()

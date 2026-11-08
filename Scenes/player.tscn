@@ -347,6 +347,14 @@ sprite_frames = SubResource("SpriteFrames_sam6v")
 animation = &"idle"
 offset = Vector2(1, 1)
 
+[node name="Camera" type="Camera2D" parent="."]
+top_level = true
+process_callback = 0
+limit_left = 0
+limit_top = 0
+limit_right = 640
+limit_bottom = 352
+
 [node name="LandDust" type="Node2D" parent="."]
 script = ExtResource("4_dust")
 

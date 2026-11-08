@@ -8,6 +8,13 @@ extends Node2D
 ## 走到终点后弹出结算页；不接 main.tscn 的通关流程。
 const WIN_PANEL_SCENE := preload("res://Scenes/win_panel.tscn")
 
+## 本关尺寸（单位：格，与 TileMap 一致）。
+##
+## 玩家的相机在 _ready 里读这个值来设 limit：一屏关（20×11 = 640×352）时
+## 相机被钉死不动；改成 40×11 后，玩家越过左半屏相机才开始跟随，到右边界停住。
+## 注意：出界死亡（DeathBounds）目前仍按 Config.LEVEL_SIZE 判定，宽屏关要一起改。
+@export var level_size: Vector2i = Vector2i(20, 11)
+
 ## 暂停菜单场景。四关由 game.gd 挂载；挑战关是独立场景，得自己挂一份。
 const PAUSE_MENU_SCENE := preload("res://Scenes/pause_menu.tscn")
 
