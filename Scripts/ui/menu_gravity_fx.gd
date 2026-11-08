@@ -50,6 +50,8 @@ const STEP_JITTER := 3.0
 ## 按方向键时，整屏 UI 被"甩"向该方向的位移（像素）。
 ## 与塌陷是**两层独立效果**：晃动管左右上，塌陷管向下，可以叠加。
 const UI_SWING := 7.0
+## 石粒改流向的过渡速度（每秒）。越大越跟手，越小越像"重力慢慢转过来"。
+const DIR_SWITCH_SPEED := 4.0
 ## 晃动过渡时间（秒）。
 const SWING_TIME := 0.28
 
@@ -63,20 +65,26 @@ const SWING_TIME := 0.28
 ## 用固定表能保证"塌成什么样子"是设计好的。
 const SCATTER := {
 	# 标题：压在最上面一层，横向左移
-	"Title": Vector2(-150.0, 92.0),
-	# 四个按钮：横向错开成斜的一列，纵向依次叠高一点（避免完全重叠）
-	"ButtonPlay": Vector2(-190.0, 4.0),
-	"ButtonChallenge": Vector2(-120.0, 16.0),
-	"ButtonSettings": Vector2(-50.0, 28.0),
-	"ButtonQuit": Vector2(20.0, 40.0),
+	"Title": Vector2(-40.0, 100.0),
+	# 四个按钮：纵向差 40px（> 按钮高 36，所以目标位置互不重叠），
+	# 横向再错开一点形成斜列
+	"ButtonPlay": Vector2(-60.0, 4.0),
+	"ButtonChallenge": Vector2(-20.0, 44.0),
+	"ButtonSettings": Vector2(20.0, 84.0),
+	"ButtonQuit": Vector2(60.0, 124.0),
 }
 ## 表里没登记的元素：底边贴屏幕底，横移 0。
 const SCATTER_DEFAULT := Vector2(0.0, 0.0)
 
+## 按钮碰撞求解器：让塌落的按钮互相推开、不重叠、不抖动。
+const COLLISION_SOLVER := preload("res://Scripts/ui/button_collision_solver.gd")
+
 ## 每颗石粒：{pos: Vector2, size: float}
 var _stones: Array[Dictionary] = []
-## 当前重力方向（石粒朝这边落），塌陷时固定朝下。
+## 当前重力方向（石粒朝这边落）。按方向键会改它，石粒随之改流向。
 var _dir: Vector2 = Vector2.DOWN
+## 目标重力方向，_dir 朝它平滑过渡（硬切的话石粒会瞬移，不像"重力变了"）。
+var _dir_target: Vector2 = Vector2.DOWN
 ## 当前塌陷步数（0..COLLAPSE_STEPS）。
 var _step: int = 0
 ## 已塌陷的插值进度（0..1），驱动石粒加速。
@@ -116,50 +124,37 @@ func _spawn_stones() -> void:
 ##
 ## 目标位置来自 `SCATTER` 表：每个元素有自己的高度与横向偏移，
 ## 所以塌完是**散落**成一片，而不是全部叠在屏幕底部同一处。
+## 收集需要跟着塌的 UI 元素，并算好它们各自的"落地目标"。
+##
+## 11/8 说明：按钮已经改回**直接挂在主菜单下**（不用 VBoxContainer），
+## 这样布局不会重排它们，直接改 position 就生效。
+## 收集只取主菜单的**直接子节点**——设置面板、选关面板里的按钮平时是隐藏的，
+## 它们跟着塌会露出来。
 func _collect_ui() -> void:
 	_ui_moves.clear()
 	var root := get_parent()
 	if root == null:
 		return
-	_collect_ui_recursive(root)
-
-
-## 递归收集需要跟着塌的 UI 元素（标题 + 按钮），逐个登记。
-##
-## **只收当前可见的**：设置面板、选关面板里的按钮平时是隐藏的，
-## 它们跟着塌会露出来——面板一打开就看到一堆按钮堆在底部。
-##
-## ## 为什么每个按钮都要设 top_level = true
-##
-func _collect_ui_recursive(node: Node) -> void:
-	for child in node.get_children():
+	for child in root.get_children():
 		if not (child is Control):
+			continue
+		if not (child is Button or child is TextureRect):
 			continue
 		var c := child as Control
 		if not c.is_visible_in_tree():
 			continue
-		if child is Button or child is TextureRect:
-			_add_element(c)
-		else:
-			# 容器：收容器里的按钮，但不收容器本身
-			_collect_ui_recursive(child)
-
-
-## 登记一个元素，并算出它塌陷后的目标位置。
-##
-## **顺序很重要**：先收集**全部**元素的位置，最后再统一设 top_level。
-## 若边收集边设，前面已经设过的按钮会被 VBox 重新排布、
-## 后面的按钮又拿不到自己的位置——结果就是四个按钮全叠在同一点。
-func _add_element(c: Control) -> void:
-	for m in _ui_moves:
-		if m["node"] == c:
-			return
-	var from := c.global_position
-	# 查表拿落点：x 是横向偏移，y 是底边距屏幕底的高度
-	var spec: Vector2 = SCATTER.get(c.name, SCATTER_DEFAULT)
-	# 目标 = 底边落在 SCREEN.y - spec.y 的位置
-	var to := Vector2(from.x + spec.x, SCREEN.y - spec.y - c.size.y)
-	_ui_moves.append({"node": c, "from": from, "to": to})
+		var from := c.position
+		# 查表拿散落位置：x 是横向偏移，y 是底边距屏幕底的高度
+		var spec: Vector2 = SCATTER.get(c.name, SCATTER_DEFAULT)
+		# 目标 = 底边落在 SCREEN.y - spec.y 的位置
+		var to := Vector2(
+			from.x + spec.x,
+			SCREEN.y - spec.y - c.size.y
+		)
+		# 已经在下面的元素不要往上跳
+		if to.y < from.y:
+			to.y = from.y
+		_ui_moves.append({"node": c, "from": from, "to": to})
 
 
 ## 让所有收集到的元素脱离布局控制。
@@ -177,11 +172,50 @@ func _detach_from_layout() -> void:
 
 
 
+## 每帧做一次按钮排斥：挤在一起的按钮互相推开，不重叠、不抖动。
+##
+## 为什么每帧做：排斥只在动画开始时算一次的话，动画途中按钮会互相穿过去；
+## 每帧都算就能保证任何时刻都不重叠。
+##
+## 排斥算的是**全局坐标**（按钮可能不在同一个父节点下），
+## 算完再换算回各自的父容器局部坐标再写回。
+func _resolve_button_collisions() -> void:
+	var button_items := []
+	for m in _ui_moves:
+		var node: Node = m["node"]
+		if not is_instance_valid(node):
+			continue
+		if not (node is Button):
+			continue
+		var ctrl: Control = node as Control
+		button_items.append({"node": ctrl, "to": ctrl.global_position})
+	if button_items.size() < 2:
+		return
+
+	var solver = COLLISION_SOLVER.new()
+	var solved: Dictionary = solver.solve(button_items)
+	for node2 in solved:
+		var c2: Control = node2 as Control
+		if not is_instance_valid(c2):
+			continue
+		var parent_xform: Transform2D = c2.get_parent().get_global_transform().affine_inverse()
+		c2.position = parent_xform * solved[node2]
+
+
 func _process(delta: float) -> void:
+	# 石粒方向朝目标平滑过渡
+	_dir = _dir.lerp(_dir_target, clampf(delta * DIR_SWITCH_SPEED, 0.0, 1.0))
+	if _dir.length() < 0.01:
+		_dir = _dir_target
+	else:
+		_dir = _dir.normalized()
+
 	# 石粒基础漂移
 	var step: Vector2 = _dir * STONE_SPEED * delta
 	# 塌得越多，下落越快
 	step.y += STONE_FALL_ACCEL * _sink_ratio * delta
+
+	_resolve_button_collisions()
 
 	for s in _stones:
 		var p: Vector2 = s["pos"] + step
@@ -251,6 +285,8 @@ func _unhandled_input(event: InputEvent) -> void:
 ## 整屏朝指定方向轻轻一晃。
 func _swing_to(dir: Vector2) -> void:
 	_swing = dir * UI_SWING
+	# 石粒也跟着改流向：这是「按 WASD 改主界面重力」的核心表现
+	_dir_target = dir
 	_apply_layout(SWING_TIME, false)
 
 
@@ -259,6 +295,8 @@ func _reset() -> void:
 	_step = 0
 	_sink_ratio = 0.0
 	_swing = Vector2.ZERO
+	# 石粒方向也回到默认（朝下）
+	_dir_target = Vector2.DOWN
 	_apply_layout(RESET_TIME, false)
 
 
@@ -285,8 +323,11 @@ func _apply_layout(duration: float, jitter: bool) -> void:
 	# 塌陷用 EASE_IN（越塌越快），晃动和复位用 EASE_OUT（一触即达再缓下来）
 	_layout_tween.set_ease(Tween.EASE_IN if jitter else Tween.EASE_OUT)
 
+	# 先算所有按钮的目标位置
+	var targets := {}
+	var items := []
 	for m in _ui_moves:
-		var node: Control = m["node"]
+		var node: Node = m["node"]
 		if not is_instance_valid(node):
 			continue
 		var from: Vector2 = m["from"]
@@ -294,6 +335,11 @@ func _apply_layout(duration: float, jitter: bool) -> void:
 		var target := from.lerp(to, _sink_ratio) + _swing
 		if jitter:
 			target.x += randf_range(-STEP_JITTER, STEP_JITTER)
+		targets[node] = target
+		items.append({"node": node, "to": target})
+
+	# 应用位置
+	for node3 in targets:
 		# 用 position（相对父容器）：按钮直接挂在主菜单下，
 		# 父节点不是 Container，位置不会被布局重排，可以自由改。
-		_layout_tween.tween_property(node, "position", target, duration)
+		_layout_tween.tween_property(node3, "position", targets[node3], duration)

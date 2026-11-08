@@ -15,7 +15,7 @@ const CHALLENGE_SCENES: Array[PackedScene] = [
 ]
 
 ## 挑战关名称，和 CHALLENGE_SCENES 一一对应。
-const CHALLENGE_NAMES := ["CHALLENGE 1", "CHALLENGE 2 逆流", "CHALLENGE 3 失重走廊"]
+const CHALLENGE_NAMES := ["挑战 1", "挑战 2 逆流", "挑战 3 失重走廊"]
 
 @onready var _list: VBoxContainer = %ButtonList
 @onready var _btn_back: Button = %ButtonBack
@@ -42,9 +42,9 @@ func _build_buttons() -> void:
 	for i in CHALLENGE_SCENES.size():
 		var btn := Button.new()
 		btn.text = CHALLENGE_NAMES[i] if i < CHALLENGE_NAMES.size() else "CHALLENGE %d" % (i + 1)
-		btn.custom_minimum_size = Vector2(180.0, 36.0)
-		# 和主菜单按钮同一套样式：直接借用主题里的默认字体大小
-		btn.add_theme_font_size_override("font_size", 20)
+		btn.custom_minimum_size = Vector2(240.0, 36.0)
+		# 像素字体比原字体宽不少，字号压到 16 才放得下最长的一行
+		btn.add_theme_font_size_override("font_size", 16)
 		_copy_button_style(btn)
 		btn.pressed.connect(_on_challenge_button_pressed.bind(i))
 		_list.add_child(btn)
