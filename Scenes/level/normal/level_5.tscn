@@ -6,39 +6,271 @@
 [ext_resource type="PackedScene" uid="uid://bcc0efq3yy18v" path="res://Scenes/tile/level_goal.tscn" id="4_goal"]
 [ext_resource type="Texture2D" uid="uid://rmo458s4itmk" path="res://Art/bg/bg_cave.png" id="6_bg"]
 [ext_resource type="PackedScene" uid="uid://cnnosxglxyvx3" path="res://Scenes/tile/spike.tscn" id="7_spike"]
+[ext_resource type="PackedScene" uid="uid://bqom0xe37pje3" path="res://Scenes/moving_platform.tscn" id="8_plat"]
+[ext_resource type="Texture2D" uid="uid://6of1qploqh23" path="res://Art/tiles/spr_crystal.png" id="9_crystal"]
+[ext_resource type="Texture2D" uid="uid://vqyiexh02203" path="res://Art/tiles/spr_flag.png" id="9_flag"]
+[ext_resource type="Texture2D" uid="uid://c6a8rchwxnnj4" path="res://Art/tiles/spr_ore.png" id="9_ore"]
+[ext_resource type="Texture2D" uid="uid://ddxwcjlydoly4" path="res://Art/tiles/spr_rocks.png" id="9_rocks"]
 
 [node name="Level5" type="Node2D" unique_id=1738421000]
 
-[node name="Background" type="Sprite2D" parent="."]
+[node name="Background" type="Sprite2D" parent="." unique_id=290255064]
 z_index = -100
 texture_filter = 1
 position = Vector2(320, 180)
 scale = Vector2(1.125, 1.125)
 texture = ExtResource("6_bg")
 
-[node name="Terrain" type="TileMapLayer" parent="."]
-tile_map_data = PackedByteArray("AAAAAAAAAAADAAAAAAABAAAAAAADAAAAAAACAAAAAAADAAAAAAADAAAAAAADAAAAAAAEAAAAAAADAAAAAAAFAAAAAAADAAAAAAAGAAAAAAADAAAAAAAHAAAAAAADAAAAAAAIAAAAAAADAAAAAAAJAAAAAAADAAAAAAAKAAAAAAADAAAAAAALAAAAAAADAAAAAAAMAAAAAAADAAAAAAANAAAAAAADAAAAAAAOAAAAAAADAAAAAAAPAAAAAAADAAAAAAAQAAAAAAADAAAAAAARAAAAAAADAAAAAAASAAAAAAADAAAAAAATAAAAAAADAAAAAAAAAAEAAAADAAAAAAATAAEAAAADAAAAAAAAAAIAAAADAAAAAAATAAIAAAADAAAAAAAAAAMAAAADAAAAAAATAAMAAAADAAAAAAAAAAQAAAADAAAAAAATAAQAAAADAAAAAAAAAAUAAAADAAAAAAATAAUAAAADAAAAAAAAAAYAAAADAAAAAAATAAYAAAADAAAAAAAAAAcAAAADAAAAAAATAAcAAAADAAAAAAAAAAgAAAADAAAAAAATAAgAAAADAAAAAAAAAAkAAAADAAAAAAATAAkAAAADAAAAAAAAAAoAAAADAAAAAAATAAoAAAADAAAAAAABAAoAAAAEAAAAAAAIAAoAAAAEAAAAAAAQAAoAAAAEAAAAAAARAAoAAAAEAAAAAAASAAoAAAAEAAAAAAABAAkAAAAEAAAAAAAQAAkAAAAEAAAAAAARAAkAAAAEAAAAAAASAAkAAAAEAAAAAAAIAAkAAAAEAAAAAAA=")
+[node name="Terrain" type="TileMapLayer" parent="." unique_id=1644837531]
+tile_map_data = PackedByteArray("AAABAAkAAAAEAAAAAAACAAkAAAAEAAAAAAADAAgAAAAEAAAAAAAEAAgAAAAEAAAAAAAFAAgAAAAEAAAAAAAGAAgAAAAEAAAAAAAHAAgAAAAEAAAAAAAIAAgAAAAEAAAAAAAJAAgAAAAEAAAAAAAKAAgAAAAEAAAAAAALAAgAAAAEAAAAAAAMAAgAAAAEAAAAAAANAAgAAAAEAAAAAAAOAAgAAAAEAAAAAAAPAAgAAAAEAAAAAAARAAgAAAAEAAAAAAASAAgAAAAEAAAAAAAQAAgAAAAEAAAAAAAAAAAAAAADAAAAAAABAAAAAAADAAAAAAACAAAAAAADAAAAAAADAAAAAAADAAAAAAAEAAAAAAADAAAAAAAFAAAAAAADAAAAAAAGAAAAAAADAAAAAAAHAAAAAAADAAAAAAAIAAAAAAADAAAAAAAJAAAAAAADAAAAAAAKAAAAAAADAAAAAAALAAAAAAADAAAAAAAMAAAAAAADAAAAAAANAAAAAAADAAAAAAAOAAAAAAADAAAAAAAPAAAAAAADAAAAAAAQAAAAAAADAAAAAAARAAAAAAADAAAAAAASAAAAAAADAAAAAAATAAAAAAADAAAAAAAAAAEAAAADAAAAAAATAAEAAAADAAAAAAAAAAIAAAADAAAAAAATAAIAAAADAAAAAAAAAAMAAAADAAAAAAATAAMAAAADAAAAAAAAAAQAAAADAAAAAAATAAQAAAADAAAAAAAAAAUAAAADAAAAAAATAAUAAAADAAAAAAAAAAYAAAADAAAAAAATAAYAAAADAAAAAAAAAAcAAAADAAAAAAATAAcAAAADAAAAAAAAAAgAAAADAAAAAAATAAgAAAADAAAAAAAAAAkAAAADAAAAAAATAAkAAAADAAAAAAAAAAoAAAADAAAAAAATAAoAAAADAAAAAAAIAAMAAAADAAAAAAAIAAQAAAADAAAAAAAIAAUAAAADAAAAAAAIAAYAAAADAAAAAAAIAAcAAAADAAAAAAAMAAUAAAADAAAAAAAMAAYAAAADAAAAAAAMAAcAAAADAAAAAAAMAAMAAAADAAAAAAAMAAQAAAADAAAAAAA=")
 tile_set = ExtResource("1_tiles")
 
-[node name="Deco" type="TileMapLayer" parent="."]
+[node name="Deco" type="TileMapLayer" parent="." unique_id=1096113299]
+tile_map_data = PackedByteArray("")
+tile_set = ExtResource("1_tiles")
+collision_enabled = false
 
-[node name="Zones" type="Node2D" parent="."]
+[node name="Zones" type="Node2D" parent="." unique_id=903087701]
 
-[node name="ZoneUpTrap" parent="Zones" instance=ExtResource("3_zone")]
-position = Vector2(320, 128)
+[node name="ZoneRight" parent="Zones" unique_id=200007 instance=ExtResource("3_zone")]
+position = Vector2(224, 96)
+size_in_tiles = Vector2i(1, 5)
+direction = 1
+
+[node name="ZoneUp" parent="Zones" unique_id=200016 instance=ExtResource("3_zone")]
+position = Vector2(256, 32)
+size_in_tiles = Vector2i(4, 3)
 direction = 0
-size_in_tiles = Vector2i(6, 6)
 
+[node name="ZonePushLeft" parent="Zones" unique_id=200026 instance=ExtResource("3_zone")]
+position = Vector2(416, 96)
+size_in_tiles = Vector2i(3, 5)
+direction = 3
 
-[node name="Spawn" type="Marker2D" parent="."]
+[node name="MovingPlatform1" parent="." unique_id=200039 instance=ExtResource("8_plat")]
+position = Vector2(528, 240)
+
+[node name="MovingPlatform2" parent="." unique_id=200040 instance=ExtResource("8_plat")]
+position = Vector2(560, 240)
+
+[node name="SprOre200001" type="Sprite2D" parent="." unique_id=200001]
+position = Vector2(48, 272)
+texture = ExtResource("9_ore")
+
+[node name="SprOre200002" type="Sprite2D" parent="." unique_id=200002]
+position = Vector2(80, 272)
+texture = ExtResource("9_ore")
+
+[node name="SprOre200003" type="Sprite2D" parent="." unique_id=200003]
+position = Vector2(112, 240)
+texture = ExtResource("9_ore")
+
+[node name="SprRocks200004" type="Sprite2D" parent="." unique_id=200004]
+position = Vector2(144, 240)
+texture = ExtResource("9_rocks")
+
+[node name="SprCrystal200005" type="Sprite2D" parent="." unique_id=200005]
+position = Vector2(80, 264)
+texture = ExtResource("9_crystal")
+
+[node name="SprCrystal200006" type="Sprite2D" parent="." unique_id=200006]
+position = Vector2(144, 232)
+texture = ExtResource("9_crystal")
+
+[node name="SprOre200008" type="Sprite2D" parent="." unique_id=200008]
+position = Vector2(176, 240)
+texture = ExtResource("9_ore")
+
+[node name="SprOre200009" type="Sprite2D" parent="." unique_id=200009]
+position = Vector2(208, 240)
+texture = ExtResource("9_ore")
+
+[node name="SprOre200010" type="Sprite2D" parent="." unique_id=200010]
+position = Vector2(240, 240)
+texture = ExtResource("9_ore")
+
+[node name="SprRocks200011" type="Sprite2D" parent="." unique_id=200011]
+position = Vector2(176, 240)
+texture = ExtResource("9_rocks")
+
+[node name="SprRocks200012" type="Sprite2D" parent="." unique_id=200012]
+position = Vector2(240, 240)
+texture = ExtResource("9_rocks")
+
+[node name="SprCrystal200013" type="Sprite2D" parent="." unique_id=200013]
+position = Vector2(176, 232)
+texture = ExtResource("9_crystal")
+
+[node name="SprCrystal200014" type="Sprite2D" parent="." unique_id=200014]
+position = Vector2(208, 232)
+texture = ExtResource("9_crystal")
+
+[node name="SprCrystal200015" type="Sprite2D" parent="." unique_id=200015]
+position = Vector2(240, 232)
+texture = ExtResource("9_crystal")
+
+[node name="SprCrystal200017" type="Sprite2D" parent="." unique_id=200017]
+position = Vector2(272, 42)
+texture = ExtResource("9_crystal")
+
+[node name="SprCrystal200018" type="Sprite2D" parent="." unique_id=200018]
+position = Vector2(304, 42)
+texture = ExtResource("9_crystal")
+
+[node name="SprCrystal200019" type="Sprite2D" parent="." unique_id=200019]
+position = Vector2(336, 42)
+texture = ExtResource("9_crystal")
+
+[node name="SprCrystal200020" type="Sprite2D" parent="." unique_id=200020]
+position = Vector2(368, 42)
+texture = ExtResource("9_crystal")
+
+[node name="SprOre200021" type="Sprite2D" parent="." unique_id=200021]
+position = Vector2(272, 52)
+texture = ExtResource("9_ore")
+
+[node name="SprOre200022" type="Sprite2D" parent="." unique_id=200022]
+position = Vector2(336, 52)
+texture = ExtResource("9_ore")
+
+[node name="SprOre200023" type="Sprite2D" parent="." unique_id=200023]
+position = Vector2(368, 52)
+texture = ExtResource("9_ore")
+
+[node name="SprRocks200024" type="Sprite2D" parent="." unique_id=200024]
+position = Vector2(304, 54)
+texture = ExtResource("9_rocks")
+
+[node name="SprRocks200025" type="Sprite2D" parent="." unique_id=200025]
+position = Vector2(336, 54)
+texture = ExtResource("9_rocks")
+
+[node name="SprOre200027" type="Sprite2D" parent="." unique_id=200027]
+position = Vector2(400, 240)
+texture = ExtResource("9_ore")
+
+[node name="SprOre200028" type="Sprite2D" parent="." unique_id=200028]
+position = Vector2(432, 240)
+texture = ExtResource("9_ore")
+
+[node name="SprOre200029" type="Sprite2D" parent="." unique_id=200029]
+position = Vector2(464, 240)
+texture = ExtResource("9_ore")
+
+[node name="SprOre200030" type="Sprite2D" parent="." unique_id=200030]
+position = Vector2(496, 240)
+texture = ExtResource("9_ore")
+
+[node name="SprRocks200031" type="Sprite2D" parent="." unique_id=200031]
+position = Vector2(400, 240)
+texture = ExtResource("9_rocks")
+
+[node name="SprRocks200032" type="Sprite2D" parent="." unique_id=200032]
+position = Vector2(432, 240)
+texture = ExtResource("9_rocks")
+
+[node name="SprRocks200033" type="Sprite2D" parent="." unique_id=200033]
+position = Vector2(464, 240)
+texture = ExtResource("9_rocks")
+
+[node name="SprRocks200034" type="Sprite2D" parent="." unique_id=200034]
+position = Vector2(496, 240)
+texture = ExtResource("9_rocks")
+
+[node name="SprCrystal200035" type="Sprite2D" parent="." unique_id=200035]
+position = Vector2(400, 232)
+texture = ExtResource("9_crystal")
+
+[node name="SprCrystal200036" type="Sprite2D" parent="." unique_id=200036]
+position = Vector2(432, 232)
+texture = ExtResource("9_crystal")
+
+[node name="SprCrystal200037" type="Sprite2D" parent="." unique_id=200037]
+position = Vector2(464, 232)
+texture = ExtResource("9_crystal")
+
+[node name="SprCrystal200038" type="Sprite2D" parent="." unique_id=200038]
+position = Vector2(496, 232)
+texture = ExtResource("9_crystal")
+
+[node name="SprFlag200041" type="Sprite2D" parent="." unique_id=200041]
+position = Vector2(560, 226)
+texture = ExtResource("9_flag")
+
+[node name="SprFlag200042" type="Sprite2D" parent="." unique_id=200042]
+position = Vector2(592, 226)
+texture = ExtResource("9_flag")
+
+[node name="SprOre200043" type="Sprite2D" parent="." unique_id=200043]
+position = Vector2(560, 240)
+texture = ExtResource("9_ore")
+
+[node name="SprOre200044" type="Sprite2D" parent="." unique_id=200044]
+position = Vector2(592, 240)
+texture = ExtResource("9_ore")
+
+[node name="SprRocks200045" type="Sprite2D" parent="." unique_id=200045]
+position = Vector2(560, 240)
+texture = ExtResource("9_rocks")
+
+[node name="SprRocks200046" type="Sprite2D" parent="." unique_id=200046]
+position = Vector2(592, 240)
+texture = ExtResource("9_rocks")
+
+[node name="Spikes" type="Node2D" parent="." unique_id=976300751]
+
+[node name="Spike1" parent="Spikes" unique_id=200047 instance=ExtResource("7_spike")]
 position = Vector2(48, 272)
 
-[node name="Player" parent="." instance=ExtResource("2_player")]
+[node name="Spike2" parent="Spikes" unique_id=200048 instance=ExtResource("7_spike")]
+position = Vector2(80, 272)
+
+[node name="Spike3" parent="Spikes" unique_id=200049 instance=ExtResource("7_spike")]
+position = Vector2(112, 240)
+
+[node name="Spike4" parent="Spikes" unique_id=200050 instance=ExtResource("7_spike")]
+position = Vector2(144, 240)
+
+[node name="Spike5" parent="Spikes" unique_id=200051 instance=ExtResource("7_spike")]
+position = Vector2(176, 240)
+
+[node name="Spike6" parent="Spikes" unique_id=200052 instance=ExtResource("7_spike")]
+position = Vector2(208, 240)
+
+[node name="Spike7" parent="Spikes" unique_id=200053 instance=ExtResource("7_spike")]
+position = Vector2(240, 240)
+
+[node name="Spike8" parent="Spikes" unique_id=200054 instance=ExtResource("7_spike")]
+position = Vector2(272, 240)
+
+[node name="Spike9" parent="Spikes" unique_id=200055 instance=ExtResource("7_spike")]
+position = Vector2(304, 240)
+
+[node name="Spike10" parent="Spikes" unique_id=200056 instance=ExtResource("7_spike")]
+position = Vector2(336, 240)
+
+[node name="Spike11" parent="Spikes" unique_id=200057 instance=ExtResource("7_spike")]
+position = Vector2(368, 240)
+
+[node name="Spike12" parent="Spikes" unique_id=200058 instance=ExtResource("7_spike")]
+position = Vector2(400, 240)
+
+[node name="Spike13" parent="Spikes" unique_id=200059 instance=ExtResource("7_spike")]
+position = Vector2(432, 240)
+
+[node name="Spike14" parent="Spikes" unique_id=200060 instance=ExtResource("7_spike")]
+position = Vector2(464, 240)
+
+[node name="Spike15" parent="Spikes" unique_id=200061 instance=ExtResource("7_spike")]
+position = Vector2(496, 240)
+
+[node name="Spike16" parent="Spikes" unique_id=200062 instance=ExtResource("7_spike")]
+position = Vector2(528, 240)
+
+[node name="LevelGoal" parent="." unique_id=833299112 instance=ExtResource("4_goal")]
+position = Vector2(576, 240)
+
+[node name="Spawn" type="Marker2D" parent="." unique_id=1976273592]
 position = Vector2(48, 272)
 
-[node name="LevelGoal" parent="." instance=ExtResource("4_goal")]
-position = Vector2(560, 272)
-
-[node name="Spikes" type="Node2D" parent="."]
-[node name="Spike1" parent="Spikes" instance=ExtResource("7_spike")]
-position = Vector2(512, 256)
+[node name="Player" parent="." unique_id=969211626 instance=ExtResource("2_player")]
