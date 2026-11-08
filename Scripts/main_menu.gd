@@ -18,10 +18,10 @@ const UI_SFX_SCRIPT := preload("res://Scripts/ui/ui_sfx.gd")
 ## 主菜单重力场效果（背景石粒 + 方向键切换重力）。
 const MENU_GRAVITY_FX := preload("res://Scripts/ui/menu_gravity_fx.gd")
 
-@onready var _btn_play: Button = $VBoxContainer/ButtonPlay
-@onready var _btn_challenge: Button = $VBoxContainer/ButtonChallenge
-@onready var _btn_settings: Button = $VBoxContainer/ButtonSettings
-@onready var _btn_quit: Button = $VBoxContainer/ButtonQuit
+@onready var _btn_play: Button = $ButtonPlay
+@onready var _btn_challenge: Button = $ButtonChallenge
+@onready var _btn_settings: Button = $ButtonSettings
+@onready var _btn_quit: Button = $ButtonQuit
 
 # 运行时实例化的设置面板；默认隐藏。
 var _panel: Control = null
@@ -64,8 +64,9 @@ func _ready() -> void:
 	add_child(_gravity_fx)
 	# 石粒要画在所有 UI 之下，但节点是在 UI 之后 add 的，所以显式压低层级。
 	_gravity_fx.z_index = -50
-	# 等一帧再收集：此时所有 UI 子节点（含刚加的设置面板）都已就位
-	_gravity_fx.call_deferred("_collect_ui")
+	# 等一帧再收集：确保所有子节点都已就位
+	await get_tree().process_frame
+	_gravity_fx.call("_collect_ui")
 
 	_btn_play.grab_focus()
 
