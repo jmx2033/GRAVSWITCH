@@ -4,7 +4,6 @@
 [ext_resource type="PackedScene" uid="uid://b11hj8ncr5db5" path="res://Scenes/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://bcc0efq3yy18v" path="res://Scenes/tile/level_goal.tscn" id="4_goal"]
 [ext_resource type="Texture2D" uid="uid://rmo458s4itmk" path="res://Art/bg/bg_cave.png" id="6_bg"]
-[ext_resource type="Texture2D" uid="uid://dgy7cjbu1dbs2" path="res://Art/tiles/spr_arch.png" id="20_arch"]
 
 [node name="Level4" type="Node2D" unique_id=1738420900]
 
@@ -32,6 +31,3 @@ position = Vector2(48, 272)
 [node name="LevelGoal" parent="." instance=ExtResource("4_goal")]
 position = Vector2(560, 272)
 
-[node name="GoalArch" type="Sprite2D" parent="."]
-position = Vector2(576, 268)
-texture = ExtResource("20_arch")

@@ -5,7 +5,6 @@
 [ext_resource type="PackedScene" uid="uid://b11hj8ncr5db5" path="res://Scenes/player.tscn" id="3_cggpd"]
 [ext_resource type="PackedScene" uid="uid://bcc0efq3yy18v" path="res://Scenes/tile/level_goal.tscn" id="4_055b2"]
 [ext_resource type="PackedScene" uid="uid://cnnosxglxyvx3" path="res://Scenes/tile/spike.tscn" id="5_spk2"]
-[ext_resource type="Texture2D" uid="uid://dgy7cjbu1dbs2" path="res://Art/tiles/spr_arch.png" id="20_arch"]
 
 [node name="Level1" type="Node2D" unique_id=2016033099]
 
@@ -44,9 +43,6 @@ position = Vector2(50, 300)
 [node name="LevelGoal" parent="." unique_id=2024212454 instance=ExtResource("4_055b2")]
 position = Vector2(576, 289)
 
-[node name="GoalArch" type="Sprite2D" parent="."]
-position = Vector2(592, 285)
-texture = ExtResource("20_arch")
 
 [node name="Spikes" type="Node2D" parent="." unique_id=1070093717]
 
