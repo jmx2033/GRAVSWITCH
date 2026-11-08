@@ -53,24 +53,25 @@ const UI_SWING := 7.0
 ## 晃动过渡时间（秒）。
 const SWING_TIME := 0.28
 
-## 塌完之后每个元素的散落位置：`Vector2(横向偏移, 底边距屏幕底部的高度)`。
+## 塌完之后每个元素的落点：`Vector2(横向偏移, 底边距屏幕底的高度)`。
+##
+## **语义是「底边距底」**：这样不管元素多高，塌完都**贴到屏幕底部**。
+## 之前用「下移量」的话，高矮不一的元素会停在不同高度——
+## 标题（高 87）和按钮（高 36）差得远，看着就像"没塌到底"。
 ##
 ## **为什么不用纯随机**：随机的话每次塌完都不一样，看起来像 bug；
-## 用固定表能保证"塌成什么样子"是设计好的，而且能确保彼此不重叠。
-##
-## 排序要求：**表里的纵向顺序必须和各元素的原始位置一致**
-## （Title 最上、Quit 最下）。否则某个元素的目标位置会高于它原位，
-## 被「不许往上跳」的判断拦在原地，看起来就没塌。
-## 落差统一 40px（> 按钮高 36px），保证互不重叠。
+## 用固定表能保证"塌成什么样子"是设计好的。
 const SCATTER := {
-	"Title": Vector2(-30.0, 172.0),
-	"ButtonChallenge": Vector2(-18.0, 132.0),
-	"ButtonPlay": Vector2(24.0, 92.0),
-	"ButtonSettings": Vector2(30.0, 52.0),
-	"ButtonQuit": Vector2(-24.0, 12.0),
+	# 标题：压在最上面一层，横向左移
+	"Title": Vector2(-150.0, 92.0),
+	# 四个按钮：横向错开成斜的一列，纵向依次叠高一点（避免完全重叠）
+	"ButtonPlay": Vector2(-190.0, 4.0),
+	"ButtonChallenge": Vector2(-120.0, 16.0),
+	"ButtonSettings": Vector2(-50.0, 28.0),
+	"ButtonQuit": Vector2(20.0, 40.0),
 }
 ## 表里没登记的元素：底边贴屏幕底，横移 0。
-const SCATTER_DEFAULT := Vector2(0.0, 4.0)
+const SCATTER_DEFAULT := Vector2(0.0, 0.0)
 
 ## 每颗石粒：{pos: Vector2, size: float}
 var _stones: Array[Dictionary] = []
@@ -120,23 +121,60 @@ func _collect_ui() -> void:
 	var root := get_parent()
 	if root == null:
 		return
-	for child in root.get_children():
+	_collect_ui_recursive(root)
+
+
+## 递归收集需要跟着塌的 UI 元素（标题 + 按钮），逐个登记。
+##
+## **只收当前可见的**：设置面板、选关面板里的按钮平时是隐藏的，
+## 它们跟着塌会露出来——面板一打开就看到一堆按钮堆在底部。
+##
+## ## 为什么每个按钮都要设 top_level = true
+##
+func _collect_ui_recursive(node: Node) -> void:
+	for child in node.get_children():
 		if not (child is Control):
 			continue
-		if not (child is Button or child is TextureRect):
-			continue
 		var c := child as Control
-		var from := c.position
-		# 查表拿散落位置：x 是横向偏移，y 是底边距屏幕底部的高度
-		var spec: Vector2 = SCATTER.get(c.name, SCATTER_DEFAULT)
-		var to := Vector2(
-			from.x + spec.x,
-			SCREEN.y - spec.y - c.size.y
-		)
-		# 已经在下面的元素不要往上跳
-		if to.y < from.y:
-			to.y = from.y
-		_ui_moves.append({"node": c, "from": from, "to": to})
+		if not c.is_visible_in_tree():
+			continue
+		if child is Button or child is TextureRect:
+			_add_element(c)
+		else:
+			# 容器：收容器里的按钮，但不收容器本身
+			_collect_ui_recursive(child)
+
+
+## 登记一个元素，并算出它塌陷后的目标位置。
+##
+## **顺序很重要**：先收集**全部**元素的位置，最后再统一设 top_level。
+## 若边收集边设，前面已经设过的按钮会被 VBox 重新排布、
+## 后面的按钮又拿不到自己的位置——结果就是四个按钮全叠在同一点。
+func _add_element(c: Control) -> void:
+	for m in _ui_moves:
+		if m["node"] == c:
+			return
+	var from := c.global_position
+	# 查表拿落点：x 是横向偏移，y 是底边距屏幕底的高度
+	var spec: Vector2 = SCATTER.get(c.name, SCATTER_DEFAULT)
+	# 目标 = 底边落在 SCREEN.y - spec.y 的位置
+	var to := Vector2(from.x + spec.x, SCREEN.y - spec.y - c.size.y)
+	_ui_moves.append({"node": c, "from": from, "to": to})
+
+
+## 让所有收集到的元素脱离布局控制。
+##
+## 必须在**全部位置都采集完之后**统一做：设 top_level 的瞬间，
+## 该按钮会脱离容器、位置被重置，所以要逐个写回它自己的原位。
+func _detach_from_layout() -> void:
+	for m in _ui_moves:
+		var c: Control = m["node"]
+		if not is_instance_valid(c):
+			continue
+		var from: Vector2 = m["from"]
+		c.top_level = true
+		c.global_position = from
+
 
 
 func _process(delta: float) -> void:
@@ -256,4 +294,6 @@ func _apply_layout(duration: float, jitter: bool) -> void:
 		var target := from.lerp(to, _sink_ratio) + _swing
 		if jitter:
 			target.x += randf_range(-STEP_JITTER, STEP_JITTER)
+		# 用 position（相对父容器）：按钮直接挂在主菜单下，
+		# 父节点不是 Container，位置不会被布局重排，可以自由改。
 		_layout_tween.tween_property(node, "position", target, duration)

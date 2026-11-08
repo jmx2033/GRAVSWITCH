@@ -66,28 +66,26 @@ grow_vertical = 2
 texture = ExtResource("3_title")
 stretch_mode = 5
 
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=2046527639]
+
+[node name="ButtonPlay" type="Button" parent="." unique_id=1112869794]
 layout_mode = 1
-anchors_preset = 13
+anchors_preset = -1
 anchor_left = 0.5
+anchor_top = 0.5
 anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -92.0
-offset_top = 180.0
-offset_right = 92.0
-offset_bottom = 180.0
+anchor_bottom = 0.522
+offset_left = -60.0
+offset_top = 32.0
+offset_right = 60.0
+offset_bottom = 60.08
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="ButtonPlay" type="Button" parent="VBoxContainer" unique_id=1112869794]
-layout_mode = 2
 theme_override_colors/font_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_focus_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_pressed_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_hover_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_hover_pressed_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_disabled_color = Color(0.35, 0.35, 0.35, 1)
-theme_override_fonts/font = ExtResource("3_v4pkt")
 theme_override_font_sizes/font_size = 20
 theme_override_styles/normal = SubResource("StyleBoxTexture_btn_normal")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_btn_normal")
@@ -95,16 +93,26 @@ theme_override_styles/hover = SubResource("StyleBoxTexture_btn_hover")
 theme_override_styles/focus = SubResource("StyleBoxTexture_btn_focus")
 text = "START"
 
-[node name="ButtonChallenge" type="Button" parent="VBoxContainer" unique_id=1310177641]
+[node name="ButtonChallenge" type="Button" parent="." unique_id=1310177641]
 visible = false
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -70.0
+offset_top = -17.0
+offset_right = 70.0
+offset_bottom = 19.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_focus_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_pressed_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_hover_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_hover_pressed_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_disabled_color = Color(0.35, 0.35, 0.35, 1)
-theme_override_fonts/font = ExtResource("3_v4pkt")
 theme_override_font_sizes/font_size = 20
 theme_override_styles/normal = SubResource("StyleBoxTexture_btn_normal")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_btn_normal")
@@ -112,15 +120,25 @@ theme_override_styles/hover = SubResource("StyleBoxTexture_btn_hover")
 theme_override_styles/focus = SubResource("StyleBoxTexture_btn_focus")
 text = "CHALLENGE"
 
-[node name="ButtonSettings" type="Button" parent="VBoxContainer" unique_id=1326681747]
-layout_mode = 2
+[node name="ButtonSettings" type="Button" parent="." unique_id=1326681747]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = 78.0
+offset_right = 60.0
+offset_bottom = 114.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_focus_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_pressed_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_hover_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_hover_pressed_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_disabled_color = Color(0.35, 0.35, 0.35, 1)
-theme_override_fonts/font = ExtResource("3_v4pkt")
 theme_override_font_sizes/font_size = 20
 theme_override_styles/normal = SubResource("StyleBoxTexture_btn_normal")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_btn_normal")
@@ -128,15 +146,25 @@ theme_override_styles/hover = SubResource("StyleBoxTexture_btn_hover")
 theme_override_styles/focus = SubResource("StyleBoxTexture_btn_focus")
 text = "SETTINGS"
 
-[node name="ButtonQuit" type="Button" parent="VBoxContainer" unique_id=1326681748]
-layout_mode = 2
+[node name="ButtonQuit" type="Button" parent="." unique_id=1326681748]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = 122.0
+offset_right = 60.0
+offset_bottom = 158.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_focus_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_pressed_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_hover_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_hover_pressed_color = Color(0.102, 0.102, 0.102, 1)
 theme_override_colors/font_disabled_color = Color(0.35, 0.35, 0.35, 1)
-theme_override_fonts/font = ExtResource("3_v4pkt")
 theme_override_font_sizes/font_size = 20
 theme_override_styles/normal = SubResource("StyleBoxTexture_btn_normal")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_btn_normal")
