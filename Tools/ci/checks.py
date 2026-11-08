@@ -377,8 +377,21 @@ def main() -> int:
             cwd=ROOT, capture_output=True, text=True,
         )
         if out.returncode != 0:
-            print(out.stderr)
-            return 2
+            # 范围里的某个提交可能已经不存在了 —— 最常见的原因是**强推**：
+            # 重写历史后 github.event.before 指向的那个旧提交被删掉了，
+            # clone 下来的仓库里没有这个对象，git log 直接报「无效修订范围」。
+            #
+            # 这时不能当错误（那是 CI 脚本的问题，不是提交的问题），
+            # 降级成「只检查最新一条提交」——和首次推送的兜底逻辑一致。
+            print(f"[WARN] 修订范围 {args.commit_range} 无效（可能是强推导致旧提交已不存在），"
+                  "降级为只检查最新一条提交")
+            out = subprocess.run(
+                ["git", "log", "--no-merges", "--format=%s", "-1"],
+                cwd=ROOT, capture_output=True, text=True,
+            )
+            if out.returncode != 0:
+                print(out.stderr)
+                return 2
         subjects = [s for s in out.stdout.splitlines() if s.strip()]
         if not subjects:
             print("该范围内没有提交，跳过")

@@ -16,7 +16,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from checks import (  # noqa: E402
-    check_gdscript, check_hygiene, check_links, check_naming, err, validate_subject, warn,
+    check_gdscript, check_hygiene, check_links, check_naming, err, main, validate_subject, warn,
 )
 
 VALID_GD = """extends CharacterBody2D
@@ -85,6 +85,61 @@ class TestCommitSubject(unittest.TestCase):
     def test_merge_and_revert_skipped(self):
         self.assertEqual(validate_subject("Merge branch 'main' into x"), [])
         self.assertEqual(validate_subject('Revert "feat(level): x [P1-1]"'), [])
+
+
+class TestCommitRangeFallback(unittest.TestCase):
+    """范围无效时的降级行为。
+
+    **为什么要这个**：强推（force push）会重写历史，
+    github.event.before 指向的旧提交被删除，CI clone 下来的仓库里
+    没有这个对象，`git log before..sha` 报「无效修订范围」。
+    这时不该判 CI 失败（那是脚本的问题，不是提交的问题），
+    应降级为只检查最新一条提交。
+    """
+
+    def test_invalid_range_falls_back_to_latest(self):
+        """范围无效时不能返回 2（错误退出），应降级继续检查。
+
+        用一个必然无效的范围（全 0 的对象名，仓库里不存在）跑检查器。
+        **不直接调 subprocess**（沙箱里起不来管道），
+        改成在进程内 monkeypatch 掉 subprocess.run，
+        让它对无效范围返回非 0、对降级范围返回正常输出。
+        """
+        import subprocess as _sp
+
+        real_run = _sp.run
+        calls = []
+
+        def fake_run(cmd, **kwargs):
+            calls.append(cmd)
+            # 第一次：模拟无效范围报错
+            if len(calls) == 1:
+                class _R:
+                    returncode = 128
+                    stdout = ""
+                    stderr = "fatal: 无效修订范围"
+                return _R()
+            # 第二次：降级后的正常输出（最新一条合规提交）
+            class _R:
+                returncode = 0
+                stdout = "fix(level): 修正了关卡路径 [P1-1]" + chr(10)
+                stderr = ""
+            return _R()
+
+        old_argv = sys.argv
+        sys.argv = ["checks.py", "commits", "--range", "deadbeef..HEAD"]
+        _sp.run = fake_run
+        try:
+            rc = main()
+        finally:
+            _sp.run = real_run
+            sys.argv = old_argv
+
+        self.assertNotEqual(rc, 2, "无效范围不该判为错误退出（exit 2），应降级继续")
+        self.assertEqual(len(calls), 2, "应该先试原范围、失败后再试降级范围")
+        # 第一次用的是传入的范围；第二次是降级范围（不带范围参数，只查最新一条）
+        self.assertIn("deadbeef..HEAD", calls[0])
+        self.assertNotIn("deadbeef..HEAD", calls[1])
 
 
 class TestGDScript(unittest.TestCase):
