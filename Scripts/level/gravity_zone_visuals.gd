@@ -53,6 +53,30 @@ const DOWN_GLOW_BOOST := 1.35
 const DOWN_PULSE_BOOST := 1.45
 const DOWN_FIELD_BOOST := 1.18
 
+## 晶核（中央白色柔光斑）：数量、颜色、峰值 alpha、衰减指数、脉动速度。
+##
+## ## 这是 11/6 移除、11/8 加回的效果
+##
+## 当时移除的理由是"静止的光斑固定在中央非常显眼"，所以加回来时
+## **必须让它动**：沿重力方向漂移 + 缓慢脉动。
+##
+## 数值按文档记的踩坑经验定：
+## - 低 alpha + 大衰减 —— 否则在紫场体上就是一串白灯泡
+## - 多而小 = 弥散微光（不扎眼），少而大 = 扎眼
+const CORE_COUNT := 7
+const CORE_COLOR := Color("#F2F5FF")
+const CORE_ALPHA := 0.20
+## 每层同心圆的 alpha 衰减比：越外层越淡，叠出柔光而不是硬边。
+const CORE_FALLOFF := 0.55
+## 每一层的半径倍数。
+const CORE_RING_SCALE := 1.15
+## 脉动速度（每秒）。
+const CORE_PULSE_SPEED := 1.1
+## 漂移速度（像素/秒），沿重力方向。
+const CORE_DRIFT_SPEED := 7.0
+## 漂移范围：晶核在场的这一段里来回游走，不会飘出场外。
+const CORE_DRIFT_SPAN := 0.35
+
 ## 重力指向侧高亮边：颜色与厚度（像素）。等于 0 表示不画这条加粗边。
 const EDGE_HIGHLIGHT_COLOR := Color("D9C7FF")
 const EDGE_HIGHLIGHT_WIDTH := 0.0
@@ -61,22 +85,76 @@ const FRAME_ALPHA := 0.10
 const CORNER_SIZE := 4.0
 const CORNER_ALPHA := 0.0
 
+## 出口辉光的强度倍率。1.0 是关卡里的标准强度。
+##
+## 主菜单要用同一个视觉层画「重力场」，但那里的辉光只是背景之上的点缀，
+## 压到 0.55 左右才不抢戏。主菜单那侧通过继承本类并设这个值来调。
+var _glow_scale: float = 1.0
+
 ## 以下四项由 gravity_zone.gd 灌入/推进。
 var _zone_size: Vector2 = Vector2.ZERO
 var _pull_dir: Vector2 = Vector2.UP
 var _editor_hint: bool = false
 ## 石粒：{pos: Vector2, size: float}。
 var _stones: Array[Dictionary] = []
+## 晶核：{pos: Vector2, radius: float, phase: float}。
+var _cores: Array[Dictionary] = []
 ## 动画时钟，驱动辉光呼吸与游走。
 var _time: float = 0.0
 
 
 ## 设置区域尺寸、重力方向与编辑器状态。
 func set_zone(zone_size: Vector2, pull_dir: Vector2, editor_hint: bool) -> void:
+	var size_changed := zone_size != _zone_size
 	_zone_size = zone_size
 	_pull_dir = pull_dir
 	_editor_hint = editor_hint
+	if size_changed:
+		_spawn_cores()
 	queue_redraw()
+
+
+## 生成晶核：沿重力方向错开排布，每个有自己的脉动相位与漂移起点。
+func _spawn_cores() -> void:
+	_cores.clear()
+	if _zone_size == Vector2.ZERO:
+		return
+	# 半径**不按场的大小缩放**，固定在小像素级：
+	# 主菜单的场是 640×360（短边 360），按比例算会得到 20px+ 的光斑，
+	# 那就是文档里说的"一串白灯泡"。
+	var base_radius := randf_range(2.5, 5.0)
+	# 沿重力轴铺开 + 横向随机错开，避免全部叠在一条线上
+	for i in CORE_COUNT:
+		var t := (float(i) + 0.5) / float(CORE_COUNT)
+		var pos := _core_pos(t)
+		# 横向（垂直于重力轴）随机偏移，打散成一片而不是一串
+		var lateral := randf_range(-0.28, 0.28) * _zone_size.x
+		var lateral_v := randf_range(-0.28, 0.28) * _zone_size.y
+		if _pull_dir.y != 0.0:
+			pos.x += lateral
+		else:
+			pos.y += lateral_v
+		_cores.append({
+			"pos": pos,
+			"radius": base_radius * randf_range(0.7, 1.3),
+			"phase": randf_range(0.0, TAU),
+			"drift": randf_range(0.6, 1.4),
+			"t": t,
+		})
+
+
+## 晶核在场上沿重力轴的位置：t=0 是远端，t=1 是重力指向的出口。
+func _core_pos(t: float) -> Vector2:
+	var along := _zone_size.y if _pull_dir.y != 0.0 else _zone_size.x
+	var base := along * (0.25 + t * 0.5)
+	var off := _zone_size * 0.5
+	if _pull_dir.y > 0.0:
+		return Vector2(off.x, base)
+	if _pull_dir.y < 0.0:
+		return Vector2(off.x, along - base)
+	if _pull_dir.x > 0.0:
+		return Vector2(base, off.y)
+	return Vector2(along - base, off.y)
 
 
 ## 灌入石粒数据（与 gravity_zone.gd 共用同一批字典，位置由它推进）。
@@ -85,10 +163,41 @@ func set_stones(stones: Array[Dictionary]) -> void:
 	queue_redraw()
 
 
-## 推进动画时钟并重绘。
+## 设置出口辉光的强度倍率（1.0 = 关卡里的标准强度）。
+func set_glow_scale(scale: float) -> void:
+	_glow_scale = maxf(scale, 0.0)
+	queue_redraw()
+
+
+## 推进动画时钟、推进晶核并重绘。
 func advance_time(delta: float) -> void:
 	_time += delta
+	_update_cores(delta)
 	queue_redraw()
+
+
+## 晶核沿重力方向缓慢漂移，并在场的范围内来回游走。
+func _update_cores(delta: float) -> void:
+	if _cores.is_empty():
+		return
+	var along := _zone_size.y if _pull_dir.y != 0.0 else _zone_size.x
+	var span := along * CORE_DRIFT_SPAN
+	for core in _cores:
+		var phase: float = core["phase"]
+		var drift: float = core["drift"]
+		var t0: float = core["t"] if core.has("t") else 0.5
+		# 用 sin 在一段范围内来回游走，不单调漂移（单调会飘出场外）。
+		# 相位和速度都带 drift，所以每颗的节奏不一样，不会整齐划一。
+		var wobble := sin(_time * CORE_DRIFT_SPEED * drift + phase)
+		var t := clampf(t0 + wobble * span * 0.5 * delta * 0.6, 0.05, 0.95)
+		core["t"] = t
+		var p := _core_pos(t)
+		# 横向也跟着微微晃，避免只有一条轴在动
+		if _pull_dir.y != 0.0:
+			p.x += sin(_time * CORE_DRIFT_SPEED * 0.7 * drift + phase * 1.7) * span * 0.12
+		else:
+			p.y += sin(_time * CORE_DRIFT_SPEED * 0.7 * drift + phase * 1.7) * span * 0.12
+		core["pos"] = p
 
 
 ## 画整个重力区。
@@ -111,6 +220,7 @@ func _draw() -> void:
 	var frame_color := EDGE_HIGHLIGHT_COLOR
 	frame_color.a = FRAME_ALPHA
 	draw_rect(Rect2(Vector2.ZERO, _zone_size), frame_color, false, 1.0)
+	_draw_cores()
 	_draw_stones()
 
 
@@ -186,8 +296,8 @@ func _draw_exit_glow() -> void:
 		# 光纹随相位平移，所以看着是"在流"而不是"在闪"。
 		var wave0 := sin(s0 * TAU * GLOW_FLOW_WAVES + phase) * 0.5 + 0.5
 		var wave1 := sin(s1 * TAU * GLOW_FLOW_WAVES + phase) * 0.5 + 0.5
-		var a0 := GLOW_ALPHA * glow_boost * alpha_scale * (1.0 - GLOW_FLOW_DEPTH + GLOW_FLOW_DEPTH * wave0)
-		var a1 := GLOW_ALPHA * glow_boost * alpha_scale * (1.0 - GLOW_FLOW_DEPTH + GLOW_FLOW_DEPTH * wave1)
+		var a0 := GLOW_ALPHA * _glow_scale * glow_boost * alpha_scale * (1.0 - GLOW_FLOW_DEPTH + GLOW_FLOW_DEPTH * wave0)
+		var a1 := GLOW_ALPHA * _glow_scale * glow_boost * alpha_scale * (1.0 - GLOW_FLOW_DEPTH + GLOW_FLOW_DEPTH * wave1)
 		if a0 <= 0.004 and a1 <= 0.004:
 			continue
 		var c0 := GLOW_COLOR
@@ -236,6 +346,28 @@ func _glow_quad(depth: float, along: float, along_len: float) -> PackedVector2Ar
 		Vector2(along, 0.0), Vector2(along + along_len, 0.0),
 		Vector2(along + along_len, depth), Vector2(along, depth),
 	])
+
+
+## 画晶核：多层同心圆叠出的白色柔光。
+##
+## 每层 alpha 按 CORE_FALLOFF 递减，半径按 CORE_RING_SCALE 递增，
+## 所以看起来是从中心向外弥散的微光，而不是一个硬边白圆。
+func _draw_cores() -> void:
+	for core in _cores:
+		var pos: Vector2 = core["pos"]
+		var radius: float = core["radius"]
+		var phase: float = core["phase"]
+		# 脉动：alpha 缓慢起伏，避免静止的"灯泡感"
+		var pulse := sin(_time * CORE_PULSE_SPEED + phase) * 0.5 + 0.5
+		var base_a := CORE_ALPHA * (0.65 + pulse * 0.35)
+		for layer in 2:
+			var r := radius * (1.0 + float(layer) * CORE_RING_SCALE)
+			var a := base_a * pow(CORE_FALLOFF, float(layer))
+			if a <= 0.004:
+				continue
+			var c := CORE_COLOR
+			c.a = clampf(a, 0.0, 1.0)
+			draw_circle(pos, r, c)
 
 
 ## 石粒与拖尾（拖尾朝重力反方向、渐隐）。

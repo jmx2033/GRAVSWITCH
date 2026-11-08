@@ -78,6 +78,10 @@ const SCATTER_DEFAULT := Vector2(0.0, 0.0)
 
 ## 按钮碰撞求解器：让塌落的按钮互相推开、不重叠、不抖动。
 const COLLISION_SOLVER := preload("res://Scripts/ui/button_collision_solver.gd")
+## 重力场视觉（复用关卡里重力区的画法，见 menu_gravity_field.gd）。
+const GRAVITY_FIELD := preload("res://Scripts/ui/menu_gravity_field.gd")
+## 绕四边的顺时针呼吸灯（独立效果，不随方向键变）。
+const FRAME_GLOW := preload("res://Scripts/ui/menu_frame_glow.gd")
 
 ## 每颗石粒：{pos: Vector2, size: float}
 var _stones: Array[Dictionary] = []
@@ -91,6 +95,11 @@ var _step: int = 0
 var _sink_ratio: float = 0.0
 ## 当前方向偏移（按左右上触发）。与塌陷叠加：先按塌陷进度插值，再加上这个偏移。
 var _swing: Vector2 = Vector2.ZERO
+
+## 重力场视觉节点：随方向键改变重力方向。
+var _field: Node2D = null
+## 绕四边的顺时针呼吸灯。
+var _frame_glow: Node2D = null
 
 ## 正在跑的布局动画。
 ## **必须只保留一个**：连按方向键/S 会不断创建新 Tween，
@@ -107,6 +116,18 @@ func _ready() -> void:
 	z_index = -50
 	_spawn_stones()
 	_collect_ui()
+
+	# 重力场视觉：比石粒更靠底（-45），压住背景但不盖住石粒
+	_field = GRAVITY_FIELD.new()
+	_field.name = "GravityField"
+	_field.z_index = -45
+	add_child(_field)
+
+	# 底部呼吸灯：在石粒之上（-40），看得见但不压住按钮
+	_frame_glow = FRAME_GLOW.new()
+	_frame_glow.name = "FrameGlow"
+	_frame_glow.z_index = -40
+	add_child(_frame_glow)
 
 
 ## 生成初始石粒，位置随机铺满整屏。
@@ -214,6 +235,10 @@ func _process(delta: float) -> void:
 	var step: Vector2 = _dir * STONE_SPEED * delta
 	# 塌得越多，下落越快
 	step.y += STONE_FALL_ACCEL * _sink_ratio * delta
+
+	# 重力场跟着当前重力方向转（用平滑后的 _dir，方向切换有连续感）
+	if _field != null:
+		_field.call("set_pull_dir", _dir)
 
 	_resolve_button_collisions()
 
