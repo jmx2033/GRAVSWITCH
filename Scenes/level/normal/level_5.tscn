@@ -1,0 +1,44 @@
+[gd_scene format=4 uid="uid://df2dbifp0v45d"]
+
+[ext_resource type="TileSet" uid="uid://dpphdnueb46dl" path="res://Scenes/tileset_cave.tres" id="1_tiles"]
+[ext_resource type="PackedScene" uid="uid://b11hj8ncr5db5" path="res://Scenes/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" uid="uid://u7jbmkf7gqyg" path="res://Scenes/tile/gravity_zone.tscn" id="3_zone"]
+[ext_resource type="PackedScene" uid="uid://bcc0efq3yy18v" path="res://Scenes/tile/level_goal.tscn" id="4_goal"]
+[ext_resource type="Texture2D" uid="uid://rmo458s4itmk" path="res://Art/bg/bg_cave.png" id="6_bg"]
+[ext_resource type="PackedScene" uid="uid://cnnosxglxyvx3" path="res://Scenes/tile/spike.tscn" id="7_spike"]
+
+[node name="Level5" type="Node2D" unique_id=1738421000]
+
+[node name="Background" type="Sprite2D" parent="."]
+z_index = -100
+texture_filter = 1
+position = Vector2(320, 180)
+scale = Vector2(1.125, 1.125)
+texture = ExtResource("6_bg")
+
+[node name="Terrain" type="TileMapLayer" parent="."]
+tile_map_data = PackedByteArray("AAAAAAAAAAADAAAAAAABAAAAAAADAAAAAAACAAAAAAADAAAAAAADAAAAAAADAAAAAAAEAAAAAAADAAAAAAAFAAAAAAADAAAAAAAGAAAAAAADAAAAAAAHAAAAAAADAAAAAAAIAAAAAAADAAAAAAAJAAAAAAADAAAAAAAKAAAAAAADAAAAAAALAAAAAAADAAAAAAAMAAAAAAADAAAAAAANAAAAAAADAAAAAAAOAAAAAAADAAAAAAAPAAAAAAADAAAAAAAQAAAAAAADAAAAAAARAAAAAAADAAAAAAASAAAAAAADAAAAAAATAAAAAAADAAAAAAAAAAEAAAADAAAAAAATAAEAAAADAAAAAAAAAAIAAAADAAAAAAATAAIAAAADAAAAAAAAAAMAAAADAAAAAAATAAMAAAADAAAAAAAAAAQAAAADAAAAAAATAAQAAAADAAAAAAAAAAUAAAADAAAAAAATAAUAAAADAAAAAAAAAAYAAAADAAAAAAATAAYAAAADAAAAAAAAAAcAAAADAAAAAAATAAcAAAADAAAAAAAAAAgAAAADAAAAAAATAAgAAAADAAAAAAAAAAkAAAADAAAAAAATAAkAAAADAAAAAAAAAAoAAAADAAAAAAATAAoAAAADAAAAAAABAAoAAAAEAAAAAAAIAAoAAAAEAAAAAAAQAAoAAAAEAAAAAAARAAoAAAAEAAAAAAASAAoAAAAEAAAAAAABAAkAAAAEAAAAAAAQAAkAAAAEAAAAAAARAAkAAAAEAAAAAAASAAkAAAAEAAAAAAAIAAkAAAAEAAAAAAA=")
+tile_set = ExtResource("1_tiles")
+
+[node name="Deco" type="TileMapLayer" parent="."]
+
+[node name="Zones" type="Node2D" parent="."]
+
+[node name="ZoneUpTrap" parent="Zones" instance=ExtResource("3_zone")]
+position = Vector2(320, 128)
+direction = 0
+size_in_tiles = Vector2i(6, 6)
+
+
+[node name="Spawn" type="Marker2D" parent="."]
+position = Vector2(48, 272)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(48, 272)
+
+[node name="LevelGoal" parent="." instance=ExtResource("4_goal")]
+position = Vector2(560, 272)
+
+[node name="Spikes" type="Node2D" parent="."]
+[node name="Spike1" parent="Spikes" instance=ExtResource("7_spike")]
+position = Vector2(512, 256)

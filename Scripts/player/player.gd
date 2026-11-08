@@ -21,7 +21,8 @@ signal landed(impact_speed: float)
 signal walking_changed(walking: bool)
 
 ## 180° 重力翻转开始时发出，由音效脚本播放下落二音（与跳跃的上升音相反）。
-signal flipped
+## 参数是翻转的目标方向，音效据此决定声像往左还是往右扫。
+signal flipped(new_direction: Vector2)
 
 ## 死亡后重生完成时发出，由音效脚本复位"死亡/通关"标志。
 signal respawned
@@ -70,8 +71,24 @@ var coyote_timer: float = 0.0
 # 跳预输入倒计时
 var jump_timer: float = 0.0
 
+## 本次起跳是否还在"可截断"窗口里：起跳后置 true，松手/落地清掉。
+## 只在里面为 true 时才做可变跳跃高度的截断，避免把走过去掉落也砍一刀。
+var _jump_cut_armed: bool = false
+
 # 玩家当前重叠的重力区 -> 拉力方向；叠加时按各区的加速度贡献计算
 var _gravity_dirs: Dictionary = {}
+
+## 关卡是否授权玩家主动改变重力方向（挑战关专用）。
+## 默认关闭，所以四关的行为与之前完全一致；挑战关在 _ready 里调用
+## enable_gravity_shift() 显式打开。
+var _gravity_shift_enabled: bool = false
+
+## 玩家主动设定的重力方向；Vector2.ZERO 表示"没改过，走世界默认向下"。
+## 有重力区重叠时它被忽略（重力区优先级最高），出区后继续生效。
+var _shifted_gravity: Vector2 = Vector2.ZERO
+
+## 本次滞空是否已经用掉改重力的机会。落地清零，实现"落地前不能再改"。
+var _gravity_shift_used: bool = false
 
 
 func _ready() -> void:
@@ -121,10 +138,18 @@ func _physics_process(delta: float) -> void:
 
 	var side_speed: float = velocity.dot(right_dir) if on_axis else velocity.x
 
+	# 地面用 ACCEL（慢起步），空中用 AIR_ACCEL（跟手）
+	var accel: float = Config.ACCEL if is_on_floor() else Config.AIR_ACCEL
+	# 反向输入 = 掉头：换用更大的 TURN_ACCEL 把速度拽回来。
+	# 不加这一条的话，掉头和起步共用 accel，把 ACCEL 调小做「慢起步」时
+	# 掉头会被一起拖慢（ACCEL=1100 时掉头要 0.45 秒），主观上就是脚底打滑。
+	# side_speed 始终是沿 right_dir 的分量，所以重力朝左/朝右时这个判断同样成立。
+	if is_on_floor() and axis != 0.0 and side_speed * axis < 0.0:
+		accel = Config.TURN_ACCEL
 	# 目标侧向速度：有输入就加速/限速，没输入就减速。
 	var target_side: float = side_speed
 	if axis != 0.0:
-		target_side = clampf(side_speed + axis * Config.ACCEL * delta,
+		target_side = clampf(side_speed + axis * accel * delta,
 			-Config.MAX_SPEED, Config.MAX_SPEED)
 	elif on_axis:
 		target_side = move_toward(side_speed, 0.0, Config.DECEL * delta)
@@ -135,11 +160,24 @@ func _physics_process(delta: float) -> void:
 	# 更新土狼时间
 	if is_on_floor():
 		coyote_timer = Config.COYOTE_TIME
+		# 落地：重置"改重力"的机会，实现"落地前不能再改"
+		_gravity_shift_used = false
 	else:
 		coyote_timer = coyote_timer - delta
 
-	# 更新跳预输入
-	if Input.is_action_just_pressed("jump"):
+	# 空中改重力：空中按「方向 + 空格」改变重力方向。
+	# 它必须排在跳预输入之前，并且在触发时把这一下空格吃掉，
+	# 否则会既改重力又起跳。
+	#
+	# ⚠️ 已知问题（11/7 复盘）：平台跳跃里"按住方向键"是常态（跑动时一直按着），
+	# 所以跑跳时连按空格、或落地前按空格做跳预输入，都会误触发改重力。
+	# 曾改用专用键 Shift 规避，但实测手感别扭（左手在方向键上，够 Shift 跨度大），
+	# 负责人决定改回原方案。若将来要彻底解决，应重新设计触发方式而不是换键位。
+	var shifted: bool = _try_gravity_shift()
+	if shifted:
+		# 这一下空格已经用于改重力，不进入跳预输入
+		jump_timer = 0.0
+	elif Input.is_action_just_pressed("jump"):
 		jump_timer = Config.JUMP_BUFFER_TIME
 	else:
 		jump_timer = jump_timer - delta
@@ -153,7 +191,23 @@ func _physics_process(delta: float) -> void:
 		velocity += (-g) * Config.JUMP_SPEED
 		jump_timer = 0.0
 		coyote_timer = 0.0
+		# 开启"可截断"窗口：这一跳还没松手，松手就按 JUMP_CUT 砍高度。
+		_jump_cut_armed = true
 		jumped.emit()
+
+	# 可变跳跃高度：起跳后提前松手，就把剩余的上升速度砍掉一部分。
+	#
+	# 必须用沿重力轴的分量（velocity.dot(g)）判断"是否在上升"，
+	# 不能照抄常见的 velocity.y < 0——这游戏空中能改重力，
+	# 重力朝上/朝左时 velocity.y 的符号和"上升"毫无关系。
+	# on_axis 为假说明 g 正在转向过渡期（斜向），此时按 g 砍会把侧向速度拆歪，
+	# 干脆跳过这一帧（过渡期只有 GRAVITY_TURN_TIME，最长 0.12 秒）。
+	if _jump_cut_armed and on_axis:
+		if not Input.is_action_pressed("jump"):
+			_jump_cut_armed = false
+			var rise: float = velocity.dot(g)
+			if rise < 0.0:
+				velocity -= g * rise * (1.0 - Config.JUMP_CUT)
 	
 	# 记录撞地前的沿重力速度；move_and_slide 落地后会把速度清零。
 	var impact_speed: float = velocity.dot(g)
@@ -165,6 +219,8 @@ func _physics_process(delta: float) -> void:
 	var on_floor_now: bool = is_on_floor()
 	if on_floor_now and not _was_on_floor:
 		landed.emit(impact_speed)
+		# 落地后不再有"上升速度"可砍，关掉可变跳跃窗口。
+		_jump_cut_armed = false
 	_was_on_floor = on_floor_now
 
 	# 行走状态：贴地且真的在移动；变化时通知音效脚本。
@@ -257,7 +313,7 @@ func _update_gravity(delta: float) -> void:
 		_turning = true
 		# 真正开始一次 180° 翻转时发信号，由音效脚本播放下落二音
 		if _turn_is_flip:
-			flipped.emit()
+			flipped.emit(_turn_to)
 
 		# up_direction 在翻转期间保持旧方向（见 _physics_process 开头），
 		# 这样脚下的地板不会被误判成"墙"，水平速度不会被 move_and_slide 清掉。
@@ -315,6 +371,66 @@ func _set_walking(walking: bool) -> void:
 	walking_changed.emit(walking)
 
 
+## 由关卡控制器调用，授权本关使用"主动改重力"能力。四关不会调用，所以保持关闭。
+func enable_gravity_shift() -> void:
+	_gravity_shift_enabled = true
+
+
+## 尝试用掉一次"空中改重力"：条件不满足就返回 false，调用方照常处理跳跃。
+##
+## ## 触发条件（缺一不可）
+## 1. 本关已授权该能力（只有第 5 关和挑战关授权）
+## 2. 真正在空中：coyote_timer <= 0
+## 3. 本次滞空还没用过：实现"落地前不能再改"
+## 4. 这一帧刚按下 jump
+## 5. 同时按住某个方向键（决定改成哪个方向）
+##
+## ## ⚠️ 已知问题：与跑跳操作冲突
+##
+## 平台跳跃里**按住方向键是常态**（跑动时一直按着），所以「方向键按着」
+## 不能表达"我想改重力"。实际后果：
+##   - 按住右跑 → 跳 → 连按空格想再跳 → 意外改重力
+##   - 按住右跑 → 跳 → 落地前按空格做跳预输入 → 意外改重力
+##
+## 11/7 曾改成专用键 Shift 来规避，但负责人实机反馈**手感别扭**
+## （左手在方向键上，够 Shift 跨度大），决定改回现在这样。
+##
+## 如果将来要彻底解决，方向应该是**重新设计触发方式**（例如"方向键新按下"
+## 或"空中松手再按"），而不是简单换键位——换键位会把别扭感转嫁给玩家。
+func _try_gravity_shift() -> bool:
+	if not _gravity_shift_enabled:
+		return false
+	if coyote_timer > 0.0:
+		return false
+	if _gravity_shift_used:
+		return false
+	if not Input.is_action_just_pressed("jump"):
+		return false
+
+	var target := _shift_direction_from_input()
+	if target == Vector2.ZERO:
+		return false
+
+	_gravity_shift_used = true
+	_shifted_gravity = target
+	# 立即重算：没在重力区里就生效；在区里则被区覆盖（出区后继续生效）
+	_apply_gravity_zones()
+	return true
+
+
+## 读取方向键，换算成"重力要指向哪一边"；没按方向就返回 ZERO。
+## 垂直优先：同时按住两组时取垂直，因为垂直键意图更明确
+## （水平键跑动时一直按着，垂直键通常是额外按下的）。
+func _shift_direction_from_input() -> Vector2:
+	var axis_y: float = Input.get_axis("move_up", "move_down")
+	if not is_zero_approx(axis_y):
+		return Vector2.DOWN if axis_y > 0.0 else Vector2.UP
+	var axis_x: float = Input.get_axis("move_left", "move_right")
+	if not is_zero_approx(axis_x):
+		return Vector2.RIGHT if axis_x > 0.0 else Vector2.LEFT
+	return Vector2.ZERO
+
+
 ## 进入重力区：记录该区的拉力方向，并重算所有重叠区的合力。
 func enter_gravity_zone(zone: Area2D, gravity_direction: Vector2) -> void:
 	if gravity_direction == Vector2.ZERO:
@@ -340,9 +456,16 @@ func exit_gravity_zone(zone: Area2D) -> void:
 ## - 朝上 / 朝左 / 朝右 → 该方向 1g
 ## - 朝下 → 该方向 2g（"加重"：跳得更矮、落得更快）
 ## - 多个区同时生效 → 各自的加速度相加，完全相抵时就是失重（加速度 0）
+## 汇总当前所有重力来源，算出 Config.gravity_acceleration。
+##
+## 优先级：**重力区最高**。有区重叠时玩家的主动重力被忽略（出区后继续生效），
+## 没有区时：用过主动重力就保持它，否则回到世界默认的向下 1g。
 func _apply_gravity_zones() -> void:
 	if _gravity_dirs.is_empty():
-		Config.gravity_acceleration = Vector2.DOWN * Config.GRAVITY
+		var base: Vector2 = (
+			_shifted_gravity if _shifted_gravity != Vector2.ZERO else Vector2.DOWN
+		)
+		Config.gravity_acceleration = base * Config.GRAVITY
 		return
 
 	var total := Vector2.ZERO
@@ -377,6 +500,7 @@ func die() -> void:
 	is_alive = false
 	velocity = Vector2.ZERO
 	_set_walking(false)
+	
 	# 死亡动画：不循环，播完停在最后一帧（人形消散后是泡沫）。
 	anim.play("die")
 	died.emit()
@@ -384,6 +508,8 @@ func die() -> void:
 
 ## 重开时调用，把玩家恢复到指定位置并重置所有状态。
 func respawn(at: Vector2) -> void:
+	# 过渡由关卡侧在黑幕里发起（见 game.gd / challenge_level.gd），
+	# 这里只做状态复位。若在这里盖黑，就是「先瞬移、后遮住」，跳变会露在画面上。
 	global_position = at
 	velocity = Vector2.ZERO
 	current_gravity = Vector2.DOWN
@@ -394,9 +520,13 @@ func respawn(at: Vector2) -> void:
 	_turn_is_flip = false
 	coyote_timer = 0.0
 	jump_timer = 0.0
+	_jump_cut_armed = false
 	is_alive = true
 	is_won = false
 	_gravity_dirs.clear()
+	# 重置主动重力：重生后回到世界默认，并重新获得改重力的机会
+	_shifted_gravity = Vector2.ZERO
+	_gravity_shift_used = false
 	_set_walking(false)
 	_was_on_floor = false
 	anim.rotation = 0.0

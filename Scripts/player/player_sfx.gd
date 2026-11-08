@@ -41,6 +41,11 @@ const WIN_SFX_VOLUME_DB := -3.0
 ## 翻转音音量。
 const FLIP_SFX_VOLUME_DB := -2.0
 
+## 翻转音专用总线名；给它挂一个声像器（AudioEffectPanner）做左右声道扫描。
+const FLIP_BUS := "Flip"
+## 声像从一侧扫到另一侧用时（秒）。太短听不出方向，太长会拖到下一次操作。
+const FLIP_PAN_TIME := 0.25
+
 @onready var _jump_sfx: AudioStreamPlayer = $JumpSfx
 @onready var _land_sfx: AudioStreamPlayer = $LandSfx
 @onready var _flip_sfx: AudioStreamPlayer = $FlipSfx
@@ -52,6 +57,11 @@ const FLIP_SFX_VOLUME_DB := -2.0
 	$WalkSfx2 as AudioStreamPlayer,
 	$WalkSfx3 as AudioStreamPlayer,
 ]
+
+# 翻转音的声像器；_ready 里动态创建总线并挂上。
+var _flip_panner: AudioEffectPanner = null
+# 正在跑的那条声像 Tween；新翻转发生时先 kill 掉，避免两条互相打架。
+var _flip_tween: Tween = null
 
 # 是否处于行走状态；由 player.gd 的 walking_changed 信号驱动。
 var _walking: bool = false
@@ -84,6 +94,33 @@ func _ready() -> void:
 	player.connect("died", _on_died)
 	player.connect("won", _on_won)
 	player.connect("respawned", _on_respawned)
+	_setup_flip_bus()
+
+
+## 建一条 "Flip" 总线并挂声像器，把翻转音送进去。
+##
+## 为什么要总线而不是直接调播放器：AudioStreamPlayer 本身没有 pan 属性
+## （AudioStreamPlayer2D 才有），挂 AudioEffectPanner 到独立总线是改动最小的做法，
+## 不用换节点类型、也不用在 .tscn 里配音频总线。
+func _setup_flip_bus() -> void:
+	var idx := AudioServer.get_bus_index(FLIP_BUS)
+	if idx == -1:
+		AudioServer.add_bus()
+		idx = AudioServer.bus_count - 1
+		AudioServer.set_bus_name(idx, FLIP_BUS)
+		AudioServer.set_bus_send(idx, "Master")
+		_flip_panner = AudioEffectPanner.new()
+		AudioServer.add_bus_effect(idx, _flip_panner)
+	else:
+		# 总线已存在（重进场景时），复用它的声像器
+		for i in AudioServer.get_bus_effect_count(idx):
+			var fx := AudioServer.get_bus_effect(idx, i)
+			if fx is AudioEffectPanner:
+				_flip_panner = fx as AudioEffectPanner
+				break
+	if _flip_panner != null:
+		AudioServer.set_bus_volume_db(idx, 0.0)
+		_flip_sfx.bus = FLIP_BUS
 
 
 func _physics_process(delta: float) -> void:
@@ -131,10 +168,40 @@ func _on_landed(impact_speed: float) -> void:
 
 
 ## 重力翻转时播放下落二音，与跳跃的上升音方向相反，靠耳朵即可区分。
-func _on_flipped() -> void:
+## 同时按翻转方向做声像扫描：翻向右边时声音从左声道滑到右声道，翻向左边反之，
+## 翻向上下（竖直方向）保持居中——竖直方向没有"左右"可言。
+func _on_flipped(new_direction: Vector2) -> void:
+	_pan_flip(new_direction)
 	_flip_sfx.stream = FLIP_SFX
 	_flip_sfx.volume_db = FLIP_SFX_VOLUME_DB
 	_flip_sfx.play()
+
+
+## 根据翻转方向设置声像起点与终点，并让它随时间扫过去。
+## pan 取值 -1（全左）到 1（全右）。
+func _pan_flip(new_direction: Vector2) -> void:
+	if _flip_panner == null:
+		return
+	# 竖直方向：居中，不偏
+	if new_direction.is_equal_approx(Vector2.UP) or new_direction.is_equal_approx(Vector2.DOWN):
+		_kill_flip_tween()
+		_flip_panner.pan = 0.0
+		return
+
+	# 水平方向：从对侧扫到目标侧。
+	# 向右翻 → 从左(-1)扫到右(+1)；向左翻 → 从右(+1)扫到左(-1)。
+	var target := 1.0 if new_direction.x > 0.0 else -1.0
+	_kill_flip_tween()
+	_flip_panner.pan = -target
+	_flip_tween = create_tween()
+	_flip_tween.tween_property(_flip_panner, "pan", target, FLIP_PAN_TIME)
+
+
+## 停掉正在跑的声像 Tween，避免连续翻转时两条互相拉扯。
+func _kill_flip_tween() -> void:
+	if _flip_tween != null and _flip_tween.is_valid():
+		_flip_tween.kill()
+	_flip_tween = null
 
 
 ## 死亡时播放玉片碎裂音。
