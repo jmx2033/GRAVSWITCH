@@ -15,8 +15,8 @@ extends Node
 const LEVELS := [
 	"res://Scenes/challenge_1.tscn",
 	"res://Scenes/level/normal/level_4.tscn",
-	"res://Scenes/level/normal/level_5.tscn",
 	"res://Scenes/challenge_2.tscn",
+	"res://Scenes/challenge_3.tscn",
 ]
 
 ## 重力区方向枚举，与 gravity_zone.gd 一致。
