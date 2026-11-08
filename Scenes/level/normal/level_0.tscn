@@ -16,7 +16,7 @@ tile_set = ExtResource("1_m0b12")
 collision_enabled = false
 
 [node name="Deco2" type="TileMapLayer" parent="." unique_id=940555464]
-tile_map_data = PackedByteArray("AAACAAkAAAAFAAIAAAAEAAcAAAAGAAIAAAAFAAcAAAAFAAIAAAANAAkAAAAGAAIAAAAPAAkAAAAFAAIAAAA=")
+tile_map_data = PackedByteArray("AAACAAkAAAAFAAIAAAAEAAcAAAAGAAIAAAAPAAkAAAAFAAIAAAA=")
 tile_set = ExtResource("1_m0b12")
 collision_enabled = false
 
@@ -33,4 +33,4 @@ position = Vector2(50, 300)
 position = Vector2(50, 300)
 
 [node name="LevelGoal" parent="." unique_id=1246939478 instance=ExtResource("6_goal")]
-position = Vector2(576, 287)
+position = Vector2(579, 285)

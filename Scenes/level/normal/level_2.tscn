@@ -13,7 +13,7 @@ tile_map_data = PackedByteArray("AAABAAAAAAAEAAAAAGACAAAAAAAEAAAAAGADAAAAAAAEAAA
 tile_set = ExtResource("1_1q6tm")
 
 [node name="Deco" type="TileMapLayer" parent="." unique_id=1145484285]
-tile_map_data = PackedByteArray("AAASAAgAAAAIAAEAAAASAAkAAAAIAAIAAAA=")
+tile_map_data = PackedByteArray("AAA=")
 tile_set = ExtResource("1_1q6tm")
 collision_enabled = false
 
