@@ -1,0 +1,67 @@
+[gd_scene format=4 uid="uid://dfycj48s43ub4"]
+
+[ext_resource type="TileSet" uid="uid://dpphdnueb46dl" path="res://Scenes/tileset_cave.tres" id="1_2857x"]
+[ext_resource type="Script" uid="uid://dyvi8elcavl7i" path="res://Scripts/level/challenge_level.gd" id="1_rn5wh"]
+[ext_resource type="Texture2D" uid="uid://rmo458s4itmk" path="res://Art/bg/bg_cave.png" id="2_rn5wh"]
+[ext_resource type="Script" uid="uid://cto0ucty03wxl" path="res://Scripts/level/death_bounds.gd" id="3_vlstb"]
+[ext_resource type="PackedScene" uid="uid://u7jbmkf7gqyg" path="res://Scenes/tile/gravity_zone.tscn" id="3_vrq4u"]
+[ext_resource type="PackedScene" uid="uid://b11hj8ncr5db5" path="res://Scenes/player.tscn" id="4_vlstb"]
+[ext_resource type="PackedScene" uid="uid://bcc0efq3yy18v" path="res://Scenes/tile/level_goal.tscn" id="5_u0n0i"]
+[ext_resource type="PackedScene" uid="uid://cnnosxglxyvx3" path="res://Scenes/tile/spike.tscn" id="8_vlstb"]
+
+[node name="challenge_3" type="Node2D" unique_id=2016033099]
+script = ExtResource("1_rn5wh")
+
+[node name="Terrain" type="TileMapLayer" parent="." unique_id=506487372]
+tile_map_data = PackedByteArray("AAABAAAAAAAEAAAAAGACAAAAAAAEAAAAAGADAAAAAAAEAAAAAGAEAAAAAAAEAAAAAGAFAAAAAAAEAAAAAGAGAAAAAAAEAAAAAGAHAAAAAAAEAAAAAGAJAAAAAAAEAAEAAAAKAAAAAAAEAAAAAGALAAAAAAAEAAAAAGAMAAAAAAAEAAAAAGANAAAAAAAEAAAAAGAOAAAAAAAEAAAAAGAPAAAAAAAEAAAAAGAQAAAAAAAEAAAAAGAAAAEAAAAEAAAAADAAAAIAAAAEAAAAADAAAAMAAAAEAAAAADAAAAQAAAAEAAAAADAAAAUAAAAEAAAAADAAAAYAAAAEAAAAADAAAAcAAAAEAAAAADAAAAgAAAAEAAAAADAAAAkAAAAEAAAAADATAAEAAAAEAAAAADATAAIAAAAEAAAAADATAAMAAAAEAAAAADATAAQAAAAEAAAAADATAAUAAAAEAAAAADATAAYAAAAEAAAAADATAAcAAAAEAAAAADATAAgAAAAEAAAAADATAAkAAAAEAAAAADABAAoAAAAEAAAAAFACAAoAAAAEAAAAAFAAAAAAAAABAAEAAAAAAAoAAAABAAEAAGATAAoAAAACAAAAADADAAoAAAAEAAAAAFAEAAoAAAAEAAAAAFAFAAoAAAAEAAAAAFAGAAoAAAAEAAAAAFAHAAoAAAAEAAAAAFAIAAoAAAAEAAAAAFAJAAoAAAACAAAAAFARAAAAAAAEAAAAAFASAAAAAAAEAAAAAFATAAAAAAABAAEAAFAIAAAAAAAEAAAAAFAJAAEAAAAEAAAAADAJAAIAAAAEAAAAADAJAAMAAAAEAAAAADAJAAQAAAAEAAAAADAJAAUAAAAEAAAAADA=")
+tile_set = ExtResource("1_2857x")
+
+[node name="DeathBounds" type="Node" parent="." unique_id=7693627]
+script = ExtResource("3_vlstb")
+
+[node name="Background" type="Sprite2D" parent="." unique_id=526264054]
+z_index = -100
+texture_filter = 1
+position = Vector2(320, 180)
+scale = Vector2(1.125, 1.125)
+texture = ExtResource("2_rn5wh")
+
+[node name="Zones" type="Node2D" parent="." unique_id=1402379953]
+
+[node name="RightTop" parent="Zones" unique_id=285377863 instance=ExtResource("3_vrq4u")]
+position = Vector2(320, 32)
+direction = 1
+size_in_tiles = Vector2i(9, 2)
+
+[node name="LeftDown" parent="Zones" unique_id=1467441944 instance=ExtResource("3_vrq4u")]
+position = Vector2(64, 192)
+size_in_tiles = Vector2i(3, 4)
+
+[node name="RightDown" parent="Zones" unique_id=397770007 instance=ExtResource("3_vrq4u")]
+position = Vector2(320, 224)
+direction = 1
+size_in_tiles = Vector2i(9, 2)
+
+[node name="LeftTop" parent="Zones" unique_id=2006039191 instance=ExtResource("3_vrq4u")]
+position = Vector2(64, 64)
+direction = 1
+size_in_tiles = Vector2i(3, 3)
+
+[node name="LeftRight" parent="Zones" unique_id=1909000125 instance=ExtResource("3_vrq4u")]
+position = Vector2(192, 160)
+direction = 3
+size_in_tiles = Vector2i(3, 3)
+
+[node name="Spawn" type="Marker2D" parent="." unique_id=757425576]
+position = Vector2(50, 300)
+
+[node name="Player" parent="." unique_id=1085382721 instance=ExtResource("4_vlstb")]
+position = Vector2(50, 300)
+
+[node name="LevelGoal" parent="." unique_id=2024212454 instance=ExtResource("5_u0n0i")]
+position = Vector2(576, 32)
+
+[node name="Spike" parent="." unique_id=1755118528 instance=ExtResource("8_vlstb")]
+position = Vector2(591.00006, 161)
+rotation = 4.712389
+scale = Vector2(3.271, 1.09)
