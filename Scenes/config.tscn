@@ -1,8 +1,7 @@
-[gd_scene format=3 uid="uid://cvp0bnvhg5bhu"]
+[gd_scene format=3 uid="uid://cm5uskvpqwju8"]
 
 [ext_resource type="Script" uid="uid://btb2fs6cmqiiw" path="res://Scripts/core/config.gd" id="1_config"]
 
 [node name="Config" type="Node" unique_id=1919299172]
 script = ExtResource("1_config")
 ACCEL = 1800.0
-TRANSITION_FADE_OUT = 0.8

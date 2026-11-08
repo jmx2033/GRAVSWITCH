@@ -57,11 +57,11 @@ const LEVEL_SIZE: Vector2 = Vector2(640, 352)
 
 @export_group("转场")
 ## 黑幕盖满屏幕的时长（秒）。对齐 die 动画长度，玩家看不到被重置的那一帧。
-@export var TRANSITION_FADE_OUT: float = 1.0
+@export var TRANSITION_FADE_OUT: float = 0.5
 ## 全黑之后停住多久（秒）。真正的重生 / 切场景就发生在这段全黑里。
 @export var TRANSITION_HOLD: float = 0.08
 ## 黑幕退开的时长（秒）。退幕期间玩家已经能动，所以别拉太长。
-@export var TRANSITION_FADE_IN: float = 0.45
+@export var TRANSITION_FADE_IN: float = 0.3
 
 @export_group("可动平台")
 ## 平台移动速度，单位像素/秒。

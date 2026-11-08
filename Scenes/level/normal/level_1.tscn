@@ -13,7 +13,7 @@ tile_map_data = PackedByteArray("AAABAAAAAAAEAAAAAGACAAAAAAAEAAAAAGADAAAAAAAEAAA
 tile_set = ExtResource("1_m0b12")
 
 [node name="Deco" type="TileMapLayer" parent="." unique_id=1145484285]
-tile_map_data = PackedByteArray("AAA=")
+tile_map_data = PackedByteArray("AAASAAUAAAAIAAEAAAASAAYAAAAIAAIAAAA=")
 tile_set = ExtResource("1_m0b12")
 collision_enabled = false
 
@@ -36,7 +36,6 @@ position = Vector2(50, 300)
 
 [node name="LevelGoal" parent="." unique_id=2024212454 instance=ExtResource("6_goal")]
 position = Vector2(576, 192)
-
 
 [node name="Spike" parent="." unique_id=1755118528 instance=ExtResource("5_6444e")]
 position = Vector2(177, 46)
