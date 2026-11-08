@@ -51,8 +51,6 @@ func _draw() -> void:
 	if _zone_size == Vector2.ZERO:
 		return
 	_draw_exit_glow()
-	# 晶核（随机游走的白色柔光斑）—— 与关卡里同一套画法
-	_draw_cores()
 	# 一圈极淡的描边，和关卡里一致，交代出「这里是个场」的边界
 	var frame_color := EDGE_HIGHLIGHT_COLOR
 	frame_color.a = FRAME_ALPHA
