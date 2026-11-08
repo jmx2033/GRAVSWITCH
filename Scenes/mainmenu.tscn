@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://dv478o526tpud" path="res://Art/ui/ui_button.png" id="2_btn"]
 [ext_resource type="Texture2D" uid="uid://bl6sm5ov2b84l" path="res://Art/ui/ui_title.png" id="3_title"]
 [ext_resource type="FontFile" uid="uid://dg7bj4tuywgh1" path="res://Data/word/press-start-2p-8px-square.ttf" id="3_v4pkt"]
+[ext_resource type="Theme" path="res://Scenes/ui_theme.tres" id="9_theme"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn_normal"]
 content_margin_left = 12.0
@@ -42,6 +43,7 @@ modulate_color = Color(1.15, 1.15, 1.15, 1)
 draw_center = false
 
 [node name="mainmenu" type="Control" unique_id=2074724687]
+theme = ExtResource("9_theme")
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

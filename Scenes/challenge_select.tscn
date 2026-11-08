@@ -1,6 +1,15 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://Scripts/ui/challenge_select.gd" id="1_cs"]
+[ext_resource type="Theme" path="res://Scenes/ui_theme.tres" id="9_theme"]
+[ext_resource type="Texture2D" uid="uid://sytie6mejyms" path="res://Art/ui/ui_settings_panel.png" id="8_bg"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_frost_bg"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+texture = ExtResource("8_bg")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_frost"]
 bg_color = Color(0.12, 0.1, 0.18, 0.92)
@@ -17,6 +26,7 @@ shadow_color = Color(0, 0, 0, 0.55)
 shadow_size = 12
 
 [node name="ChallengeSelect" type="Control"]
+theme = ExtResource("9_theme")
 process_mode = 3
 visible = false
 layout_mode = 3
@@ -44,31 +54,33 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -140.0
-offset_top = -120.0
-offset_right = 140.0
-offset_bottom = 120.0
+offset_left = -150.0
+offset_top = -150.0
+offset_right = 150.0
+offset_bottom = 150.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_frost")
+theme_override_styles/panel = SubResource("StyleBoxTexture_frost_bg")
 
 [node name="Title" type="Label" parent="Frost"]
 layout_mode = 0
-offset_top = 14.0
-offset_right = 280.0
-offset_bottom = 44.0
+offset_left = 10.0
+offset_top = 38.0
+offset_right = 290.0
+offset_bottom = 66.0
 theme_override_colors/font_color = Color(0.85, 0.78, 1, 1)
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
 text = "CHALLENGE"
 horizontal_alignment = 1
 
 [node name="ButtonList" type="VBoxContainer" parent="Frost"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 50.0
-offset_top = 56.0
-offset_right = 230.0
-offset_bottom = 170.0
+offset_left = 30.0
+offset_top = 74.0
+offset_right = 270.0
+offset_bottom = 188.0
 theme_override_constants/separation = 10
 alignment = 0
 
@@ -76,8 +88,8 @@ alignment = 0
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 84.0
-offset_top = 186.0
+offset_top = 200.0
 offset_right = 196.0
-offset_bottom = 222.0
+offset_bottom = 236.0
 theme_override_font_sizes/font_size = 18
 text = "BACK"

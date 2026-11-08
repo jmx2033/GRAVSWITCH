@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cmf5g8rwey2uk" path="res://Scripts/ui/pause_menu.gd" id="1_pm"]
 [ext_resource type="Texture2D" uid="uid://dv478o526tpud" path="res://Art/ui/ui_button.png" id="2_btn"]
+[ext_resource type="Theme" path="res://Scenes/ui_theme.tres" id="9_theme"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glass"]
 bg_color = Color(0.12, 0.1, 0.18, 0.9)
@@ -54,6 +55,7 @@ modulate_color = Color(1.15, 1.15, 1.15, 1)
 draw_center = false
 
 [node name="PauseMenu" type="Control" unique_id=516674994]
+theme = ExtResource("9_theme")
 process_mode = 3
 layout_mode = 3
 anchors_preset = 15
