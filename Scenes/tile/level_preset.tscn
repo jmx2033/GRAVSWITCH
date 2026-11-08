@@ -1,9 +1,9 @@
 [gd_scene format=4 uid="uid://ovm285fs6c3s"]
 
 [ext_resource type="TileSet" uid="uid://dpphdnueb46dl" path="res://Scenes/tileset_cave.tres" id="1_mrf6f"]
-[ext_resource type="PackedScene" uid="uid://u7jbmkf7gqyg" path="res://Scenes/gravity_zone.tscn" id="2_g5p86"]
+[ext_resource type="PackedScene" uid="uid://u7jbmkf7gqyg" path="res://Scenes/tile/gravity_zone.tscn" id="2_g5p86"]
 [ext_resource type="PackedScene" uid="uid://b11hj8ncr5db5" path="res://Scenes/player.tscn" id="3_s47sg"]
-[ext_resource type="PackedScene" path="res://Scenes/level_goal.tscn" id="6_few50"]
+[ext_resource type="PackedScene" uid="uid://bcc0efq3yy18v" path="res://Scenes/tile/level_goal.tscn" id="6_few50"]
 
 [node name="Level1" type="Node2D" unique_id=2016033099]
 

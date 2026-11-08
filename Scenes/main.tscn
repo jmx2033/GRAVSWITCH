@@ -1,18 +1,17 @@
 [gd_scene format=3 uid="uid://cohl7m1fxjefw"]
 
 [ext_resource type="Script" uid="uid://bpbbbi3ytoj0c" path="res://Scripts/core/game.gd" id="1_game"]
-[ext_resource type="PackedScene" uid="uid://c3weq7t8eyox8" path="res://Scenes/level_0.tscn" id="2_level0"]
-[ext_resource type="PackedScene" uid="uid://dr8k1m4oax2q" path="res://Scenes/level_1.tscn" id="2_level1"]
-[ext_resource type="PackedScene" uid="uid://bbuo1jxt14wjq" path="res://Scenes/level_2.tscn" id="2_jjvhh"]
-[ext_resource type="PackedScene" uid="uid://b717cwxbobabo" path="res://Scenes/level_3.tscn" id="2_kry3j"]
+[ext_resource type="PackedScene" uid="uid://bbuo1jxt14wjq" path="res://Scenes/level/normal/level_2.tscn" id="2_jjvhh"]
+[ext_resource type="PackedScene" uid="uid://b717cwxbobabo" path="res://Scenes/level/normal/level_3.tscn" id="2_kry3j"]
+[ext_resource type="PackedScene" uid="uid://c3weq7t8eyox8" path="res://Scenes/level/normal/level_0.tscn" id="2_level0"]
+[ext_resource type="PackedScene" uid="uid://dr8k1m4oax2q" path="res://Scenes/level/normal/level_1.tscn" id="2_level1"]
 [ext_resource type="Script" uid="uid://cto0ucty03wxl" path="res://Scripts/level/death_bounds.gd" id="3_bounds"]
 [ext_resource type="Texture2D" uid="uid://rmo458s4itmk" path="res://Art/bg/bg_cave.png" id="4_bg"]
-[ext_resource type="PackedScene" uid="uid://df2dbifp0v44c" path="res://Scenes/level_4.tscn" id="5_level4"]
-[ext_resource type="PackedScene" uid="uid://df2dbifp0v45d" path="res://Scenes/level_5.tscn" id="6_level5"]
+[ext_resource type="PackedScene" uid="uid://df2dbifp0v44c" path="res://Scenes/level/normal/level_4.tscn" id="5_level4"]
 
 [node name="Game2" type="Node" unique_id=821458268]
 script = ExtResource("1_game")
-levels = Array[PackedScene]([ExtResource("2_level0"), ExtResource("2_level1"), ExtResource("2_jjvhh"), ExtResource("2_kry3j"), ExtResource("5_level4"), ExtResource("6_level5")])
+levels = Array[PackedScene]([ExtResource("2_level0"), ExtResource("2_level1"), ExtResource("2_jjvhh"), ExtResource("2_kry3j"), ExtResource("5_level4")])
 
 [node name="Background" type="Sprite2D" parent="." unique_id=1100223344]
 z_index = -100
