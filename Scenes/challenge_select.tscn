@@ -1,8 +1,8 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://diw1uir7cwrjx"]
 
-[ext_resource type="Script" path="res://Scripts/ui/challenge_select.gd" id="1_cs"]
-[ext_resource type="Theme" path="res://Scenes/ui_theme.tres" id="9_theme"]
+[ext_resource type="Script" uid="uid://8g7cn5tbk5oo" path="res://Scripts/ui/challenge_select.gd" id="1_cs"]
 [ext_resource type="Texture2D" uid="uid://sytie6mejyms" path="res://Art/ui/ui_settings_panel.png" id="8_bg"]
+[ext_resource type="Theme" path="res://Scenes/ui_theme.tres" id="9_theme"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_frost_bg"]
 content_margin_left = 0.0
@@ -11,43 +11,28 @@ content_margin_right = 0.0
 content_margin_bottom = 0.0
 texture = ExtResource("8_bg")
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_frost"]
-bg_color = Color(0.12, 0.1, 0.18, 0.92)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.85, 0.78, 1, 0.6)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_color = Color(0, 0, 0, 0.55)
-shadow_size = 12
-
-[node name="ChallengeSelect" type="Control"]
-theme = ExtResource("9_theme")
+[node name="ChallengeSelect" type="Control" unique_id=1807175851]
 process_mode = 3
-visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("9_theme")
 script = ExtResource("1_cs")
 
-[node name="Dim" type="ColorRect" parent="."]
-mouse_filter = 2
+[node name="Dim" type="ColorRect" parent="." unique_id=553911501]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 color = Color(0.01, 0.008, 0.03, 0.72)
 
-[node name="Frost" type="Panel" parent="."]
+[node name="Frost" type="Panel" parent="." unique_id=1305324430]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -62,7 +47,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxTexture_frost_bg")
 
-[node name="Title" type="Label" parent="Frost"]
+[node name="Title" type="Label" parent="Frost" unique_id=1991915930]
 layout_mode = 0
 offset_left = 10.0
 offset_top = 38.0
@@ -70,11 +55,10 @@ offset_right = 290.0
 offset_bottom = 66.0
 theme_override_colors/font_color = Color(0.85, 0.78, 1, 1)
 theme_override_font_sizes/font_size = 18
-horizontal_alignment = 1
 text = "CHALLENGE"
 horizontal_alignment = 1
 
-[node name="ButtonList" type="VBoxContainer" parent="Frost"]
+[node name="ButtonList" type="VBoxContainer" parent="Frost" unique_id=1538707424]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 30.0
@@ -82,14 +66,13 @@ offset_top = 74.0
 offset_right = 270.0
 offset_bottom = 188.0
 theme_override_constants/separation = 10
-alignment = 0
 
-[node name="ButtonBack" type="Button" parent="Frost"]
+[node name="ButtonBack" type="Button" parent="Frost" unique_id=1579438623]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 84.0
-offset_top = 200.0
-offset_right = 196.0
-offset_bottom = 236.0
+offset_left = 100.0
+offset_top = 258.0
+offset_right = 200.0
+offset_bottom = 284.0
 theme_override_font_sizes/font_size = 18
 text = "BACK"

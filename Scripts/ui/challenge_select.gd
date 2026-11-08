@@ -16,7 +16,7 @@ const CHALLENGE_SCENES: Array[PackedScene] = [
 ]
 
 ## 挑战关名称，和 CHALLENGE_SCENES 一一对应。
-const CHALLENGE_NAMES := ["挑战 1", "挑战 2 逆流", "挑战 3 失重走廊", "挑战 4"]
+const CHALLENGE_NAMES := ["挑战 1", "挑战 2 ", "挑战 3 ", "挑战 4"]
 
 @onready var _list: VBoxContainer = %ButtonList
 @onready var _btn_back: Button = %ButtonBack

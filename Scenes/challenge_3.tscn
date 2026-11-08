@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://b11hj8ncr5db5" path="res://Scenes/player.tscn" id="4_vlstb"]
 [ext_resource type="PackedScene" uid="uid://bcc0efq3yy18v" path="res://Scenes/tile/level_goal.tscn" id="5_u0n0i"]
 [ext_resource type="PackedScene" uid="uid://cnnosxglxyvx3" path="res://Scenes/tile/spike.tscn" id="8_vlstb"]
+[ext_resource type="Texture2D" uid="uid://dgy7cjbu1dbs2" path="res://Art/tiles/spr_arch.png" id="20_arch"]
 
 [node name="challenge_3" type="Node2D" unique_id=2016033099]
 script = ExtResource("1_rn5wh")
@@ -60,6 +61,10 @@ position = Vector2(50, 300)
 
 [node name="LevelGoal" parent="." unique_id=2024212454 instance=ExtResource("5_u0n0i")]
 position = Vector2(576, 32)
+
+[node name="GoalArch" type="Sprite2D" parent="."]
+position = Vector2(592, 28)
+texture = ExtResource("20_arch")
 
 [node name="Spike" parent="." unique_id=1755118528 instance=ExtResource("8_vlstb")]
 position = Vector2(591.00006, 161)
